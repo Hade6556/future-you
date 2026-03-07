@@ -20,29 +20,29 @@ interface IntakeApiResponse {
 }
 
 const MOCK_RESPONSE: IntakeApiResponse = {
-  values: ["Autonomy", "Craft excellence", "Health", "Adventure"],
-  roles: ["Calm founder", "Creative director", "Connector", "Athlete"],
+  values: ["Discipline", "Growth", "Health", "Creativity"],
+  roles: ["Focused founder", "Endurance athlete", "Creative thinker", "Wellness advocate"],
   paths: [
     {
       name: "Balanced Builder",
       description:
-        "Grow your studio to $30k/mo while keeping 4-day weeks. Layer in 2 flagship clients and protect creative time.",
+        "Build your venture while protecting energy. Grow revenue steadily, train 3x a week, and protect creative time.",
       timeHorizon: "9-12 months",
-      tradeoffs: "Slower growth, more focus on systemizing ops",
+      tradeoffs: "Slower growth, stronger foundation",
     },
     {
-      name: "All-in Lab",
+      name: "Peak Performance Sprint",
       description:
-        "Launch a Future You product sprint. Build in public, run weekly opportunity scans, ship one offer per month.",
-      timeHorizon: "6 months",
-      tradeoffs: "Higher stress, more public accountability",
-    },
-    {
-      name: "Restoration Arc",
-      description:
-        "Prioritize health, depth, and network. Train daily, host small salons, and rebuild energy before the next push.",
+        "Go all-in on fitness and discipline. Train daily, track nutrition, build the habits that make everything else easier.",
       timeHorizon: "3 months",
-      tradeoffs: "Revenue plateaus short-term",
+      tradeoffs: "Less time for projects, maximum physical gains",
+    },
+    {
+      name: "Creative Momentum",
+      description:
+        "Ship one creative project per month. Whether it's content, art, or a product — build in public and find your audience.",
+      timeHorizon: "6 months",
+      tradeoffs: "Higher output pressure, more public accountability",
     },
   ],
 };
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         {
           role: "system",
           content:
-            "You are Future You, an ambitious but calm planner. Always reply with valid JSON only.",
+            "You are Future Me, an AI life coach that helps people with any ambition — business, fitness, weight loss, creativity, academics, or personal wellness. You are warm, focused, and action-oriented. Always reply with valid JSON only.",
         },
         {
           role: "user",
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
       "tradeoffs": ""
     }
   ]
-}\nEach path should highlight a different mode (balanced, intense, restorative, etc.).\nNarrative: ${narrative}\nPreferred tone: ${body.tone ?? "Calming mentor"}\nReturn ONLY JSON.`,
+}\nEach path should highlight a different approach suited to the user's ambition (e.g., balanced, intense, restorative, creative). Include cross-domain suggestions covering fitness, business, creativity, or wellness as relevant.\nNarrative: ${narrative}\nPreferred tone: ${body.tone ?? "Life Coach"}\nReturn ONLY JSON.`,
         },
       ],
     });
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("/api/intake error", error);
     return NextResponse.json(
-      { error: "Unable to structure Future You right now" },
+      { error: "Future Me hit a snag. Try again in a moment." },
       { status: 500 }
     );
   }
