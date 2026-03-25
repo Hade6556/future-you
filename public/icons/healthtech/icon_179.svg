@@ -1,0 +1,12 @@
+<svg width="72.00" height="72.00" viewBox="390.00 1576.00 72.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="394" y="1580" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <circle cx="426" cy="1612" r="1" fill="#4B3425" />
+
+  <circle cx="422" cy="1612" r="1" fill="#4B3425" />
+
+  <circle cx="430" cy="1612" r="1" fill="#4B3425" />
+
+  <path d="M431 1608C433.209 1608 435 1609.79 435 1612C435 1614.21 433.209 1616 431 1616L421 1616C418.791 1616 417 1614.21 417 1612C417 1609.79 418.791 1608 421 1608L431 1608Z" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

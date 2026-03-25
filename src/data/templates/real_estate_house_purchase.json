@@ -1,0 +1,129 @@
+{
+  "horizon_weeks": 52,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Financial Readiness",
+      "duration_weeks": 12,
+      "goal": "Credit score 720+, down payment saved, debt-to-income ratio under 43%",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Pull all three credit reports",
+          "description": "Use AnnualCreditReport.com to pull Experian, TransUnion, and Equifax reports for free. Dispute any inaccuracies via certified mail — this alone can add 20–40 points.",
+          "duration_weeks": 2,
+          "resources": ["https://annualcreditreport.com"],
+          "success_metric": "All three reports reviewed, disputes filed if needed"
+        },
+        {
+          "step_number": 2,
+          "title": "Eliminate high-interest debt",
+          "description": "Pay down credit cards to below 30% utilization (ideally below 10%). Do not close old accounts — length of history matters. Avoid opening new credit lines for 6 months before applying.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "All credit cards under 30% utilization"
+        },
+        {
+          "step_number": 3,
+          "title": "Build dedicated down payment fund",
+          "description": "Target 20% down to avoid PMI (private mortgage insurance). Research first-time buyer programs: FHA (3.5% down), Fannie Mae HomeReady (3%), state-level assistance programs. Open a dedicated HYSA for this fund.",
+          "duration_weeks": 12,
+          "resources": ["https://www.hud.gov/buying/localbuying", "https://www.fanniemae.com/homeready"],
+          "success_metric": "Down payment account at target balance"
+        }
+      ],
+      "milestones": ["Credit score 720+", "Down payment 100% saved", "DTI ratio under 43%"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Market Research & Pre-Approval",
+      "duration_weeks": 8,
+      "goal": "Understand target neighborhoods, secure mortgage pre-approval letter",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Get pre-approved by 3 lenders",
+          "description": "Shop at least 3 lenders (2 banks + 1 mortgage broker). Rate shopping within a 14-day window counts as a single hard inquiry. Compare APR, not just interest rate. Lock rate when ready.",
+          "duration_weeks": 2,
+          "resources": ["https://www.consumerfinance.gov/owning-a-home/loan-options/"],
+          "success_metric": "Pre-approval letter from best lender in hand"
+        },
+        {
+          "step_number": 5,
+          "title": "Define target neighborhood criteria",
+          "description": "Evaluate: commute time (≤30 min?), school district ratings, walkability score, price-per-sqft trends (3-year trajectory), flood zone status, HOA fees. Use Redfin and Zillow market reports.",
+          "duration_weeks": 4,
+          "resources": ["https://redfin.com", "https://zillow.com", "https://www.walkscore.com"],
+          "success_metric": "3 target neighborhoods ranked and documented"
+        },
+        {
+          "step_number": 6,
+          "title": "Hire a buyer's agent",
+          "description": "The seller pays both agents' commissions in most markets — representation is effectively free to you. Interview 3 agents. Choose one who specializes in your target neighborhoods.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Buyer's agent signed and briefed on criteria"
+        }
+      ],
+      "milestones": ["Pre-approval letter received", "Agent contracted", "Search criteria locked"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Active Search & Offer",
+      "duration_weeks": 20,
+      "goal": "Tour properties, make a competitive offer, get it accepted",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Active house hunting",
+          "description": "Tour minimum 10 properties before making an offer. Track pros/cons in a spreadsheet. Note: cosmetic issues are cheap to fix; structural and location issues are not. Attend open houses in target neighborhoods.",
+          "duration_weeks": 16,
+          "resources": [],
+          "success_metric": "10+ properties toured, top 3 shortlisted"
+        },
+        {
+          "step_number": 8,
+          "title": "Make a competitive offer",
+          "description": "Include inspection contingency, appraisal contingency, and financing contingency. Use an escalation clause in competitive markets. Write a personal buyer letter for emotional appeal. Move quickly on properties you love.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Offer accepted by seller"
+        }
+      ],
+      "milestones": ["10+ properties toured", "Offer accepted"]
+    },
+    {
+      "phase_number": 4,
+      "phase_name": "Closing",
+      "duration_weeks": 6,
+      "goal": "Inspection, appraisal, underwriting — keys in hand",
+      "steps": [
+        {
+          "step_number": 9,
+          "title": "Home inspection and negotiation",
+          "description": "Hire an independent licensed inspector ($300–$500). Do not waive this contingency. Use findings to negotiate repairs or seller credits. Walk away from serious structural or environmental issues.",
+          "duration_weeks": 2,
+          "resources": ["https://www.ashi.org/find-inspector"],
+          "success_metric": "Inspection report reviewed, all issues addressed"
+        },
+        {
+          "step_number": 10,
+          "title": "Underwriting and closing prep",
+          "description": "Respond immediately to lender document requests. Do not change jobs, take on new debt, or make large purchases during this period. Purchase homeowners insurance before closing day.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "Clear to close issued by lender"
+        },
+        {
+          "step_number": 11,
+          "title": "Closing day",
+          "description": "Do a final walkthrough 24 hours before closing. Wire closing costs only to verified escrow account (confirm routing number via phone — wire fraud is common). Sign documents, receive keys.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Deed recorded in your name, keys received"
+        }
+      ],
+      "milestones": ["Inspection cleared", "Clear to close", "Keys in hand"]
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "horizon_weeks": 8,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Foundation",
+      "duration_weeks": 2,
+      "goal": "Identify your stress triggers and establish baseline recovery habits",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Run a stress audit",
+          "description": "For 7 days, note the top 3 things that drained you each day and the top 3 that restored you. Most people are surprised to find their biggest stressors are structural (commitments, environment) not situational.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "7-day stress journal completed"
+        },
+        {
+          "step_number": 2,
+          "title": "Prioritise sleep as your #1 lever",
+          "description": "Set a consistent bedtime and wake time — even on weekends. Remove screens from your bedroom. Sleep is the single highest-ROI wellbeing intervention. Everything else depends on it.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Consistent sleep schedule maintained for 2 weeks"
+        }
+      ],
+      "milestones": ["Stress audit complete", "Sleep schedule established"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Recovery System",
+      "duration_weeks": 4,
+      "goal": "Build daily and weekly recovery rituals that stick",
+      "steps": [
+        {
+          "step_number": 3,
+          "title": "Build a morning anchor",
+          "description": "Create a 15-minute morning routine that starts your day on your terms — before email, before news, before demands. Options: 5 min stretch, 5 min journaling, 5 min breathing. The content matters less than the consistency.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "Morning routine completed 5+ days per week for 3 weeks"
+        },
+        {
+          "step_number": 4,
+          "title": "Add daily movement",
+          "description": "30-minute walks are proven to reduce cortisol, improve mood, and aid sleep. This isn't fitness training — it's a stress management tool. Walking outside in daylight amplifies all three benefits.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Daily 30-minute walk completed 5+ days per week"
+        },
+        {
+          "step_number": 5,
+          "title": "Set clear work/rest boundaries",
+          "description": "Define a hard stop time for work each day. Create a shutdown ritual: write tomorrow's top 3 priorities, close all tabs, step away. This trains your brain to fully disengage, which makes rest actually restorative.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Hard stop respected at least 4 days per week for 4 weeks"
+        }
+      ],
+      "milestones": ["Morning routine locked in", "Daily movement habit built", "Work/rest boundaries established"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Sustainable Wellbeing",
+      "duration_weeks": 2,
+      "goal": "Embed habits into a long-term system that doesn't require willpower",
+      "steps": [
+        {
+          "step_number": 6,
+          "title": "Design your environment for recovery",
+          "description": "Make the healthy choice the easy choice. Phone charger outside the bedroom, walking shoes by the door, journal on the pillow. Reduce friction for recovery habits and increase friction for stress triggers.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Environment redesigned to support 3+ wellbeing habits"
+        },
+        {
+          "step_number": 7,
+          "title": "Weekly review and recalibration",
+          "description": "Every Sunday, spend 10 minutes reviewing the week: What drained me? What restored me? What do I need to protect or eliminate this coming week? This loop keeps your system self-correcting.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Weekly review completed for 2 consecutive weeks"
+        }
+      ],
+      "milestones": ["Environment redesigned", "Weekly review system live", "Wellbeing system self-sustaining"]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "horizon_weeks": 52,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Idea Validation",
+      "duration_weeks": 8,
+      "goal": "Validate a real problem exists before writing any code or spending money",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Problem discovery interviews",
+          "description": "Interview 20 target customers about the problem space. Do NOT pitch your solution. Ask: 'Tell me about the last time you struggled with X.' Listen for pain intensity, frequency, and current workarounds. A problem worth solving has all three.",
+          "duration_weeks": 4,
+          "resources": ["https://www.momtestbook.com"],
+          "success_metric": "20 interviews completed, clear recurring pain pattern identified"
+        },
+        {
+          "step_number": 2,
+          "title": "Define the one-sentence problem statement",
+          "description": "Write: '[Target customer] struggle with [problem] because [root cause], which causes [consequence].' This must come from interview data, not assumptions. Share it with 5 interviewees and see if they nod.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Problem statement validated by 3+ interviewees"
+        },
+        {
+          "step_number": 3,
+          "title": "Identify existing alternatives and gaps",
+          "description": "Map every existing solution (competitors, workarounds, spreadsheets). Understand why they fall short for your target customer. Your differentiation comes from this gap.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Competitive landscape mapped, clear differentiation documented"
+        },
+        {
+          "step_number": 4,
+          "title": "Define MVP scope (single core feature)",
+          "description": "Write a one-page MVP spec: target customer, problem, one feature that solves it, and success metric. Ruthlessly cut everything else. The MVP exists to test one assumption, not to be a complete product.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "MVP spec document complete and reviewed"
+        }
+      ],
+      "milestones": ["20 customer interviews complete", "Problem statement validated", "MVP scope locked"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Build & Launch",
+      "duration_weeks": 16,
+      "goal": "Ship MVP to first paying customers as fast as possible",
+      "steps": [
+        {
+          "step_number": 5,
+          "title": "Build minimum lovable product",
+          "description": "Use no-code tools first (Bubble, Webflow, Airtable, Zapier). Only write custom code if no-code cannot do the job. Ship ugly and fast. Aim for a working product in 4–8 weeks, not 6 months.",
+          "duration_weeks": 8,
+          "resources": ["https://bubble.io", "https://webflow.com", "https://airtable.com"],
+          "success_metric": "5 beta users actively using the product"
+        },
+        {
+          "step_number": 6,
+          "title": "Charge from day one",
+          "description": "Even $1 validates that someone finds it valuable enough to pay. Free users give you feedback; paying users give you signal. Start with manual billing if needed — do not spend weeks building payment infrastructure.",
+          "duration_weeks": 4,
+          "resources": ["https://stripe.com"],
+          "success_metric": "First dollar of revenue received"
+        },
+        {
+          "step_number": 7,
+          "title": "Weekly user calls",
+          "description": "Call every active user weekly. Ask: 'What's the one thing that would make you cancel?' and 'What's the one thing you'd tell a friend about?' These answers drive your next 4 weeks of product work.",
+          "duration_weeks": 16,
+          "resources": [],
+          "success_metric": "Weekly call cadence established, feedback loop running"
+        }
+      ],
+      "milestones": ["MVP live", "First paying customer", "First $1,000 in revenue"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Traction",
+      "duration_weeks": 20,
+      "goal": "Reach $5K MRR or a strong user growth signal that justifies continued investment",
+      "steps": [
+        {
+          "step_number": 8,
+          "title": "Identify one repeatable acquisition channel",
+          "description": "Test 3 channels in parallel (content, paid ads, cold outreach, community, partnerships). Measure CAC and conversion rate. Double down on the channel with the best unit economics. Kill the others.",
+          "duration_weeks": 8,
+          "resources": ["https://www.indiehackers.com", "https://www.producthunt.com"],
+          "success_metric": "One acquisition channel with measurable, repeatable results"
+        },
+        {
+          "step_number": 9,
+          "title": "Improve retention and NPS",
+          "description": "Churn kills growth. Measure 30/60/90-day retention. Survey churned users. Fix the top 1-2 reasons people leave before adding new features.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "Month-1 retention above 60%, NPS above 30"
+        },
+        {
+          "step_number": 10,
+          "title": "Evaluate funding vs. bootstrap",
+          "description": "If growing organically to $5K MRR: consider staying bootstrapped. If you need to move faster or face a land-grab market: build investor relationships now. Attend startup events, join YC Startup School.",
+          "duration_weeks": 4,
+          "resources": ["https://startupschool.org", "https://www.ycombinator.com"],
+          "success_metric": "Funding strategy decided and documented"
+        }
+      ],
+      "milestones": ["$1K MRR", "$5K MRR", "Product-market fit signal confirmed", "Growth channel operational"]
+    },
+    {
+      "phase_number": 4,
+      "phase_name": "Scale",
+      "duration_weeks": 8,
+      "goal": "Build the team and infrastructure to grow beyond founder capacity",
+      "steps": [
+        {
+          "step_number": 11,
+          "title": "Make first key hire",
+          "description": "Hire for your biggest bottleneck. If you're engineering-constrained: hire engineer. If sales-constrained: hire salesperson. First hire must be someone you'd work for. Culture starts here.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "First hire onboarded and productive"
+        }
+      ],
+      "milestones": ["First employee hired", "$10K MRR", "Processes documented"]
+    }
+  ]
+}

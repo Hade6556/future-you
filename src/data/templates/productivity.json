@@ -1,0 +1,88 @@
+{
+  "horizon_weeks": 8,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Clarity",
+      "duration_weeks": 2,
+      "goal": "Identify your biggest time drains and define your most important work",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Run a time audit",
+          "description": "Track every activity in 30-minute blocks for 5 days. Most people are shocked to discover how little time goes to their most important work. The average knowledge worker spends less than 3 hours per day on deep, focused work.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "5-day time audit completed and top 3 time drains identified"
+        },
+        {
+          "step_number": 2,
+          "title": "Identify your MIT (Most Important Tasks)",
+          "description": "Each morning, identify the one task that — if completed — would make the day a success regardless of everything else. This is your MIT. Do it first, before email, before meetings. Everything else is secondary.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Daily MIT identified and completed first for 10 consecutive days"
+        }
+      ],
+      "milestones": ["Time audit complete", "Time drains identified", "MIT habit established"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Systems",
+      "duration_weeks": 4,
+      "goal": "Build reliable systems for capture, focus, and task management",
+      "steps": [
+        {
+          "step_number": 3,
+          "title": "Build a trusted capture system",
+          "description": "Your brain is for thinking, not storing. Write down every task, idea, and obligation as it arises — in one trusted place (Notion, Obsidian, paper). A full brain dump at the start of each week clears mental overhead and reduces the anxiety of forgetting.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Single trusted capture system set up and used for 2 weeks"
+        },
+        {
+          "step_number": 4,
+          "title": "Create protected deep work blocks",
+          "description": "Schedule 2-hour blocks of uninterrupted work in your calendar. Close email and Slack. Set your phone to Do Not Disturb. Tell your team. Deep work is rare and valuable — it can't happen in the gaps between notifications.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "2-hour deep work blocks protected 3+ times per week for 4 weeks"
+        },
+        {
+          "step_number": 5,
+          "title": "Implement a weekly review",
+          "description": "Every Friday or Sunday: review what you completed, what's outstanding, what's coming next week, and reset your task list. This 30-minute review prevents urgent tasks from crowding out important ones and keeps you operating strategically.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Weekly review completed for 4 consecutive weeks"
+        }
+      ],
+      "milestones": ["Capture system live", "Deep work blocks protected", "Weekly review running"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Optimisation",
+      "duration_weeks": 2,
+      "goal": "Eliminate the last major productivity leaks",
+      "steps": [
+        {
+          "step_number": 6,
+          "title": "Batch and eliminate low-value tasks",
+          "description": "Identify recurring tasks that can be batched (email twice a day, not constantly), delegated, or eliminated entirely. Every task you remove from your list is a permanent productivity gain. Say no more — every yes is a no to something else.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "At least 3 low-value tasks batched, delegated, or eliminated"
+        },
+        {
+          "step_number": 7,
+          "title": "Design your environment for focus",
+          "description": "Remove phone from desk during deep work. Use a separate browser profile for work. Use website blockers during focus sessions. Add friction to distracting apps. Add ease to focused work tools. Environment design beats willpower every time.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Physical and digital environment redesigned to support deep work"
+        }
+      ],
+      "milestones": ["Low-value tasks eliminated", "Environment optimised", "Operating at peak output"]
+    }
+  ]
+}

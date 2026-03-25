@@ -1,87 +1,217 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 import { usePlanStore } from "../state/planStore";
+import { Input } from "@/components/ui/input";
+import { createClient } from "@/lib/supabase/client";
+
+type AuthMode = "signup" | "login";
 
 export default function SignupPage() {
   const router = useRouter();
   const userName = usePlanStore((s) => s.userName);
   const onboardingComplete = usePlanStore((s) => s.onboardingComplete);
+  const setEmail = usePlanStore((s) => s.setEmail);
 
-  const handleContinue = () => {
-    if (!onboardingComplete) {
-      router.push("/onboarding");
-    } else {
-      router.push("/");
+  const [mode, setMode] = useState<AuthMode>("signup");
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmailInput] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const supabase = createClient();
+  const destination = onboardingComplete ? "/" : "/onboarding";
+
+  async function handleEmailAuth() {
+    if (!email || !password) {
+      setError("Please enter your email and password.");
+      return;
     }
-  };
+    setLoading(true);
+    setError(null);
+    try {
+      const { error: authError } =
+        mode === "signup"
+          ? await supabase.auth.signUp({ email, password })
+          : await supabase.auth.signInWithPassword({ email, password });
+
+      if (authError) {
+        setError(authError.message);
+      } else {
+        setEmail(email);
+        router.push(destination);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleAuth() {
+    setLoading(true);
+    setError(null);
+    const { error: authError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+    }
+  }
+
+  function handleSkip() {
+    router.push(destination);
+  }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-[#F8F6F1] px-6">
-      <div className="mx-auto w-full max-w-md">
-        <h1
-          className="text-center text-[28px] font-bold text-[#121212]"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
+    <div className="relative flex min-h-dvh flex-col items-center bg-background overflow-hidden" style={{ backgroundColor: "var(--canvas-base)" }}>
+      {/* Mascot hero */}
+      <div className="relative w-full flex justify-center pt-16 pb-2">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="relative h-[280px] w-[280px]"
         >
-          {userName ? `Save your plan, ${userName}` : "Create your account"}
-        </h1>
-        <p className="mt-2 text-center text-[15px] text-[#6A6A6A]">
-          Your plan is ready. Create an account to save it.
-        </p>
+          <Image
+            src="/orb-pointing.png"
+            alt="Future You"
+            fill
+            className="object-contain drop-shadow-2xl"
+            priority
+          />
+        </motion.div>
+      </div>
 
-        {/* Social sign-up (primary) */}
-        <div className="mt-8 flex flex-col gap-3">
-          <button
-            onClick={handleContinue}
-            className="flex h-[56px] w-full items-center justify-center gap-3 rounded-[28px] bg-[#121212] text-[17px] font-semibold text-white transition-transform active:scale-[0.97]"
+      {/* Content */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1 }}
+        className="flex w-full max-w-sm flex-col items-center gap-4 px-6 pb-10"
+      >
+        <h1 className="text-center font-display text-[28px] font-semibold text-foreground">
+          {userName ? `Save your plan, ${userName}` : "Sign up"}
+        </h1>
+
+        {/* Primary CTA */}
+        {!showEmailForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex w-full flex-col gap-3 mt-2"
           >
-            <GoogleIcon />
-            Continue with Google
-          </button>
-          <button
-            onClick={handleContinue}
-            className="flex h-[56px] w-full items-center justify-center gap-3 rounded-[28px] bg-[#121212] text-[17px] font-semibold text-white transition-transform active:scale-[0.97]"
-          >
-            <AppleIcon />
-            Continue with Apple
-          </button>
-        </div>
+            <button
+              onClick={() => { setMode("signup"); setShowEmailForm(true); }}
+              className="h-14 w-full rounded-2xl bg-primary text-[16px] font-semibold text-primary-foreground transition-opacity hover:bg-primary-hover active:scale-[0.98]"
+            >
+              Create account
+            </button>
+            <button
+              onClick={() => { setMode("login"); setShowEmailForm(true); }}
+              className="h-14 w-full rounded-2xl border-2 border-border bg-card text-[16px] font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+            >
+              I already have an account
+            </button>
+          </motion.div>
+        )}
+
+        {/* Email form */}
+        <AnimatePresence>
+          {showEmailForm && (
+            <motion.div
+              key="email-form"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="flex w-full flex-col gap-3 overflow-hidden"
+            >
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmailInput(e.target.value)}
+                disabled={loading}
+                className="h-14 rounded-2xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                onKeyDown={(e) => { if (e.key === "Enter") void handleEmailAuth(); }}
+                className="h-14 rounded-2xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+              {error && <p className="text-sm text-destructive text-center">{error}</p>}
+              <button
+                onClick={() => void handleEmailAuth()}
+                disabled={loading}
+                className="h-14 w-full rounded-2xl bg-primary text-[16px] font-semibold text-primary-foreground transition-opacity hover:bg-primary-hover disabled:opacity-50 active:scale-[0.98]"
+              >
+                {loading ? "..." : mode === "signup" ? "Create account" : "Sign in"}
+              </button>
+              {mode === "login" && (
+                <Link
+                  href="/forgot-password"
+                  className="text-center text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                >
+                  Forgot password?
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowEmailForm(false)}
+                className="text-center text-sm text-muted-foreground hover:text-foreground"
+              >
+                ← Back
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Divider */}
-        <div className="mt-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#E0E0E0]" />
-          <span className="text-[13px] text-[#6A6A6A]">or</span>
-          <div className="h-px flex-1 bg-[#E0E0E0]" />
-        </div>
+        {!showEmailForm && (
+          <div className="flex w-full items-center gap-3 my-1">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[15px] font-medium text-muted-foreground">or continue with</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+        )}
 
-        {/* Email/password (secondary) */}
-        <div className="mt-6 flex flex-col gap-3">
-          <input
-            type="email"
-            placeholder="Email"
-            className="h-[48px] w-full rounded-2xl border border-[#E0E0E0] bg-white px-4 text-[15px] text-[#121212] placeholder:text-[#121212]/30 focus:border-[#121212] focus:outline-none"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="h-[48px] w-full rounded-2xl border border-[#E0E0E0] bg-white px-4 text-[15px] text-[#121212] placeholder:text-[#121212]/30 focus:border-[#121212] focus:outline-none"
-          />
+        {/* Social buttons */}
+        {!showEmailForm && (
           <button
-            onClick={handleContinue}
-            className="flex h-[48px] w-full items-center justify-center rounded-[24px] border border-[#121212] text-[15px] font-semibold text-[#121212] transition-transform active:scale-[0.97]"
+            onClick={() => void handleGoogleAuth()}
+            disabled={loading}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-border bg-card text-[15px] font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
           >
-            Create account
+            <GoogleIcon />
+            <span>Continue with Google</span>
           </button>
-        </div>
+        )}
 
         {/* Skip */}
         <button
-          onClick={handleContinue}
-          className="mx-auto mt-6 block text-[14px] text-[#6A6A6A] underline"
+          onClick={handleSkip}
+          className="mt-4 text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
         >
           Skip for now
         </button>
-      </div>
+
+        {/* Legal */}
+        <p className="mt-2 text-center text-[11px] text-muted-foreground/60">
+          By continuing you agree to our{" "}
+          <Link href="/terms" className="underline hover:text-muted-foreground">Terms</Link>
+          {" "}and{" "}
+          <Link href="/privacy" className="underline hover:text-muted-foreground">Privacy Policy</Link>
+        </p>
+      </motion.div>
     </div>
   );
 }
@@ -97,10 +227,3 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-    </svg>
-  );
-}

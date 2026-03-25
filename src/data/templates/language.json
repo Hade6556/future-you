@@ -1,0 +1,96 @@
+{
+  "horizon_weeks": 20,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Foundation",
+      "duration_weeks": 4,
+      "goal": "Build a daily habit and learn the 1,000 most common words",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Commit to 30 minutes daily — no exceptions",
+          "description": "Language learning is a long-term game won by consistency, not intensity. 30 minutes every day beats 3.5 hours once a week. Set a specific time, use a habit tracker, and protect it like a meeting.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "30-minute daily study session maintained for 28 consecutive days"
+        },
+        {
+          "step_number": 2,
+          "title": "Learn the top 1,000 words with spaced repetition",
+          "description": "80% of everyday conversation uses only ~1,000 words. Use Anki with a pre-built frequency deck for your target language. The goal in this phase is vocabulary — not grammar. You can say a lot with 1,000 words and a few grammar patterns.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "500 words reviewed and retained in Anki"
+        },
+        {
+          "step_number": 3,
+          "title": "Learn the 10 core grammar patterns",
+          "description": "Focus on: present tense, past tense, future, negation, questions, articles, pronouns, common prepositions, adjective agreement, and verb conjugation. Don't try to learn all grammar — just enough to build sentences.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "10 core grammar patterns studied and able to form basic sentences"
+        }
+      ],
+      "milestones": ["Daily habit established", "500 words learned", "Core grammar understood"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Immersion",
+      "duration_weeks": 10,
+      "goal": "Build comprehensible input habit and start speaking",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Add 30 minutes of comprehensible input daily",
+          "description": "Listening and reading at your level (slightly challenging but mostly understandable) is how humans naturally acquire language. Start with beginner podcasts or graded readers, then progress to native content with subtitles.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "Daily comprehensible input habit (podcasts, shows, books) established"
+        },
+        {
+          "step_number": 5,
+          "title": "Find a language exchange partner",
+          "description": "Book weekly 1-hour sessions on Italki or with a language exchange partner. First 30 minutes in your target language, second 30 in theirs. Speaking with a real person accelerates progress more than any app.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "Weekly conversation sessions booked and running for 8 weeks"
+        },
+        {
+          "step_number": 6,
+          "title": "Immerse your daily environment",
+          "description": "Change your phone language. Follow native speakers on social media. Watch TV shows in your target language. Listen to music. The goal is exposure whenever your attention is available — not just scheduled study time.",
+          "duration_weeks": 10,
+          "resources": [],
+          "success_metric": "Phone set to target language and at least 2 daily immersion habits in place"
+        }
+      ],
+      "milestones": ["Daily input habit built", "Conversation partner found", "Environment fully immersed"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Fluency Sprint",
+      "duration_weeks": 6,
+      "goal": "Reach conversational confidence and push toward fluency",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Increase speaking sessions to 3x per week",
+          "description": "Speaking is the hardest skill but the most important. Increase to 3 conversation sessions per week. Focus on topics you care about — sports, business, travel, food. The more you enjoy the conversations, the faster you'll improve.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "3 conversation sessions per week maintained for 6 weeks"
+        },
+        {
+          "step_number": 8,
+          "title": "Consume native content without subtitles",
+          "description": "Start watching/listening to native content without English subtitles. Use target-language subtitles if needed. This trains your ear for real-speed speech, accents, and colloquial expressions that textbooks miss.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Able to follow native-speed content with target-language subtitles only"
+        }
+      ],
+      "milestones": ["Holding 10-minute conversations", "Following native content", "Conversational confidence reached"]
+    }
+  ]
+}

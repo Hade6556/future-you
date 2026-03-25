@@ -29,10 +29,10 @@ export function NorthStarButton({ isOpen, onClick }: NorthStarButtonProps) {
       type="button"
       onClick={onClick}
       aria-label="Open Future Me coach"
-      className={`relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02030b] ${pulse ? "orb-pulse" : ""}`}
+      className={`relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cool/60 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas-frame ${pulse ? "orb-pulse" : ""}`}
       style={{
-        background: "linear-gradient(135deg, #4B5DFF 0%, #A277FF 100%)",
-        boxShadow: pulse ? undefined : "inset 0 0 32px rgba(255,255,255,0.12)",
+        background: "var(--plasma-glow)",
+        boxShadow: pulse ? undefined : "inset 0 0 32px rgba(255,255,255,0.15), 0 4px 20px var(--accent-primary-glow-strong)",
       }}
       initial={false}
       animate={{
@@ -44,9 +44,9 @@ export function NorthStarButton({ isOpen, onClick }: NorthStarButtonProps) {
     >
       {/* Inner halo: solid ring just outside orb, no blur */}
       <span
-        className="pointer-events-none absolute inset-[-6px] rounded-full border-2 border-white/20"
+        className="pointer-events-none absolute inset-[-6px] rounded-full border-2 border-primary/20"
         style={{
-          background: "linear-gradient(135deg, rgba(75,93,255,0.25) 0%, rgba(162,119,255,0.25) 100%)",
+          background: "var(--accent-primary-glow)",
         }}
         aria-hidden
       />
@@ -55,7 +55,7 @@ export function NorthStarButton({ isOpen, onClick }: NorthStarButtonProps) {
         <span
           className="pointer-events-none absolute inset-[-16px] rounded-full"
           style={{
-            background: "radial-gradient(circle, rgba(75,93,255,0.35) 0%, rgba(162,119,255,0.2) 40%, transparent 70%)",
+            background: "radial-gradient(circle, var(--accent-primary-glow-strong) 0%, var(--accent-primary-glow) 40%, transparent 70%)",
             filter: "blur(8px)",
           }}
           aria-hidden

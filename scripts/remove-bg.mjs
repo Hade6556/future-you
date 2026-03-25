@@ -15,7 +15,7 @@ for (const file of files) {
   console.log(`Processing ${file}...`);
 
   const image = sharp(filePath);
-  const { width, height, channels } = await image.metadata();
+  const { width, height } = await image.metadata();
 
   const raw = await image.ensureAlpha().raw().toBuffer();
 

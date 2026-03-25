@@ -9,20 +9,21 @@ export type AmbitionDomain =
 export type Archetype = {
   id: string;
   name: string;
-  emoji: string;
   tagline: string;
   description: string;
   strengths: string[];
   watchOuts: string[];
   bestFor: AmbitionDomain[];
   ritualStyle: string;
+  strengthInsight: string;
+  watchOutInsight: string;
+  thriveInsight: string;
 };
 
 export const ARCHETYPES: Archetype[] = [
   {
     id: "steady",
     name: "The Steady Builder",
-    emoji: "🧱",
     tagline: "Steady wins the race",
     description:
       "You're consistent, warm, and show up every single day. You build trust through reliability and lift others while climbing yourself.",
@@ -30,11 +31,13 @@ export const ARCHETYPES: Archetype[] = [
     watchOuts: ["Overcommitting", "Neglecting own needs"],
     bestFor: ["entrepreneur", "wellness"],
     ritualStyle: "Steady daily habits with community check-ins",
+    strengthInsight: "You don't need a perfect day to keep going. That quiet consistency compounds into results most people never reach.",
+    watchOutInsight: "You say yes because you care — but spreading too thin erodes the very consistency that makes you unstoppable.",
+    thriveInsight: "Give you a real goal with real stakes — building a business, owning your health — and you become a force.",
   },
   {
     id: "strategist",
     name: "The Laser Strategist",
-    emoji: "🎯",
     tagline: "Laser focus, maximum output",
     description:
       "You thrive on intensity and precision. Give you a goal and you'll engineer the fastest path there — no distractions.",
@@ -42,11 +45,13 @@ export const ARCHETYPES: Archetype[] = [
     watchOuts: ["Burnout", "Perfectionism"],
     bestFor: ["entrepreneur", "student"],
     ritualStyle: "Structured sprints with recovery blocks",
+    strengthInsight: "You can lock in and outwork almost anyone when the mission is clear. That depth of focus is rare.",
+    watchOutInsight: "You push until the engine overheats. Rest isn't weakness — it's the thing that keeps you sharp.",
+    thriveInsight: "Complex problems with no obvious answer. Systems, strategy, and decisions that actually matter.",
   },
   {
     id: "endurance",
     name: "The Endurance Engine",
-    emoji: "⛰️",
     tagline: "Built for the long haul",
     description:
       "You were made for endurance. You don't sprint — you sustain. Whether it's a marathon or a business, you outlast everyone.",
@@ -54,11 +59,13 @@ export const ARCHETYPES: Archetype[] = [
     watchOuts: ["Ignoring rest", "Going solo too long"],
     bestFor: ["athlete", "weight_loss"],
     ritualStyle: "Progressive overload with mindful rest days",
+    strengthInsight: "Where others quit, you grind. Your capacity to absorb difficulty and keep moving is your greatest asset.",
+    watchOutInsight: "You can endure almost anything — except asking for help. Don't let pride rob you of momentum.",
+    thriveInsight: "Physical challenges and long-game goals. Anything that rewards the person who simply refuses to stop.",
   },
   {
     id: "creative",
     name: "The Creative Spark",
-    emoji: "✨",
     tagline: "Smart, stylish, surprising",
     description:
       "You approach every challenge with creativity and flair. You see solutions others miss and make the journey look effortless.",
@@ -66,11 +73,13 @@ export const ARCHETYPES: Archetype[] = [
     watchOuts: ["Shiny object syndrome", "Overthinking"],
     bestFor: ["creative", "entrepreneur"],
     ritualStyle: "Flexible blocks with creative exploration time",
+    strengthInsight: "You see angles others miss entirely. That creative edge turns ordinary problems into real breakthroughs.",
+    watchOutInsight: "A dozen exciting ideas can pull you in a dozen directions at once. Pick one and go deep.",
+    thriveInsight: "Original work, free experimentation, and any space where trying something new is the point.",
   },
   {
     id: "guardian",
     name: "The Guardian",
-    emoji: "🛡️",
     tagline: "Protect what matters, build what lasts",
     description:
       "You're driven by purpose and protection. You build systems that protect your health, family, and future — no shortcuts.",
@@ -78,11 +87,13 @@ export const ARCHETYPES: Archetype[] = [
     watchOuts: ["Rigidity", "Control"],
     bestFor: ["weight_loss", "wellness", "athlete"],
     ritualStyle: "Strict routine with accountability partners",
+    strengthInsight: "Structure is your superpower. When others crumble under pressure, your discipline keeps you moving forward.",
+    watchOutInsight: "Rigid systems protect you — until they trap you. Build in flexibility before life forces it on you.",
+    thriveInsight: "High-stakes health and physical performance. You flourish when the rules are clear and the mission is real.",
   },
   {
     id: "explorer",
     name: "The Explorer",
-    emoji: "🚀",
     tagline: "Every day is an adventure",
     description:
       "You bring enthusiasm and joy to everything you do. You learn fast, bounce back faster, and make growth feel like play.",
@@ -90,16 +101,19 @@ export const ARCHETYPES: Archetype[] = [
     watchOuts: ["Scattered energy", "Avoiding hard things"],
     bestFor: ["student", "creative", "wellness"],
     ritualStyle: "Gamified challenges with variety and rewards",
+    strengthInsight: "Your enthusiasm is contagious and your learning curve is steep in the best way. You pick things up fast.",
+    watchOutInsight: "The next exciting thing can steal your focus just before the current thing pays off. Stay the course.",
+    thriveInsight: "New skills, creative adventures, and any environment that rewards curiosity and growth.",
   },
 ];
 
-export const AMBITION_DOMAINS: { id: AmbitionDomain; label: string; emoji: string }[] = [
-  { id: "entrepreneur", label: "Build a business", emoji: "🚀" },
-  { id: "athlete", label: "Become an athlete", emoji: "🏋️" },
-  { id: "weight_loss", label: "Lose weight & get healthy", emoji: "💪" },
-  { id: "creative", label: "Create something amazing", emoji: "🎨" },
-  { id: "student", label: "Ace my studies", emoji: "📚" },
-  { id: "wellness", label: "Find balance & peace", emoji: "🧘" },
+export const AMBITION_DOMAINS: { id: AmbitionDomain; label: string }[] = [
+  { id: "entrepreneur", label: "Build a business" },
+  { id: "athlete", label: "Become an athlete" },
+  { id: "weight_loss", label: "Lose weight & get healthy" },
+  { id: "creative", label: "Create something amazing" },
+  { id: "student", label: "Ace my studies" },
+  { id: "wellness", label: "Find balance & peace" },
 ];
 
 export type QuizQuestion = {

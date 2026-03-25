@@ -1,0 +1,96 @@
+{
+  "horizon_weeks": 12,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Self-Awareness",
+      "duration_weeks": 3,
+      "goal": "Understand your relationship patterns and set clear intentions",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Map your current relationships",
+          "description": "List the 10 most important people in your life. Rate each relationship 1–10 for depth and quality. Identify 2–3 you want to deepen and any you've been neglecting. Most people are surprised how small their meaningful circle actually is.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Relationship map completed and priorities identified"
+        },
+        {
+          "step_number": 2,
+          "title": "Identify your blocking patterns",
+          "description": "Reflect honestly: Do you withdraw when stressed? Cancel plans too often? Struggle to be vulnerable? Keep conversation surface-level? The same pattern that limits one relationship limits all of them. Name it.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Top 1–2 blocking patterns identified in writing"
+        },
+        {
+          "step_number": 3,
+          "title": "Commit to one new weekly social action",
+          "description": "Choose one concrete weekly action: send one voice note to a friend, arrange one coffee, attend one social event. Small consistent actions compound into a dramatically richer social life over 12 weeks.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Weekly social action completed for 2 consecutive weeks"
+        }
+      ],
+      "milestones": ["Relationship map built", "Blocking pattern named", "Weekly action habit started"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Depth & Connection",
+      "duration_weeks": 6,
+      "goal": "Build deeper existing relationships and expand your social circle",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Practise deeper conversations",
+          "description": "Move beyond status updates. Ask: 'What's been the hardest part of your year?' 'What are you most excited about right now?' 'What are you figuring out?' Depth requires the first person to go first — that's usually you.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "One genuinely deep conversation per week for 6 weeks"
+        },
+        {
+          "step_number": 5,
+          "title": "Become a better listener",
+          "description": "For one month, focus exclusively on listening in conversations — not thinking about what to say next. Ask one follow-up question before contributing your own experience. The best social skill is also the simplest: genuine interest.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Active listening consciously practised in every conversation for 4 weeks"
+        },
+        {
+          "step_number": 6,
+          "title": "Join one community or recurring group",
+          "description": "The best friendships form through repeated unplanned interactions. A weekly sports team, a book club, a climbing gym, a volunteering group. Proximity and repetition build connection faster than one-off events.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "Recurring group joined and attended for at least 6 weeks"
+        }
+      ],
+      "milestones": ["Deep conversations weekly", "Active listening habit built", "Recurring community joined"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Consistency",
+      "duration_weeks": 3,
+      "goal": "Build a relationship maintenance system that doesn't rely on memory",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Create a simple relationship CRM",
+          "description": "Use a spreadsheet or notes app to track the people you want to stay in touch with and when you last reached out. Set reminders for birthdays, follow-ups, and check-ins. The people who feel most cared for are often maintained through simple systems.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Simple relationship tracker set up with 10+ key contacts"
+        },
+        {
+          "step_number": 8,
+          "title": "Host or organise one social gathering",
+          "description": "Invite 4–8 people to something you organise — dinner, a hike, a board game night. The person who creates the container for connection builds a magnetic social life. You don't need to be the most outgoing person — just the one who shows up.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "One social gathering hosted or organised"
+        }
+      ],
+      "milestones": ["Relationship system live", "Social gathering hosted", "Thriving social life built"]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+<svg width="246.00" height="240.00" viewBox="649.00 649.00 246.00 240.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M885 653H879C875.686 653 873 655.686 873 659C873 662.314 875.686 665 879 665H885C888.314 665 891 662.314 891 659C891 655.686 888.314 653 885 653Z" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <rect x="774" y="704" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <path d="M806 727L806 731" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M803 736H809" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M803 739H806" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M884 727V731" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

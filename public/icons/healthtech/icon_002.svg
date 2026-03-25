@@ -1,0 +1,16 @@
+<svg width="72.00" height="72.00" viewBox="162.00 320.00 72.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="166" y="324" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <rect x="193" y="348" width="4" height="8" rx="2" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M195 348L195 346" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M195 358L195 356" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M196 365C196 364.47 196.211 363.961 196.586 363.586C196.961 363.211 197.47 363 198 363C198.53 363 199.039 363.211 199.414 363.586C199.789 363.961 200 364.47 200 365" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M200 365C200 364.47 200.211 363.961 200.586 363.586C200.961 363.211 201.47 363 202 363C202.53 363 203.039 363.211 203.414 363.586C203.789 363.961 204 364.47 204 365" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M192 365C192 364.47 192.211 363.961 192.586 363.586C192.961 363.211 193.47 363 194 363C194.53 363 195.039 363.211 195.414 363.586C195.789 363.961 196 364.47 196 365" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

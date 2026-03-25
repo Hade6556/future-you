@@ -1,0 +1,16 @@
+<svg width="72.00" height="72.00" viewBox="162.00 1120.00 72.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="166" y="1124" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <rect x="193" y="1148" width="4" height="8" rx="2" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M195 1148L195 1146" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M195 1158L195 1156" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M196 1165C196 1164.47 196.211 1163.96 196.586 1163.59C196.961 1163.21 197.47 1163 198 1163C198.53 1163 199.039 1163.21 199.414 1163.59C199.789 1163.96 200 1164.47 200 1165" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M200 1165C200 1164.47 200.211 1163.96 200.586 1163.59C200.961 1163.21 201.47 1163 202 1163C202.53 1163 203.039 1163.21 203.414 1163.59C203.789 1163.96 204 1164.47 204 1165" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M192 1165C192 1164.47 192.211 1163.96 192.586 1163.59C192.961 1163.21 193.47 1163 194 1163C194.53 1163 195.039 1163.21 195.414 1163.59C195.789 1163.96 196 1164.47 196 1165" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

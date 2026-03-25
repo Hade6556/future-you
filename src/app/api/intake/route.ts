@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
+import { rateLimitResponse } from "@/lib/rateLimit";
 
 interface IntakeRequestBody {
   narrative: string;
@@ -47,57 +48,91 @@ const MOCK_RESPONSE: IntakeApiResponse = {
   ],
 };
 
-const openaiApiKey = process.env.OPENAI_API_KEY;
-const openai = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null;
+const SYSTEM_PROMPT = `You are Future Me, an AI life coach that helps people with any ambition — business, fitness, weight loss, creativity, academics, or personal wellness. You are warm, focused, and action-oriented.
+
+Extract identity signals from the user's narrative and return a JSON object with this exact shape:
+{
+  "values": ["value1", "value2", ...],
+  "roles": ["role1", "role2", ...],
+  "paths": [
+    {
+      "name": "Path name",
+      "description": "Path description",
+      "timeHorizon": "X months",
+      "tradeoffs": "Trade-off summary"
+    }
+  ]
+}
+
+Rules:
+- values: 3-5 core values extracted from the narrative (e.g. "Discipline", "Creativity", "Impact")
+- roles: 3-5 identity roles, mixing current and aspirational (e.g. "Focused founder", "Endurance athlete")
+- paths: exactly 3 alternative trajectories, each with a distinct approach (balanced, intense, restorative, or creative)
+- Each path should reflect cross-domain suggestions covering fitness, business, creativity, or wellness as relevant to the user
+- Return ONLY valid JSON, no markdown, no explanation`;
+
+const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
+
+function extractJson(text: string): IntakeApiResponse {
+  // Strip markdown code fences if present
+  const stripped = text.replace(/```(?:json)?\n?/g, "").trim();
+  return JSON.parse(stripped) as IntakeApiResponse;
+}
 
 export async function POST(request: Request) {
+  const limited = rateLimitResponse(request);
+  if (limited) return limited;
   try {
     const body = (await request.json()) as IntakeRequestBody;
     const narrative = body.narrative?.trim();
 
     if (!narrative) {
-      return NextResponse.json(
-        { error: "Narrative is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Narrative is required" }, { status: 400 });
     }
 
-    // If no API key is set, fall back to a mock response so local dev still works.
-    if (!openai) {
+    if (!anthropic) {
       return NextResponse.json(MOCK_RESPONSE);
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are Future Me, an AI life coach that helps people with any ambition — business, fitness, weight loss, creativity, academics, or personal wellness. You are warm, focused, and action-oriented. Always reply with valid JSON only.",
-        },
-        {
-          role: "user",
-          content: `Turn the narrative below into JSON with this exact shape:\n{\n  "values": ["value", ...],\n  "roles": ["role", ...],\n  "paths": [\n    {\n      "name": "",
-      "description": "",
-      "timeHorizon": "",
-      "tradeoffs": ""
-    }
-  ]
-}\nEach path should highlight a different approach suited to the user's ambition (e.g., balanced, intense, restorative, creative). Include cross-domain suggestions covering fitness, business, creativity, or wellness as relevant.\nNarrative: ${narrative}\nPreferred tone: ${body.tone ?? "Life Coach"}\nReturn ONLY JSON.`,
-        },
-      ],
-    });
+    const userMessage = `Turn the narrative below into the JSON structure requested.
 
-    const textOutput = completion.choices[0]?.message?.content;
+Preferred tone: ${body.tone ?? "Life Coach"}
+Narrative: ${narrative}`;
+
+    let textOutput: string | null = null;
+
+    try {
+      const message = await anthropic.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: userMessage }],
+      });
+      textOutput = message.content[0]?.type === "text" ? message.content[0].text : null;
+    } catch {
+      // Retry once on failure
+      const retry = await anthropic.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: userMessage }],
+      });
+      textOutput = retry.content[0]?.type === "text" ? retry.content[0].text : null;
+    }
 
     if (!textOutput) {
-      throw new Error("No response from model");
+      return NextResponse.json(MOCK_RESPONSE);
     }
 
-    const parsed = JSON.parse(textOutput) as IntakeApiResponse;
-
-    return NextResponse.json(parsed);
+    try {
+      const parsed = extractJson(textOutput);
+      return NextResponse.json(parsed);
+    } catch {
+      // JSON parse failed — fall back to mock
+      console.error("/api/intake: failed to parse Claude response", textOutput);
+      return NextResponse.json(MOCK_RESPONSE);
+    }
   } catch (error) {
     console.error("/api/intake error", error);
     return NextResponse.json(

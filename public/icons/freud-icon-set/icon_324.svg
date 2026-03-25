@@ -1,0 +1,10 @@
+<svg width="26.00" height="25.00" viewBox="146.00 1845.00 26.00 25.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M150 1866C150 1864.82 150.233 1863.65 150.685 1862.56C151.137 1861.46 151.8 1860.47 152.636 1859.64C153.472 1858.8 154.464 1858.14 155.556 1857.69C156.648 1857.23 157.818 1857 159 1857C160.182 1857 161.352 1857.23 162.444 1857.69C163.536 1858.14 164.528 1858.8 165.364 1859.64C166.2 1860.47 166.863 1861.46 167.315 1862.56C167.767 1863.65 168 1864.82 168 1866" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <rect x="155" y="1849" width="8" height="8" rx="4" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M156 1863H162" stroke="#9BB068" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M159 1860L159 1866" stroke="#9BB068" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

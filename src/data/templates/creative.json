@@ -1,0 +1,96 @@
+{
+  "horizon_weeks": 12,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Exploration",
+      "duration_weeks": 3,
+      "goal": "Discover your medium and establish a daily creative habit",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Pick one creative medium",
+          "description": "Choose a single medium to focus on for the next 12 weeks — drawing, writing, music, photography, or another craft. Breadth kills momentum at the start. Commit to one.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "One medium chosen and written down"
+        },
+        {
+          "step_number": 2,
+          "title": "Start a 10-minute daily practice",
+          "description": "Creativity is a muscle. Commit to 10 uninterrupted minutes every day in your chosen medium. No quality bar — just showing up. Use a habit tracker app to log streaks.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "14 consecutive days of practice logged"
+        },
+        {
+          "step_number": 3,
+          "title": "Consume to inspire",
+          "description": "Study three creators in your medium whose work you admire. Analyse what makes their work distinctive. Write one sentence per creator summarising their 'signature'.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Three creators studied and analysed"
+        }
+      ],
+      "milestones": ["Medium chosen", "First 2-week streak completed", "Inspiration list built"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Skill Building",
+      "duration_weeks": 6,
+      "goal": "Deepen fundamentals and produce your first finished piece",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Take a structured course or class",
+          "description": "Enrol in one focused course — online or in-person — to build core technique. Prioritise fundamentals: drawing basics, music theory, narrative structure, or composition depending on your medium.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Course enrolled and at least 50% completed"
+        },
+        {
+          "step_number": 5,
+          "title": "Complete one finished piece",
+          "description": "Ship something — a drawing, a short story, a song demo, a photo series. 'Done' beats 'perfect'. The goal is to experience the full creative cycle from blank canvas to finished output.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "One finished piece created"
+        },
+        {
+          "step_number": 6,
+          "title": "Join a creative community",
+          "description": "Find a community of practitioners — a local class, an online forum, or a weekly meetup. Sharing work and receiving feedback accelerates growth faster than solo practice.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "Community joined and at least one piece shared for feedback"
+        }
+      ],
+      "milestones": ["Fundamentals course started", "First finished piece completed", "Community found"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Output & Sharing",
+      "duration_weeks": 3,
+      "goal": "Build a small portfolio and share your work publicly",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Create a small portfolio",
+          "description": "Curate 3–5 of your best pieces into a simple portfolio — a folder, a free website, or a social profile. The act of curating forces you to reflect on your growth and define your voice.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Portfolio of 3–5 pieces assembled"
+        },
+        {
+          "step_number": 8,
+          "title": "Share publicly and collect feedback",
+          "description": "Post your work to at least one public channel — Instagram, Behance, SoundCloud, a writing platform, or a local gallery. Real-world feedback from strangers is irreplaceable.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Work shared publicly and at least 3 pieces of external feedback received"
+        }
+      ],
+      "milestones": ["Portfolio assembled", "Work published publicly", "Feedback loop established"]
+    }
+  ]
+}

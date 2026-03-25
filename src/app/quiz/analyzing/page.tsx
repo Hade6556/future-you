@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
+import { MascotReactor } from "../../components/mascot/MascotReactor";
+import { AMBITION_GOAL_MAP } from "../../types/pipeline";
 
 const AMBITION_LABELS: Record<string, string> = {
   entrepreneur: "business goals",
@@ -13,74 +14,158 @@ const AMBITION_LABELS: Record<string, string> = {
   creative: "creative path",
   student: "learning roadmap",
   wellness: "wellness plan",
+  career: "career plan",
+  finance: "financial roadmap",
+  language: "language journey",
+  travel: "travel plan",
+  relationships: "relationships plan",
+  productivity: "productivity system",
+  mindfulness: "mindfulness practice",
+  confidence: "confidence journey",
 };
+
+const STEP_COUNT = 7;
 
 export default function AnalyzingPage() {
   const router = useRouter();
   const ambitionType = usePlanStore((s) => s.ambitionType);
   const userName = usePlanStore((s) => s.userName);
+  const setPipelinePlan = usePlanStore((s) => s.setPipelinePlan);
+  const setPipelineStatus = usePlanStore((s) => s.setPipelineStatus);
+  const quizTimeline = usePlanStore((s) => s.quizTimeline);
+  const quizCommitment = usePlanStore((s) => s.quizCommitment);
+  const quizSchedule = usePlanStore((s) => s.quizSchedule);
+  const quizObstacles = usePlanStore((s) => s.quizObstacles);
+  const quizPrimaryGoal = usePlanStore((s) => s.quizPrimaryGoal);
+  const quizCurrentState = usePlanStore((s) => s.quizCurrentState);
+  const quizVision = usePlanStore((s) => s.quizVision);
+  const quizGender = usePlanStore((s) => s.quizGender);
+  const planFired = useRef(false);
   const [step, setStep] = useState(0);
 
+  const name = userName || "friend";
   const ambitionLabel = AMBITION_LABELS[ambitionType ?? "wellness"] ?? "goals";
 
   const lines = [
-    `Mapping your ${ambitionLabel}...`,
-    "Identifying your coaching style...",
-    "Building your 90-day roadmap...",
-    `Almost ready, ${userName || "friend"}...`,
+    `Reading your goals, ${name}...`,
+    `Profiling your ${ambitionLabel}...`,
+    "Matching your work style to proven patterns...",
+    "Calculating your 90-day projection...",
+    "Identifying your biggest obstacles...",
+    "Preparing your coaching archetype...",
+    "Your personalized plan is ready.",
   ];
 
+  // Fire plan generation once — runs in background during the animation
   useEffect(() => {
-    const intervals = [0, 1000, 2000, 3000];
+    if (planFired.current) return;
+    planFired.current = true;
+    const goal = AMBITION_GOAL_MAP[ambitionType ?? "wellness"] ?? "wellness";
+    const userContext = {
+      timeline: quizTimeline ?? undefined,
+      commitment: quizCommitment ?? undefined,
+      schedule: quizSchedule ?? undefined,
+      obstacles: quizObstacles.length > 0 ? quizObstacles : undefined,
+      primaryGoal: quizPrimaryGoal ?? undefined,
+      currentState: quizCurrentState ?? undefined,
+      vision: quizVision ?? undefined,
+      gender: quizGender ?? undefined,
+    };
+    setPipelineStatus("loading");
+    fetch("/api/plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ goal, userContext }),
+    })
+      .then((r) => r.json())
+      .then((plan) => {
+        if (plan && !plan.error) {
+          setPipelinePlan(plan);
+        } else {
+          setPipelineStatus("error");
+        }
+      })
+      .catch(() => setPipelineStatus("error"));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const intervals = [0, 1100, 2200, 3400, 4600, 5900, 7200];
     const timers = intervals.map((delay, i) =>
       setTimeout(() => setStep(i), delay),
     );
-    const navTimer = setTimeout(() => router.push("/quiz/result"), 4200);
+    const navTimer = setTimeout(() => router.push("/quiz/result"), 8500);
     return () => {
       timers.forEach(clearTimeout);
       clearTimeout(navTimer);
     };
   }, [router]);
 
-  return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-[#F8F6F1] px-6">
-      <div className="flex flex-col items-center">
-        <div className="relative h-[160px] w-[160px] animate-[mascot-float_2s_ease-in-out_infinite]">
-          <Image
-            src="/orb-thinking.png"
-            alt="Analyzing"
-            fill
-            className="object-contain"
-            priority
-          />
-        </div>
+  const isDone = step === lines.length - 1;
 
-        <div className="mt-8 h-[28px]">
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6">
+      <div className="flex flex-col items-center gap-8">
+        {/* Mascot with emotion changes */}
+        <motion.div
+          animate={{ scale: isDone ? [1, 1.08, 1] : 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <MascotReactor
+            emotion={isDone ? "celebrating" : "thinking"}
+            size={160}
+          />
+        </motion.div>
+
+        {/* Animated text line */}
+        <div className="h-8 w-full max-w-xs text-center">
           <AnimatePresence mode="wait">
             <motion.p
               key={step}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-              className="text-center text-[16px] font-medium text-[#121212]"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className={`text-center font-display text-base ${isDone ? "font-semibold text-primary" : "text-foreground"}`}
             >
               {lines[step]}
             </motion.p>
           </AnimatePresence>
         </div>
 
-        <div className="mt-8 h-[6px] w-[240px] overflow-hidden rounded-full bg-[#E0E0E0]">
+        {/* Step dots: show which step we're on */}
+        <div className="flex items-center gap-1.5" aria-hidden>
+          {Array.from({ length: STEP_COUNT }).map((_, i) => (
+            <motion.span
+              key={i}
+              className="rounded-full"
+              animate={{
+                width: i === step ? 20 : 6,
+                backgroundColor: i <= step ? "var(--accent-primary)" : "var(--border)",
+              }}
+              style={{ height: 6, display: "block" }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            />
+          ))}
+        </div>
+
+        {/* Progress bar with shimmer effect */}
+        <div className="relative h-1.5 w-60 overflow-hidden rounded-full bg-secondary">
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#6FCF97] to-[#2D9CDB]"
+            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary to-accent-glow"
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
-            transition={{ duration: 4, ease: "linear" }}
+            transition={{ duration: 8, ease: "linear" }}
+          />
+          {/* Shimmer overlay */}
+          <motion.div
+            className="absolute inset-y-0 w-16 rounded-full bg-white/30"
+            animate={{ x: ["-64px", "256px"] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           />
         </div>
 
-        <p className="mt-12 text-[11px] tracking-wide text-[#6A6A6A]">
+        <p className="font-accent text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           Powered by Future Me AI
         </p>
       </div>

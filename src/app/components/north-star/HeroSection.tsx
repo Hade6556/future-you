@@ -24,16 +24,16 @@ export function HeroSection({ onOpen }: HeroSectionProps) {
       >
         <CommandRosette isOpen={false} onClick={onOpen} />
       </div>
-      <p className="operator-label text-center text-slate-200" style={{ fontSize: "clamp(11px, 1.2vw, 13px)" }}>
+      <p className="operator-label text-center text-foreground" style={{ fontSize: "clamp(11px, 1.2vw, 13px)" }}>
         Future Me
       </p>
-      <p className="plan-body text-center text-slate-200">
+      <p className="plan-body text-center text-foreground">
         Tap to check in with your coach.
       </p>
-      <p className="plan-supporting text-center text-slate-400">
+      <p className="plan-supporting text-center text-muted-foreground">
         Your AI life coach for any ambition.
       </p>
-      <p className="operator-label text-center text-slate-500" style={{ fontSize: "clamp(10px, 1.1vw, 12px)" }}>
+      <p className="operator-label text-center text-muted-foreground" style={{ fontSize: "clamp(10px, 1.1vw, 12px)" }}>
         Quiz → Plan → Daily coaching
       </p>
     </section>

@@ -1,0 +1,96 @@
+{
+  "horizon_weeks": 12,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "System Setup",
+      "duration_weeks": 3,
+      "goal": "Build a reliable study system and eliminate friction",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Audit your current study habits",
+          "description": "Track how you currently spend your study time for 5 days. Note start/end times, what you actually studied, and how focused you felt (1–5). Most people discover they study far less effectively than they think.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "5 days of honest study-time tracking completed"
+        },
+        {
+          "step_number": 2,
+          "title": "Set up a dedicated study environment",
+          "description": "Choose one physical space used only for focused study. Remove your phone or use an app blocker. A consistent environment primes your brain to focus before you even start.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Dedicated study space set up and used for 5 sessions"
+        },
+        {
+          "step_number": 3,
+          "title": "Adopt the Pomodoro technique",
+          "description": "Study in 25-minute focused blocks with 5-minute breaks. After 4 blocks, take a 20-minute break. This matches your brain's natural attention cycles and prevents burnout.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "20 Pomodoro sessions completed over 2 weeks"
+        }
+      ],
+      "milestones": ["Study habits audited", "Dedicated environment set up", "Pomodoro routine established"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Active Learning",
+      "duration_weeks": 6,
+      "goal": "Replace passive review with active recall and spaced repetition",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Switch to active recall",
+          "description": "Stop re-reading notes. Instead, close your notes and try to recall the key concepts from memory. Write them down, then check. This retrieval practice doubles long-term retention compared to passive review.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Active recall used in every study session for 4 weeks"
+        },
+        {
+          "step_number": 5,
+          "title": "Build a spaced repetition system",
+          "description": "Use Anki or similar flashcard software for any factual content (vocabulary, formulas, dates). Set up daily 15-minute review sessions. Spaced repetition is the most evidence-backed learning technique that exists.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Anki deck built with 100+ cards and reviewed daily for 4 weeks"
+        },
+        {
+          "step_number": 6,
+          "title": "Use the Feynman technique for complex topics",
+          "description": "For any concept you struggle with: explain it in simple language as if teaching a child. Where you can't, that's your gap. Go back to source material and try again. Understanding beats memorisation.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "Feynman explanations written for every major topic"
+        }
+      ],
+      "milestones": ["Active recall habit built", "Spaced repetition system live", "No passive re-reading sessions"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Peak Performance",
+      "duration_weeks": 3,
+      "goal": "Optimise focus, energy, and exam performance",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Protect sleep and exercise",
+          "description": "Pulling all-nighters cuts memory consolidation by up to 40%. Aim for 7–8 hours. Add 3x weekly exercise — even 20-minute walks improve focus and memory retention measurably.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "Sleeping 7+ hours and exercising 3x/week for 3 consecutive weeks"
+        },
+        {
+          "step_number": 8,
+          "title": "Practice under exam conditions",
+          "description": "At least 2 weeks before any exam, do timed practice under real conditions — no notes, no phone, same duration. Familiarity with the format reduces anxiety and surfaces hidden gaps.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "At least 3 full timed practice sessions completed"
+        }
+      ],
+      "milestones": ["Sleep and exercise routine locked in", "Timed practice sessions done", "Ready to perform at peak"]
+    }
+  ]
+}

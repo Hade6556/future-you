@@ -17,7 +17,15 @@ export type AmbitionDomain =
   | "weight_loss"
   | "creative"
   | "student"
-  | "wellness";
+  | "wellness"
+  | "career"
+  | "finance"
+  | "language"
+  | "travel"
+  | "relationships"
+  | "productivity"
+  | "mindfulness"
+  | "confidence";
 
 export type ArchetypeId =
   | "steady"

@@ -1,0 +1,843 @@
+{
+  "version": "1.0",
+  "goals": {
+    "fitness_weight_loss": {
+      "display_name": "Fitness & Weight Loss",
+      "category": "health",
+      "aliases": [
+        "lose weight",
+        "get fit",
+        "get in shape",
+        "lose fat",
+        "drop pounds",
+        "healthy lifestyle",
+        "diet and exercise",
+        "weight loss",
+        "fitness",
+        "wellness",
+        "health and wellness",
+        "burn fat",
+        "slim down",
+        "lose body fat",
+        "improve health",
+        "eat healthier"
+      ],
+      "keywords": [
+        "fitness",
+        "weight loss",
+        "nutrition",
+        "HIIT",
+        "strength training",
+        "running",
+        "cycling",
+        "meal prep",
+        "body composition",
+        "cardio"
+      ],
+      "search_queries": {
+        "eventbrite": "fitness workshop weight loss nutrition seminar",
+        "meetup": "fitness group running club weight loss support",
+        "ticketmaster": "fitness expo health wellness marathon",
+        "strava": "running challenge cycling event local race",
+        "founders_network": null,
+        "luma": "fitness wellness workout nutrition community event",
+        "linkedin": "fitness health wellness nutrition workshop seminar",
+        "facebook": "fitness challenge weight loss workout running group event",
+        "f6s": null,
+        "garysguide": "fitness wellness health workout community event",
+        "allevents": null
+      },
+      "plan_template": "fitness_weight_loss",
+      "expert_tags": [
+        "personal trainer",
+        "registered dietitian",
+        "running coach"
+      ]
+    },
+
+    "real_estate_house_purchase": {
+      "display_name": "Buy a House",
+      "category": "real_estate",
+      "aliases": [
+        "buy a house",
+        "buy a home",
+        "purchase a house",
+        "become a homeowner",
+        "first home",
+        "first time buyer",
+        "real estate investment",
+        "property purchase",
+        "buy property",
+        "buy house in the city",
+        "buy a house in the city center",
+        "buy apartment",
+        "own a home"
+      ],
+      "keywords": [
+        "mortgage",
+        "down payment",
+        "first-time buyer",
+        "home loan",
+        "real estate",
+        "property",
+        "escrow",
+        "closing costs",
+        "HOA",
+        "appraisal"
+      ],
+      "search_queries": {
+        "eventbrite": "first time home buyer seminar mortgage workshop real estate",
+        "meetup": "real estate investing homebuyer group property meetup",
+        "ticketmaster": "real estate expo property investment conference",
+        "strava": null,
+        "founders_network": null,
+        "luma": "real estate homebuyer property investment seminar",
+        "linkedin": "real estate first time buyer mortgage workshop seminar",
+        "facebook": "first time home buyer real estate seminar homebuyer event",
+        "f6s": null,
+        "garysguide": "real estate property investment homebuyer workshop event",
+        "allevents": null
+      },
+      "plan_template": "real_estate_house_purchase",
+      "expert_tags": [
+        "real estate agent",
+        "mortgage broker",
+        "financial advisor",
+        "real estate attorney"
+      ]
+    },
+
+    "entrepreneurship": {
+      "display_name": "Become an Entrepreneur",
+      "category": "business",
+      "aliases": [
+        "start a business",
+        "launch a startup",
+        "become entrepreneur",
+        "become a successful entrepreneur",
+        "found a company",
+        "build a startup",
+        "start my own company",
+        "entrepreneurship",
+        "start company",
+        "be an entrepreneur",
+        "create a startup",
+        "build a business",
+        "open a business",
+        "run my own business"
+      ],
+      "keywords": [
+        "startup",
+        "entrepreneurship",
+        "venture capital",
+        "pitch deck",
+        "MVP",
+        "bootstrapping",
+        "fundraising",
+        "product-market fit",
+        "incubator",
+        "accelerator",
+        "SaaS",
+        "business model"
+      ],
+      "search_queries": {
+        "eventbrite": "startup pitch entrepreneurship workshop founder meetup",
+        "meetup": "startup founder entrepreneur networking business launch",
+        "ticketmaster": "startup conference tech summit entrepreneurship expo",
+        "strava": null,
+        "founders_network": null,
+        "luma": "startup founder entrepreneur networking pitch event",
+        "linkedin": "startup founder entrepreneur pitch networking event",
+        "facebook": "startup entrepreneur founder meetup networking event",
+        "f6s": "startup founder entrepreneur pitch accelerator funding event",
+        "garysguide": "startup entrepreneur founder networking pitch event",
+        "allevents": null
+      },
+      "plan_template": "entrepreneurship",
+      "expert_tags": [
+        "startup founder",
+        "venture capitalist",
+        "startup advisor",
+        "product manager"
+      ]
+    },
+
+    "creative": {
+      "display_name": "Become Creative",
+      "category": "creative",
+      "aliases": [
+        "creative",
+        "become creative",
+        "be creative",
+        "creative pursuits",
+        "art",
+        "become an artist",
+        "learn to draw",
+        "learn to paint",
+        "music",
+        "learn music",
+        "learn guitar",
+        "learn piano",
+        "writing",
+        "write a book",
+        "become a writer",
+        "design",
+        "graphic design",
+        "creative work",
+        "creative expression",
+        "make art",
+        "start creating",
+        "build a creative practice"
+      ],
+      "keywords": [
+        "creativity",
+        "art",
+        "music",
+        "writing",
+        "design",
+        "portfolio",
+        "creative practice",
+        "side project",
+        "maker",
+        "workshop",
+        "studio",
+        "craft"
+      ],
+      "search_queries": {
+        "eventbrite": "creative workshop art music writing design class",
+        "meetup": "creative community art writing music maker group",
+        "ticketmaster": "art exhibition music workshop creative festival",
+        "strava": null,
+        "founders_network": null,
+        "luma": "creative workshop art design writing community event",
+        "linkedin": "creative professional design writing art workshop seminar",
+        "facebook": "creative workshop art music writing design class event",
+        "f6s": null,
+        "garysguide": "creative workshop art design music writing maker event",
+        "allevents": null
+      },
+      "plan_template": "creative",
+      "expert_tags": [
+        "artist",
+        "creative coach",
+        "musician",
+        "writer",
+        "designer"
+      ]
+    },
+
+    "athletics": {
+      "display_name": "Become an Athlete",
+      "category": "sport",
+      "aliases": [
+        "become an athlete",
+        "competitive sports",
+        "train like an athlete",
+        "improve athletic performance",
+        "compete in sports",
+        "sport training",
+        "athletics",
+        "become athlete",
+        "be an athlete",
+        "compete athletically",
+        "run a marathon",
+        "do a triathlon",
+        "compete in a race",
+        "improve performance"
+      ],
+      "keywords": [
+        "athletics",
+        "sport",
+        "competition",
+        "triathlon",
+        "marathon",
+        "CrossFit",
+        "performance training",
+        "race",
+        "tournament",
+        "Olympic lifting"
+      ],
+      "search_queries": {
+        "eventbrite": "athletic competition sport training workshop performance",
+        "meetup": "sport training group athlete performance accountability",
+        "ticketmaster": "marathon triathlon sports competition championship",
+        "strava": "race challenge segment competition athletic event site:strava.com OR site:active.com OR site:runningcompetitor.com",
+        "founders_network": null,
+        "luma": "running cycling triathlon fitness race community event",
+        "linkedin": "sports athletics performance competition training event",
+        "facebook": "race marathon triathlon athletic competition challenge event",
+        "f6s": null,
+        "garysguide": "sports athletics race competition training event",
+        "allevents": null
+      },
+      "plan_template": "athletics",
+      "expert_tags": [
+        "strength and conditioning coach",
+        "sports physiotherapist",
+        "athletic trainer"
+      ]
+    },
+
+    "student": {
+      "display_name": "Master New Skills",
+      "category": "education",
+      "aliases": [
+        "student",
+        "master new skills",
+        "study",
+        "learn new skills",
+        "academic performance",
+        "improve grades",
+        "become a better student",
+        "ace my exams",
+        "pass my exams",
+        "get a degree",
+        "study smarter",
+        "academic success",
+        "learn faster",
+        "skill mastery",
+        "upskill"
+      ],
+      "keywords": [
+        "study",
+        "learning",
+        "exams",
+        "academic",
+        "skills",
+        "knowledge",
+        "focus",
+        "retention",
+        "Pomodoro",
+        "spaced repetition",
+        "flashcards",
+        "course"
+      ],
+      "search_queries": {
+        "eventbrite": "study skills workshop academic success learning seminar",
+        "meetup": "study group learning community skill building academic",
+        "ticketmaster": "educational conference learning summit skills workshop",
+        "strava": null,
+        "founders_network": null,
+        "luma": "learning workshop study skills academic community event",
+        "linkedin": "skills development learning workshop upskilling seminar",
+        "facebook": "study skills learning workshop academic community event",
+        "f6s": null,
+        "garysguide": "learning skills workshop education academic training event",
+        "allevents": null
+      },
+      "plan_template": "student",
+      "expert_tags": [
+        "learning coach",
+        "academic tutor",
+        "memory trainer",
+        "study skills coach"
+      ]
+    },
+
+    "wellness": {
+      "display_name": "Improve Your Wellbeing",
+      "category": "wellness",
+      "aliases": [
+        "wellness",
+        "improve your wellbeing",
+        "feel better",
+        "feel less stressed",
+        "reduce stress",
+        "better sleep",
+        "improve sleep",
+        "mental health",
+        "burnout recovery",
+        "work-life balance",
+        "self care",
+        "self-care",
+        "stress management",
+        "emotional health",
+        "wellbeing",
+        "improve wellbeing",
+        "develop better habits",
+        "build healthy habits"
+      ],
+      "keywords": [
+        "wellness",
+        "stress",
+        "sleep",
+        "mental health",
+        "burnout",
+        "self-care",
+        "resilience",
+        "boundaries",
+        "rest",
+        "recovery",
+        "balance",
+        "anxiety"
+      ],
+      "search_queries": {
+        "eventbrite": "wellness workshop stress management mental health seminar",
+        "meetup": "wellness community stress reduction self-care mental health",
+        "ticketmaster": "wellness festival health mindfulness retreat event",
+        "strava": null,
+        "founders_network": null,
+        "luma": "wellness workshop self-care mental health community event",
+        "linkedin": "wellness mental health stress management workshop seminar",
+        "facebook": "wellness mental health stress reduction self-care event",
+        "f6s": null,
+        "garysguide": "wellness mental health self-care stress community event",
+        "allevents": null
+      },
+      "plan_template": "wellness",
+      "expert_tags": [
+        "life coach",
+        "therapist",
+        "sleep specialist",
+        "stress management coach"
+      ]
+    },
+
+    "career": {
+      "display_name": "Advance My Career",
+      "category": "career",
+      "aliases": [
+        "advance my career",
+        "career growth",
+        "get a promotion",
+        "career change",
+        "career development",
+        "grow in my career",
+        "new job",
+        "switch careers",
+        "find a new role",
+        "land a new job",
+        "career advancement",
+        "professional development",
+        "build a personal brand",
+        "get ahead at work",
+        "climb the ladder"
+      ],
+      "keywords": [
+        "career",
+        "promotion",
+        "job search",
+        "LinkedIn",
+        "networking",
+        "resume",
+        "salary negotiation",
+        "leadership",
+        "personal brand",
+        "interview",
+        "skills gap",
+        "professional development"
+      ],
+      "search_queries": {
+        "eventbrite": "career development professional networking leadership workshop",
+        "meetup": "career networking professional development job seekers group",
+        "ticketmaster": "career summit professional development leadership conference",
+        "strava": null,
+        "founders_network": null,
+        "luma": "career networking professional development workshop event",
+        "linkedin": "career development networking leadership promotion workshop",
+        "facebook": "career networking professional development job search event",
+        "f6s": "career professional development networking leadership event",
+        "garysguide": "career professional networking development leadership event",
+        "allevents": null
+      },
+      "plan_template": "career",
+      "expert_tags": [
+        "career coach",
+        "executive coach",
+        "recruiter",
+        "LinkedIn strategist"
+      ]
+    },
+
+    "finance": {
+      "display_name": "Build Financial Security",
+      "category": "finance",
+      "aliases": [
+        "build financial security",
+        "financial independence",
+        "save money",
+        "invest",
+        "get out of debt",
+        "pay off debt",
+        "build wealth",
+        "personal finance",
+        "budgeting",
+        "financial freedom",
+        "FIRE",
+        "retire early",
+        "grow my savings",
+        "manage money",
+        "stop living paycheck to paycheck"
+      ],
+      "keywords": [
+        "savings",
+        "investing",
+        "budget",
+        "debt",
+        "compound interest",
+        "index funds",
+        "emergency fund",
+        "net worth",
+        "financial independence",
+        "FIRE",
+        "401k",
+        "passive income"
+      ],
+      "search_queries": {
+        "eventbrite": "personal finance investing workshop financial independence seminar",
+        "meetup": "personal finance investing group financial independence community",
+        "ticketmaster": "financial summit investing conference wealth building event",
+        "strava": null,
+        "founders_network": null,
+        "luma": "personal finance investing workshop financial independence event",
+        "linkedin": "personal finance investing financial planning workshop seminar",
+        "facebook": "personal finance investing financial independence workshop event",
+        "f6s": "investing finance fintech wealth building workshop event",
+        "garysguide": "personal finance investing financial independence wealth event",
+        "allevents": null
+      },
+      "plan_template": "finance",
+      "expert_tags": [
+        "financial advisor",
+        "certified financial planner",
+        "investment coach",
+        "debt counselor"
+      ]
+    },
+
+    "language": {
+      "display_name": "Learn a New Language",
+      "category": "education",
+      "aliases": [
+        "learn a language",
+        "learn a new language",
+        "become fluent",
+        "speak a new language",
+        "learn Spanish",
+        "learn French",
+        "learn German",
+        "learn Italian",
+        "learn Mandarin",
+        "learn Japanese",
+        "learn Portuguese",
+        "language learning",
+        "reach conversational level",
+        "become bilingual",
+        "master a language"
+      ],
+      "keywords": [
+        "language",
+        "fluency",
+        "vocabulary",
+        "grammar",
+        "conversation",
+        "Duolingo",
+        "Anki",
+        "immersion",
+        "bilingual",
+        "speaking practice",
+        "listening",
+        "tutor"
+      ],
+      "search_queries": {
+        "eventbrite": "language learning workshop conversation practice immersion event",
+        "meetup": "language exchange conversation group language learners meetup",
+        "ticketmaster": "language learning conference cultural immersion event",
+        "strava": null,
+        "founders_network": null,
+        "luma": "language exchange conversation practice community event",
+        "linkedin": "language learning professional development multilingual workshop",
+        "facebook": "language exchange meetup conversation practice immersion event",
+        "f6s": null,
+        "garysguide": "language learning conversation exchange immersion event",
+        "allevents": null
+      },
+      "plan_template": "language",
+      "expert_tags": [
+        "language tutor",
+        "polyglot coach",
+        "conversational language teacher",
+        "immersion specialist"
+      ]
+    },
+
+    "travel": {
+      "display_name": "Travel & Live Freely",
+      "category": "lifestyle",
+      "aliases": [
+        "travel and live freely",
+        "travel",
+        "become a digital nomad",
+        "digital nomad",
+        "travel the world",
+        "live abroad",
+        "work remotely",
+        "visit new countries",
+        "long-term travel",
+        "location independent",
+        "backpacking",
+        "slow travel",
+        "expat life",
+        "live and work abroad",
+        "travel more"
+      ],
+      "keywords": [
+        "travel",
+        "digital nomad",
+        "remote work",
+        "passport",
+        "visa",
+        "budget travel",
+        "location independence",
+        "backpacking",
+        "expat",
+        "Airbnb",
+        "hostel",
+        "travel hacking"
+      ],
+      "search_queries": {
+        "eventbrite": "digital nomad remote work travel lifestyle workshop",
+        "meetup": "digital nomad travel community remote workers expat group",
+        "ticketmaster": "travel summit digital nomad conference lifestyle event",
+        "strava": null,
+        "founders_network": null,
+        "luma": "digital nomad travel remote work community event",
+        "linkedin": "remote work digital nomad location independent lifestyle event",
+        "facebook": "digital nomad travel remote work meetup community event",
+        "f6s": "remote work digital nomad location independent lifestyle event",
+        "garysguide": "digital nomad travel remote work expat community event",
+        "allevents": null
+      },
+      "plan_template": "travel",
+      "expert_tags": [
+        "travel coach",
+        "digital nomad mentor",
+        "remote work consultant",
+        "travel blogger"
+      ]
+    },
+
+    "relationships": {
+      "display_name": "Build Better Relationships",
+      "category": "social",
+      "aliases": [
+        "build better relationships",
+        "improve relationships",
+        "make more friends",
+        "find a partner",
+        "improve social life",
+        "build deeper friendships",
+        "social confidence",
+        "better communication",
+        "networking",
+        "meet new people",
+        "overcome shyness",
+        "build my social circle",
+        "improve social skills",
+        "connect with people"
+      ],
+      "keywords": [
+        "relationships",
+        "social skills",
+        "communication",
+        "friendship",
+        "networking",
+        "empathy",
+        "vulnerability",
+        "social anxiety",
+        "dating",
+        "connection",
+        "trust",
+        "listening"
+      ],
+      "search_queries": {
+        "eventbrite": "social skills workshop communication relationships networking event",
+        "meetup": "social skills community friendship networking meet new people",
+        "ticketmaster": "social confidence communication workshop relationships event",
+        "strava": null,
+        "founders_network": null,
+        "luma": "social skills networking relationships community event",
+        "linkedin": "communication networking social skills professional relationships event",
+        "facebook": "social skills relationships meetup friendship networking event",
+        "f6s": null,
+        "garysguide": "social skills communication relationships networking community event",
+        "allevents": null
+      },
+      "plan_template": "relationships",
+      "expert_tags": [
+        "relationships coach",
+        "social skills coach",
+        "communication coach",
+        "therapist"
+      ]
+    },
+
+    "productivity": {
+      "display_name": "Master Productivity",
+      "category": "productivity",
+      "aliases": [
+        "master productivity",
+        "become more productive",
+        "productivity",
+        "time management",
+        "stop procrastinating",
+        "deep work",
+        "get things done",
+        "GTD",
+        "build a second brain",
+        "eliminate distractions",
+        "focus better",
+        "work smarter",
+        "develop better habits",
+        "build habits",
+        "be more efficient"
+      ],
+      "keywords": [
+        "productivity",
+        "time management",
+        "deep work",
+        "focus",
+        "procrastination",
+        "habits",
+        "systems",
+        "Notion",
+        "Obsidian",
+        "GTD",
+        "time blocking",
+        "second brain"
+      ],
+      "search_queries": {
+        "eventbrite": "productivity workshop time management deep work focus seminar",
+        "meetup": "productivity community accountability group habits focus",
+        "ticketmaster": "productivity summit time management habits conference",
+        "strava": null,
+        "founders_network": null,
+        "luma": "productivity workshop habits focus time management event",
+        "linkedin": "productivity time management deep work habits workshop seminar",
+        "facebook": "productivity workshop time management habits focus community event",
+        "f6s": null,
+        "garysguide": "productivity habits time management focus deep work event",
+        "allevents": null
+      },
+      "plan_template": "productivity",
+      "expert_tags": [
+        "productivity coach",
+        "time management expert",
+        "habit coach",
+        "systems thinker"
+      ]
+    },
+
+    "mindfulness": {
+      "display_name": "Practice Mindfulness",
+      "category": "wellness",
+      "aliases": [
+        "practice mindfulness",
+        "mindfulness",
+        "meditation",
+        "learn to meditate",
+        "start meditating",
+        "be more present",
+        "inner peace",
+        "stress relief",
+        "mindful living",
+        "daily meditation",
+        "breathwork",
+        "yoga",
+        "spiritual growth",
+        "emotional regulation",
+        "calm my mind"
+      ],
+      "keywords": [
+        "mindfulness",
+        "meditation",
+        "breathwork",
+        "presence",
+        "yoga",
+        "Headspace",
+        "Calm",
+        "Wim Hof",
+        "emotional regulation",
+        "awareness",
+        "stillness",
+        "spiritual"
+      ],
+      "search_queries": {
+        "eventbrite": "mindfulness meditation workshop breathwork yoga retreat",
+        "meetup": "meditation mindfulness group yoga breathwork community",
+        "ticketmaster": "mindfulness retreat meditation festival wellness event",
+        "strava": null,
+        "founders_network": null,
+        "luma": "mindfulness meditation yoga breathwork community event",
+        "linkedin": "mindfulness meditation wellness workshop professional event",
+        "facebook": "mindfulness meditation yoga retreat workshop community event",
+        "f6s": null,
+        "garysguide": "mindfulness meditation yoga breathwork wellness event",
+        "allevents": null
+      },
+      "plan_template": "mindfulness",
+      "expert_tags": [
+        "meditation teacher",
+        "mindfulness coach",
+        "yoga instructor",
+        "breathwork facilitator"
+      ]
+    },
+
+    "confidence": {
+      "display_name": "Build Confidence",
+      "category": "personal_development",
+      "aliases": [
+        "build confidence",
+        "become more confident",
+        "confidence",
+        "self-confidence",
+        "self-esteem",
+        "public speaking",
+        "overcome fear",
+        "stop being shy",
+        "speak up more",
+        "be more assertive",
+        "believe in myself",
+        "imposter syndrome",
+        "body language",
+        "social confidence",
+        "build self-belief"
+      ],
+      "keywords": [
+        "confidence",
+        "self-esteem",
+        "public speaking",
+        "assertiveness",
+        "body language",
+        "imposter syndrome",
+        "vulnerability",
+        "fear",
+        "courage",
+        "mindset",
+        "Toastmasters",
+        "self-belief"
+      ],
+      "search_queries": {
+        "eventbrite": "confidence building public speaking workshop self-esteem seminar",
+        "meetup": "public speaking confidence group Toastmasters self-improvement",
+        "ticketmaster": "public speaking conference confidence leadership workshop",
+        "strava": null,
+        "founders_network": null,
+        "luma": "confidence building public speaking workshop community event",
+        "linkedin": "public speaking confidence leadership assertiveness workshop",
+        "facebook": "confidence building public speaking workshop self-improvement event",
+        "f6s": null,
+        "garysguide": "confidence public speaking self-esteem leadership workshop event",
+        "allevents": null
+      },
+      "plan_template": "confidence",
+      "expert_tags": [
+        "confidence coach",
+        "public speaking coach",
+        "mindset coach",
+        "NLP practitioner"
+      ]
+    }
+  }
+}

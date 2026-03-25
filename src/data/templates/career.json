@@ -1,0 +1,104 @@
+{
+  "horizon_weeks": 16,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Clarity & Positioning",
+      "duration_weeks": 4,
+      "goal": "Define your target role and identify your competitive advantage",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Define your target role with precision",
+          "description": "Identify 3–5 specific job titles you're aiming for. Research what skills, experience, and credentials are required. Most career transitions fail because the target is too vague. 'Senior Product Manager at a B2B SaaS startup' beats 'something in product'.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "3–5 specific target roles defined with required skills mapped"
+        },
+        {
+          "step_number": 2,
+          "title": "Audit your current skills and gaps",
+          "description": "Compare your current skillset against the requirements of your target role. Identify your top 3 transferable strengths and your top 3 gaps. Be honest — this drives everything that follows.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Skills audit completed with gaps and strengths documented"
+        },
+        {
+          "step_number": 3,
+          "title": "Optimise your LinkedIn profile",
+          "description": "Recruiters search LinkedIn like a search engine. Optimise your headline (target role + value proposition), summary (story + achievements), and experience (results, not responsibilities). 70% of jobs are filled through connections.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "LinkedIn headline, summary, and top 3 experiences rewritten"
+        }
+      ],
+      "milestones": ["Target role defined", "Skills gap mapped", "LinkedIn profile optimised"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Skill Building & Visibility",
+      "duration_weeks": 8,
+      "goal": "Close your key skill gaps and build external visibility",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Close your top skill gap",
+          "description": "Enrol in one targeted course, certification, or project to address your most critical skill gap. Choose something you can complete within 8 weeks and that produces a tangible output (certificate, portfolio piece, case study).",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "Course or certification enrolled and at least 75% completed"
+        },
+        {
+          "step_number": 5,
+          "title": "Build a network in your target field",
+          "description": "Send 2 personalised connection requests per week to people in your target role or company. Ask for 15-minute informational interviews — not job leads. The goal is genuine relationships and insider knowledge, not transactions.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "16+ new connections made and at least 4 informational interviews completed"
+        },
+        {
+          "step_number": 6,
+          "title": "Create one piece of visible work",
+          "description": "Write a LinkedIn article, build a side project, contribute to an open-source project, or give a talk at a meetup. Visible work builds credibility before any interview happens and makes your network reach out to you.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "One piece of publicly visible work published"
+        }
+      ],
+      "milestones": ["Skill gap course completed", "Network of 16+ connections built", "Visible work published"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "The Move",
+      "duration_weeks": 4,
+      "goal": "Apply strategically and negotiate effectively",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Apply to 10 targeted roles",
+          "description": "Quality over quantity. Tailor each application to the specific role — reference the company's mission, use keywords from the job description, and quantify your impact with numbers wherever possible.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "10 tailored applications submitted"
+        },
+        {
+          "step_number": 8,
+          "title": "Prepare and practise for interviews",
+          "description": "Use the STAR method (Situation, Task, Action, Result) for all behavioural questions. Prepare 5–7 strong stories. Do at least 3 mock interviews with a friend or recorded for self-review.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "5 STAR stories prepared and 3 mock interviews completed"
+        },
+        {
+          "step_number": 9,
+          "title": "Negotiate your offer",
+          "description": "Never accept the first offer. Research market rates. Counter with a specific number backed by market data and your unique value. Negotiating your first offer has a compounding effect on every raise that follows.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Counter-offer made (outcome secondary to the attempt)"
+        }
+      ],
+      "milestones": ["10 applications submitted", "Interview preparation complete", "Offer negotiated"]
+    }
+  ]
+}

@@ -2,134 +2,121 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProgressStepper } from "../components/ProgressStepper";
-import { GlassCard, PrimaryButton } from "../components/ui";
-import type { IntakeResponse } from "../types/plan";
+import { motion } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MascotReactor } from "../components/mascot/MascotReactor";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 
-const STORAGE_KEY_PREFIX = "future-you-plan-";
-const QUESTIONS = [
-  "What does the best version of you look like?",
-  "What ambition are you chasing — business, fitness, creativity, something else?",
-  "How do you want to feel when you've made it?",
-];
-
-function generatePlanId(): string {
-  return `plan-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
+const PENDING_NARRATIVE_KEY = "future-you-pending-narrative";
 
 export default function IntakePage() {
   const router = useRouter();
-  const setIdentityComplete = usePlanStore((s) => s.setIdentityComplete);
-  const setPlanReady = usePlanStore((s) => s.setPlanReady);
-
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<string[]>(["", "", ""]);
-  const [loading, setLoading] = useState(false);
+  const dogArchetype = usePlanStore((s) => s.dogArchetype);
+  const ambitionType = usePlanStore((s) => s.ambitionType);
+  const [narrative, setNarrative] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [planReady, setPlanReadyState] = useState(false);
 
-  const currentAnswer = answers[step] ?? "";
-  const setCurrent = (v: string) => {
-    const next = [...answers];
-    next[step] = v;
-    setAnswers(next);
-  };
-
-  const handleNext = () => {
-    if (step < 2) {
-      setStep(step + 1);
-      setError(null);
+  const handleSubmit = () => {
+    const trimmed = narrative.trim();
+    if (trimmed.length < 20) {
+      setError("Tell me a bit more — the more detail, the better your plan.");
       return;
     }
-    const narrative = answers.filter(Boolean).join("\n\n");
-    if (!narrative.trim()) {
-      setError("Say a little more.");
-      return;
+
+    // Enrich narrative with quiz context so API contract is preserved
+    const enriched = [
+      trimmed,
+      ambitionType ? `Goal area: ${ambitionType}` : "",
+      dogArchetype ? `Coaching style: ${dogArchetype}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    try {
+      sessionStorage.setItem(PENDING_NARRATIVE_KEY, enriched);
+    } catch {
+      // ignore private mode
     }
-    setLoading(true);
-    setError(null);
-    fetch("/api/intake", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ narrative, tone: "Life Coach" }),
-    })
-      .then((res) => {
-        if (!res.ok) return res.json().then((b) => Promise.reject(new Error(b?.error || "Something went wrong")));
-        return res.json() as Promise<IntakeResponse>;
-      })
-      .then((data) => {
-        setIdentityComplete(true);
-        const planId = generatePlanId();
-        const payload = JSON.stringify(data);
-        sessionStorage.setItem(`${STORAGE_KEY_PREFIX}${planId}`, payload);
-        try {
-          localStorage.setItem(`${STORAGE_KEY_PREFIX}${planId}`, payload);
-        } catch {
-          // quota or private mode
-        }
-        setPlanReady(planId);
-        setPlanReadyState(true);
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : "Something went wrong"))
-      .finally(() => setLoading(false));
-  };
 
-  const handleSeePlan = () => {
-    router.push("/plan");
+    router.push("/generating");
   };
-
-  if (planReady) {
-    return (
-      <div className="min-w-0 overflow-x-hidden px-5 pb-28 pt-5">
-        <div className="mx-auto min-w-0 max-w-lg">
-          <div className="rounded-[32px] glass-glow p-6 transition-opacity duration-200">
-            <h2 className="text-[24px] font-medium tracking-tight text-white">
-              Your coaching plan is ready.
-            </h2>
-            <PrimaryButton
-              type="button"
-              onClick={handleSeePlan}
-              className="mt-5 w-full"
-            >
-              See Plan
-            </PrimaryButton>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-w-0 overflow-x-hidden px-5 pb-28 pt-5">
-      <div className="mx-auto flex min-w-0 max-w-lg flex-col gap-6">
-        <ProgressStepper step={step} total={3} />
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6 pb-10 pt-14">
+      <div className="mx-auto w-full max-w-md space-y-6">
+        {/* Mascot */}
+        <motion.div
+          className="flex justify-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+        >
+          <MascotReactor emotion="thinking" size={80} />
+        </motion.div>
 
-        <GlassCard className="flex flex-col gap-5 p-5">
-          <div key={step} className="transition-opacity duration-200">
-            <p className="text-[17px] leading-[1.5] text-white">
-              {QUESTIONS[step]}
-            </p>
-          <textarea
-            className="field-glass min-h-[120px] w-full resize-none rounded-2xl p-4 text-[15px] leading-relaxed text-white placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-accent-blue/40"
-            value={currentAnswer}
-            onChange={(e) => setCurrent(e.target.value)}
-            placeholder="A few words."
-            rows={4}
-          />
-          <PrimaryButton
-            type="button"
-            onClick={handleNext}
-            disabled={!currentAnswer.trim() || loading}
-            className="w-full"
-          >
-            {loading ? "…" : step < 2 ? "Next" : "Generate"}
-          </PrimaryButton>
-          {error && (
-            <p className="text-[14px] text-red-300">{error}</p>
-          )}
+        {/* Badge + heading */}
+        <motion.div
+          className="space-y-3 text-center"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex justify-center">
+            <Badge variant="secondary">One question</Badge>
           </div>
-        </GlassCard>
+          <h2 className="font-display text-2xl leading-snug text-foreground">
+            Tell me what winning looks like for you.
+          </h2>
+          <p className="text-[14px] text-muted-foreground">
+            Be specific — the more detail, the better your plan.
+          </p>
+        </motion.div>
+
+        {/* Textarea */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="space-y-4"
+        >
+          <textarea
+            className="min-h-[140px] w-full resize-none rounded-2xl border border-input bg-background px-4 py-4 text-[16px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30"
+            value={narrative}
+            onChange={(e) => {
+              setNarrative(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="e.g. I want to launch my first product by summer, feel confident enough to pitch investors, and build a small team I'm proud of..."
+            rows={5}
+            autoFocus
+          />
+
+          {error && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-[13px] text-destructive"
+            >
+              {error}
+            </motion.p>
+          )}
+
+          <Button
+            onClick={handleSubmit}
+            disabled={narrative.trim().length < 10}
+            className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover"
+            size="lg"
+          >
+            Create my plan
+            <ArrowRightIcon className="ml-2 h-4 w-4" aria-hidden />
+          </Button>
+
+          <p className="text-center text-[12px] text-muted-foreground">
+            Quick · Private · No credit card required
+          </p>
+        </motion.div>
       </div>
     </div>
   );

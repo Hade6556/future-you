@@ -1,0 +1,16 @@
+<svg width="22.00" height="26.00" viewBox="277.00 758.00 22.00 26.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M284 766L284 765C284 763.343 285.343 762 287 762C288.657 762 290 763.343 290 765L290 766" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M284 776L284 777C284 778.657 285.343 780 287 780C288.657 780 290 778.657 290 777L290 776" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M295 770H293" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M295 773H293" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M284 771H290" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M287 768L287 774" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="287" cy="771" r="6" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

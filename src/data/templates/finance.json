@@ -1,0 +1,104 @@
+{
+  "horizon_weeks": 16,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Clarity",
+      "duration_weeks": 3,
+      "goal": "Know exactly where your money goes and set a clear target",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Calculate your net worth",
+          "description": "List everything you own (assets: savings, investments, property) and everything you owe (liabilities: loans, credit cards, mortgage). Net worth = assets minus liabilities. This is your financial baseline — you can't improve what you don't measure.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Net worth calculated and written down"
+        },
+        {
+          "step_number": 2,
+          "title": "Track every expense for 30 days",
+          "description": "Use a budgeting app or spreadsheet to categorise every purchase for a full month. Don't change your behaviour yet — just observe. Most people underestimate their spending in 2–3 categories significantly.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "30 consecutive days of expense tracking completed"
+        },
+        {
+          "step_number": 3,
+          "title": "Set a specific financial target",
+          "description": "Define a concrete goal: 'Save £10,000 emergency fund by December', 'Pay off £5,000 credit card debt in 12 months', or 'Invest £500/month for 2 years'. Vague goals produce vague results.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Specific financial target defined with a deadline"
+        }
+      ],
+      "milestones": ["Net worth baseline set", "30-day expense audit complete", "Specific target defined"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Build the System",
+      "duration_weeks": 8,
+      "goal": "Eliminate money leaks, pay down debt, and automate savings",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Build a zero-based budget",
+          "description": "Give every pound/dollar a job. Allocate income across essentials, savings, debt repayment, and discretionary spending until income minus all allocations equals zero. Automate savings on payday before you can spend them.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Zero-based budget created and first month tracked against it"
+        },
+        {
+          "step_number": 5,
+          "title": "Build a 3-month emergency fund",
+          "description": "Before investing, build a cash buffer of 3 months of essential expenses. Keep it in a high-yield savings account. This prevents you from raiding investments in a crisis and eliminates the anxiety of living with no margin.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "Emergency fund target set and automatic contributions running"
+        },
+        {
+          "step_number": 6,
+          "title": "Attack high-interest debt",
+          "description": "List all debts by interest rate. Minimum payments on all. Every extra pound goes to the highest-rate debt first (avalanche method) — this is mathematically optimal. Alternatively, pay off smallest balance first for a psychological win (snowball method).",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "Debt repayment plan running with first debt targeted"
+        }
+      ],
+      "milestones": ["Budget system live", "Emergency fund contributions automated", "Debt payoff plan running"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Invest & Grow",
+      "duration_weeks": 5,
+      "goal": "Start investing consistently and build long-term wealth habits",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Max employer pension/401k match",
+          "description": "If your employer matches pension or 401k contributions, maximise this before anything else. Matching is an instant 50–100% return on your money — no investment can beat it. Contribute at least enough to get the full match.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Employer match fully claimed"
+        },
+        {
+          "step_number": 8,
+          "title": "Open an investment account and start investing",
+          "description": "Open a low-cost index fund account (ISA, Roth IRA, or equivalent). Start with a broad global index fund. Set up a monthly standing order. Investing £200/month at 8% average return over 20 years grows to over £110,000.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Investment account open with recurring monthly contribution set up"
+        },
+        {
+          "step_number": 9,
+          "title": "Automate and review quarterly",
+          "description": "Set your budget, savings, and investments to run automatically. Review quarterly — not monthly — to avoid emotional decision-making from short-term fluctuations. The best investors are the ones who forget they have accounts.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "All financial systems automated and first quarterly review scheduled"
+        }
+      ],
+      "milestones": ["Employer match maximised", "First investments placed", "System fully automated"]
+    }
+  ]
+}

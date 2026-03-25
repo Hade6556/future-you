@@ -1,0 +1,20 @@
+<svg width="312.00" height="72.00" viewBox="576.00 548.00 312.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="698" y="552" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <path d="M727 579L727 578C727 576.343 728.343 575 730 575C731.657 575 733 576.343 733 578L733 579" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M727 589L727 590C727 591.657 728.343 593 730 593C731.657 593 733 591.657 733 590L733 589" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M738 583H736" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M738 586H736" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M727 584H733" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M730 581L730 587" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="730" cy="584" r="6" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M884 593L884 587C884 585.343 882.657 584 881 584C879.343 584 878 582.657 878 581V580" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

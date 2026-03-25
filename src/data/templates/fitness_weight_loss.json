@@ -1,0 +1,96 @@
+{
+  "horizon_weeks": 16,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Foundation",
+      "duration_weeks": 4,
+      "goal": "Establish baseline habits and eliminate caloric surplus",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Establish caloric baseline",
+          "description": "Track all food intake for 7 days using MyFitnessPal to determine current average calorie consumption. Do not change eating habits yet — just observe.",
+          "duration_weeks": 1,
+          "resources": ["https://myfitnesspal.com", "https://cronometer.com"],
+          "success_metric": "7 consecutive days of food logging completed"
+        },
+        {
+          "step_number": 2,
+          "title": "Set a moderate caloric deficit",
+          "description": "Target 500 kcal/day deficit (1 lb/week loss). Use TDEE calculator to determine maintenance calories. Prioritize protein at 0.8g per lb of bodyweight.",
+          "duration_weeks": 3,
+          "resources": ["https://tdeecalculator.net"],
+          "success_metric": "Hitting calorie and protein targets 5 out of 7 days"
+        },
+        {
+          "step_number": 3,
+          "title": "Begin 3x/week movement routine",
+          "description": "Start with low-intensity cardio: 30-minute walks, cycling, or swimming. The goal is habit formation, not performance. Consistency beats intensity at this stage.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "12 completed sessions in 4 weeks"
+        }
+      ],
+      "milestones": ["First 3 lbs lost", "3 weeks of consistent food logging", "Exercise habit established"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Progression",
+      "duration_weeks": 8,
+      "goal": "Add strength training, optimize nutrition, accelerate fat loss",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Add 2x/week strength training",
+          "description": "Begin a beginner program (StrongLifts 5x5 or Starting Strength). Compound movements (squat, deadlift, bench, row) build metabolic rate and preserve muscle during a deficit.",
+          "duration_weeks": 8,
+          "resources": ["https://stronglifts.com", "https://startingstrength.com"],
+          "success_metric": "All three main lifts progressing week-over-week"
+        },
+        {
+          "step_number": 5,
+          "title": "Optimize meal timing and prep",
+          "description": "Batch cook proteins and vegetables on Sundays. Pre-logging meals the night before prevents impulsive choices. Eat protein-first at every meal.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "Meal prep done 3 out of 4 Sundays per month"
+        },
+        {
+          "step_number": 6,
+          "title": "Track weekly weigh-ins",
+          "description": "Weigh daily, log the 7-day average. Ignore day-to-day fluctuations (water retention, glycogen). A 0.5–1 lb/week average loss is the target range.",
+          "duration_weeks": 8,
+          "resources": [],
+          "success_metric": "Weekly average weight declining consistently"
+        }
+      ],
+      "milestones": ["10 lbs total lost", "Protein hitting target daily", "Strength baseline established"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Consolidation",
+      "duration_weeks": 4,
+      "goal": "Reach target weight range and build sustainable lifestyle",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Transition to maintenance calories",
+          "description": "Increase calories by 200–300 kcal/day over 2 weeks. Continue training. Monitor weight weekly — target stable within 2 lb window.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Weight stable for 2 consecutive weeks"
+        },
+        {
+          "step_number": 8,
+          "title": "Identify and reinforce sustainable habits",
+          "description": "List the 3 habits that drove the most results. Build these into a permanent routine. Celebrate the process, not just the outcome number on the scale.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Written maintenance plan completed"
+        }
+      ],
+      "milestones": ["Goal weight reached", "Maintenance phase begun", "Habits fully systemized"]
+    }
+  ]
+}

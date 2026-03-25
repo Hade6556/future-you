@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
-import { PrimaryButton } from "./ui";
+import { Button } from "@/components/ui/button";
 import type { TileStatus } from "./StatusTile";
 
 const STATUS_LABEL: Record<TileStatus, string> = {
@@ -64,7 +65,7 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
     <motion.div
       role="dialog"
       aria-label="Future Me coach"
-      className="glass fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-50 max-h-[60dvh] overflow-hidden rounded-[28px] p-6 md:left-1/2 md:right-auto md:w-full md:max-w-lg md:-translate-x-1/2"
+      className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-50 max-h-[60dvh] overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg md:left-1/2 md:right-auto md:w-full md:max-w-lg md:-translate-x-1/2"
       drag="y"
       dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={{ top: 0, bottom: 0.4 }}
@@ -76,14 +77,14 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
     >
       <div className="flex max-h-[55dvh] flex-col gap-5 overflow-y-auto">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-[17px] leading-[1.5] text-white">
+          <p className="text-[15px] leading-relaxed text-foreground">
             Future Me: {statusMessage}
           </p>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close assistant"
-            className="shrink-0 rounded-full p-2 text-muted transition-colors hover:bg-white/10 hover:text-white"
+            className="shrink-0 rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -93,18 +94,18 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
 
         <div className="flex flex-col gap-3">
           {chips.map((chip) => (
-            <div key={chip.id} className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03]">
+            <div key={chip.id} className="overflow-hidden rounded-xl border border-border">
               <button
                 type="button"
                 onClick={() => setExpandedChip(expandedChip === chip.id ? null : chip.id)}
-                className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors hover:bg-white/5"
+                className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors hover:bg-secondary"
               >
-                <span className="text-[15px] font-medium text-white">{chip.label}</span>
-                <span className="flex-1 text-right text-[13px] text-muted">{STATUS_LABEL[chip.status]}</span>
+                <span className="text-[15px] font-medium text-foreground">{chip.label}</span>
+                <span className="flex-1 text-right font-accent text-xs uppercase tracking-wider text-muted-foreground">{STATUS_LABEL[chip.status]}</span>
                 <motion.span
                   animate={{ rotate: expandedChip === chip.id ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
-                  className="shrink-0"
+                  className="shrink-0 text-muted-foreground"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     <path d="M6 9l6 6 6-6" />
@@ -118,19 +119,19 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="overflow-hidden border-t border-white/[0.06] px-4 pb-4 pt-2"
+                    className="overflow-hidden border-t border-border px-4 pb-4 pt-2"
                   >
-                    <p className="mb-3 text-[14px] text-muted">
+                    <p className="mb-3 text-sm text-muted-foreground">
                       {CHIP_SUMMARY[chip.id]?.[chip.status]}
                     </p>
                     {chip.disabled ? (
-                      <span className="inline-flex h-12 items-center rounded-full border border-white/20 px-6 text-[14px] text-muted">
+                      <span className="inline-flex h-10 items-center rounded-xl border border-border px-6 text-sm text-muted-foreground">
                         Take the quiz first
                       </span>
                     ) : (
-                      <PrimaryButton href={chip.href} className="w-full">
+                      <Button render={<Link href={chip.href} />} className="w-full" size="sm">
                         {chip.cta}
-                      </PrimaryButton>
+                      </Button>
                     )}
                   </motion.div>
                 )}
@@ -139,15 +140,13 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
           ))}
         </div>
 
-        {/* Streak indicator */}
-        <p className="text-center text-[12px] text-muted/70">
+        <p className="text-center font-accent text-[10px] uppercase tracking-wider text-muted-foreground">
           Streak: {streak} {streak === 1 ? "day" : "days"}
         </p>
       </div>
 
-      {/* Swipe hint */}
       <div className="mt-2 flex justify-center">
-        <span className="h-1 w-8 rounded-full bg-white/20" aria-hidden />
+        <span className="h-1 w-8 rounded-full bg-border" aria-hidden />
       </div>
     </motion.div>
   );

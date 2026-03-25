@@ -40,15 +40,15 @@ export function NorthStarPanel() {
         <div className="mx-auto flex min-w-0 max-w-lg flex-1 flex-col">
           <HeroSection onOpen={open} />
           <section className="flex flex-1 flex-col gap-3 overflow-y-auto py-6 md:gap-4">
-            <p className="operator-label text-[10px] text-slate-500">Stacked Rituals</p>
+            <p className="operator-label text-[10px] text-muted-foreground">Stacked Rituals</p>
             {status.chips.map((chip) => (
               <button
                 key={chip.id}
                 type="button"
                 onClick={open}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition-colors hover:bg-white/[0.06] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 md:px-5"
+                className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-left transition-colors hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 md:px-5"
               >
-                <span className="plan-body font-semibold text-white">{chip.label}</span>
+                <span className="plan-body font-semibold text-foreground">{chip.label}</span>
                 <span
                   className={`shrink-0 plan-supporting font-medium ${
                     chip.status === "locked" ? "text-[var(--ritual-red)]" : "text-[var(--ion-green)]"
@@ -75,7 +75,7 @@ export function NorthStarPanel() {
               aria-hidden
               style={{
                 background:
-                  "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(123,91,255,0.14) 0%, rgba(65,179,255,0.07) 40%, transparent 70%)",
+                  "radial-gradient(ellipse 80% 60% at 50% 30%, var(--accent-primary-glow-strong) 0%, var(--accent-primary-glow) 40%, transparent 70%)",
               }}
             />
             <motion.div

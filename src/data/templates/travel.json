@@ -1,0 +1,96 @@
+{
+  "horizon_weeks": 12,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Foundation",
+      "duration_weeks": 3,
+      "goal": "Define your travel vision and build the financial runway",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Define your travel vision precisely",
+          "description": "Answer these: Where do you want to go first? How long do you want to travel? Are you going nomadic (location-independent income) or planning a fixed trip? What's your monthly budget on the road? Clarity here determines every other decision.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Travel vision document written with destination, duration, and budget"
+        },
+        {
+          "step_number": 2,
+          "title": "Calculate your travel fund target",
+          "description": "Add up: flights, first month's accommodation, travel insurance, visa fees, buffer fund (20% extra). Research your destination's cost of living. Many people over-estimate what travel costs — Southeast Asia or Eastern Europe are often cheaper than home.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Specific savings target calculated with itemised breakdown"
+        },
+        {
+          "step_number": 3,
+          "title": "Cut costs to fund your trip",
+          "description": "Identify your top 3 monthly expenses that can be reduced. Temporarily eliminating subscriptions, eating out less, or downsizing can generate £500–£1,000/month towards your travel fund faster than you think.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "At least £300/month redirected to travel fund"
+        }
+      ],
+      "milestones": ["Vision defined", "Savings target set", "Monthly contributions running"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Logistics & Remote Income",
+      "duration_weeks": 6,
+      "goal": "Sort your practicalities and create income that travels with you",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Negotiate remote work or build a portable income stream",
+          "description": "If employed, research whether your role can be done remotely and make the case to your manager. If going freelance, identify one marketable skill (writing, design, code, VA work) and land 2–3 clients before you leave. Don't quit before the income exists.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "Remote work approved or first freelance client secured"
+        },
+        {
+          "step_number": 5,
+          "title": "Handle the practicalities",
+          "description": "Get travel insurance that covers health, theft, and cancellation. Notify your bank. Get an international debit card (Wise or Revolut) with no foreign transaction fees. Renew passport if needed. These feel boring but blocking one is trip-ending.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "Insurance, banking, and passport sorted"
+        },
+        {
+          "step_number": 6,
+          "title": "Book your first destination",
+          "description": "Commit by booking. One flight, one week of accommodation. The act of booking transforms travel from dream to plan. Everything else becomes concrete once there's a date.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "First flight and accommodation booked"
+        }
+      ],
+      "milestones": ["Income sorted", "Practicalities complete", "First trip booked"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "First Trip & Systems",
+      "duration_weeks": 3,
+      "goal": "Execute your first trip and build systems for long-term travel",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Build your travel workflow",
+          "description": "Create a packing list that fits in a carry-on. Set up your work environment (VPN, noise-cancelling headphones, portable hotspot). Find one reliable workspace in your destination city. The first trip teaches you what you actually need.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Packing list finalised and work setup tested"
+        },
+        {
+          "step_number": 8,
+          "title": "Debrief and plan your next move",
+          "description": "After your first trip, review: What worked? What didn't? What was the actual cost vs estimate? What would you pack differently? Use this to refine your system for the next destination.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Debrief document written and next destination shortlisted"
+        }
+      ],
+      "milestones": ["First trip executed", "Travel workflow tested", "Next destination planned"]
+    }
+  ]
+}

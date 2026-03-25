@@ -20,14 +20,16 @@ export function Sheet({ children, onClose }: SheetProps) {
 
   const motionProps = reduceMotion
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
-    : { initial: { y: 100, opacity: 0 }, animate: { y: 0, opacity: 1 }, exit: { y: 100, opacity: 0 } };
+    : { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
+
+  const transitionProps = reduceMotion ? { duration } : { duration: 0.2 };
 
   return (
     <motion.div
       data-testid="sheet"
       role="dialog"
       aria-label="Future Me coaching"
-      className="glass fixed left-5 right-5 z-50 w-auto max-w-[420px] overflow-hidden rounded-[28px] p-6 md:left-1/2 md:right-auto md:w-full md:max-w-[520px] md:-translate-x-1/2 md:px-8 md:py-6 lg:max-w-[640px] lg:px-10"
+      className="fixed left-5 right-5 z-50 w-auto max-w-[420px] overflow-hidden rounded-xl border border-border bg-card p-6 shadow-[0_2px_8px_rgba(0,0,0,0.2)] md:left-1/2 md:right-auto md:w-full md:max-w-[520px] md:-translate-x-1/2 md:px-8 md:py-6 lg:max-w-[640px] lg:px-10"
       style={{
         top: "clamp(12%, 18vh, 22%)",
       }}
@@ -36,7 +38,7 @@ export function Sheet({ children, onClose }: SheetProps) {
       dragElastic={{ top: 0, bottom: 0.4 }}
       onDragEnd={handleDragEnd}
       {...motionProps}
-      transition={{ duration, ease: "easeOut" }}
+      transition={transitionProps}
     >
       <div
         data-testid="sheet-body"
@@ -50,7 +52,7 @@ export function Sheet({ children, onClose }: SheetProps) {
       </div>
 
       <div className="mt-3 flex justify-center" aria-hidden>
-        <span className="h-1 w-10 rounded-full bg-white/20" />
+        <span className="h-0.5 w-8 rounded-full bg-border" />
       </div>
     </motion.div>
   );

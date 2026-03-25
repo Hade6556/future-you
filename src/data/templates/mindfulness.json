@@ -1,0 +1,88 @@
+{
+  "horizon_weeks": 8,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Foundation",
+      "duration_weeks": 2,
+      "goal": "Build a consistent meditation practice from scratch",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Start with 5 minutes a day",
+          "description": "The biggest mistake beginners make is starting too long and quitting. Start with 5 minutes of focused breathing every morning. Just observe your breath — in, out. When your mind wanders, gently return. That returning is the practice.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "5-minute morning meditation completed for 7 consecutive days"
+        },
+        {
+          "step_number": 2,
+          "title": "Increase to 10 minutes and lock in the habit",
+          "description": "After your first week, extend to 10 minutes. Meditate at the same time and place every day. Use an app like Headspace or Insight Timer if guided meditation helps. Consistency at a low duration beats sporadic long sessions.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "10-minute daily meditation maintained for 7 consecutive days"
+        }
+      ],
+      "milestones": ["Daily meditation habit started", "10-minute practice locked in"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Deepening",
+      "duration_weeks": 4,
+      "goal": "Extend your practice and bring mindfulness into daily life",
+      "steps": [
+        {
+          "step_number": 3,
+          "title": "Extend to 20 minutes",
+          "description": "Gradually increase your session length to 20 minutes over 4 weeks. Longer sits allow the mind to settle past its first layer of noise. Many practitioners report that the real calm starts around the 10–15 minute mark.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "20-minute daily meditation maintained for 2 consecutive weeks"
+        },
+        {
+          "step_number": 4,
+          "title": "Add one mindful activity per day",
+          "description": "Choose one daily activity — eating breakfast, washing dishes, commuting — and do it with full attention. No phone, no podcast, no multitasking. Just the activity. Informal mindfulness throughout the day compounds the benefits of formal meditation.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "One daily mindful activity practised for 4 consecutive weeks"
+        },
+        {
+          "step_number": 5,
+          "title": "Use the STOP technique when stressed",
+          "description": "STOP: Stop what you're doing. Take a breath. Observe what's happening in your body and mind without judgement. Proceed with awareness. Use this in any high-stress moment. Over time it rewires your automatic stress response.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "STOP technique used at least once in every high-stress situation for 4 weeks"
+        }
+      ],
+      "milestones": ["20-minute practice established", "Mindfulness in daily activities", "STOP technique automatic"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Integration",
+      "duration_weeks": 2,
+      "goal": "Make mindfulness a permanent part of your identity",
+      "steps": [
+        {
+          "step_number": 6,
+          "title": "Attend a class or retreat",
+          "description": "Join a local meditation class, yoga studio, or attend a one-day mindfulness workshop. Practising with others deepens your commitment and exposes you to teachers who can correct your technique and answer questions.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "At least one class or workshop attended"
+        },
+        {
+          "step_number": 7,
+          "title": "Reflect on what has changed",
+          "description": "Write a reflection on how your inner experience has shifted over 8 weeks. What triggers you less? Where do you notice more space between stimulus and response? This reflection cements your identity as a mindful person — not just someone who meditates.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Reflection written on changes experienced over 8 weeks"
+        }
+      ],
+      "milestones": ["Community practice found", "Transformation reflected on", "Mindfulness as permanent identity"]
+    }
+  ]
+}

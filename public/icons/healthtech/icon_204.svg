@@ -1,0 +1,18 @@
+<svg width="72.00" height="72.00" viewBox="466.00 1728.00 72.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="470" y="1732" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <path d="M497.406 1755.12C496.812 1754.96 496.188 1754.96 495.594 1755.12C495.001 1755.28 494.46 1755.59 494.025 1756.03C493.591 1756.46 493.278 1757 493.119 1757.59C492.96 1758.19 492.96 1758.81 493.119 1759.41" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M499 1757L495 1761" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M499 1761L494 1756" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M499 1771H505" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M505 1761L510 1756" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M506.594 1755.12C507.188 1754.96 507.812 1754.96 508.406 1755.12C508.999 1755.28 509.54 1755.59 509.975 1756.03C510.409 1756.46 510.722 1757 510.881 1757.59C511.04 1758.19 511.04 1758.81 510.881 1759.41" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="502" cy="1763" r="4" stroke="#9BB068" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

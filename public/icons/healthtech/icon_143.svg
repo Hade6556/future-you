@@ -1,0 +1,12 @@
+<svg width="72.00" height="72.00" viewBox="390.00 1348.00 72.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="394" y="1352" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <path d="M417 1393C417 1391.82 417.233 1390.65 417.685 1389.56C418.137 1388.46 418.8 1387.47 419.636 1386.64C420.472 1385.8 421.464 1385.14 422.556 1384.69C423.648 1384.23 424.818 1384 426 1384C427.182 1384 428.352 1384.23 429.444 1384.69C430.536 1385.14 431.528 1385.8 432.364 1386.64C433.2 1387.47 433.863 1388.46 434.315 1389.56C434.767 1390.65 435 1391.82 435 1393" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <rect x="422" y="1376" width="8" height="8" rx="4" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M423 1390H429" stroke="#9BB068" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M426 1387L426 1393" stroke="#9BB068" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

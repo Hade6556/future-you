@@ -1,0 +1,96 @@
+{
+  "horizon_weeks": 12,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Foundation",
+      "duration_weeks": 3,
+      "goal": "Understand your confidence patterns and start expanding your comfort zone",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Map your confidence landscape",
+          "description": "List 10 situations you find difficult: speaking in meetings, introducing yourself, asserting your needs, dating, public speaking, etc. Rate each 1–10 for anxiety level. This becomes your roadmap — you'll work from lowest to highest over 12 weeks.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Confidence anxiety map completed with 10+ situations rated"
+        },
+        {
+          "step_number": 2,
+          "title": "Start a confidence journal",
+          "description": "Each evening, write down one moment where you acted despite feeling uncertain. No matter how small. Over time this builds a concrete evidence base that you are, in fact, capable — which is the foundation of real confidence.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "Daily confidence journal maintained for 21 consecutive days"
+        },
+        {
+          "step_number": 3,
+          "title": "Take one small uncomfortable action per day",
+          "description": "Start from the low end of your anxiety map. Say hello to a stranger. Ask a question in a meeting. Send the email you've been avoiding. Each small act of courage rewires your brain's threat response slightly. Consistency compounds.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "One uncomfortable action taken every day for 3 weeks"
+        }
+      ],
+      "milestones": ["Anxiety map complete", "Confidence journal running", "Daily discomfort habit built"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Skill Building",
+      "duration_weeks": 6,
+      "goal": "Build the specific skills that create visible confidence",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Join Toastmasters or a public speaking group",
+          "description": "Public speaking is rated more feared than death. It's also the most transferable confidence skill. Toastmasters provides a structured environment to practise regularly with feedback. Attend for at least 6 weeks before judging the impact.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "Joined Toastmasters or equivalent and attended for 6 consecutive weeks"
+        },
+        {
+          "step_number": 5,
+          "title": "Improve body language deliberately",
+          "description": "Confidence communicates before you speak. Work on: standing tall, maintaining eye contact, speaking at a deliberate pace, and not filling silence with nervous sounds. Film yourself speaking for 2 minutes. The gap between how you feel and how you look is usually significant.",
+          "duration_weeks": 4,
+          "resources": [],
+          "success_metric": "Self-filmed speaking exercise done twice and one specific body language habit changed"
+        },
+        {
+          "step_number": 6,
+          "title": "Progressively tackle harder items on your anxiety map",
+          "description": "Each week, intentionally approach one item that sits above your current comfort level. The goal isn't to feel no anxiety — it's to act despite it. Each repeated exposure reduces the anxiety around that situation permanently.",
+          "duration_weeks": 6,
+          "resources": [],
+          "success_metric": "At least 6 items from your anxiety map deliberately confronted"
+        }
+      ],
+      "milestones": ["Public speaking practice running", "Body language improved", "6 anxiety items tackled"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Identity Shift",
+      "duration_weeks": 3,
+      "goal": "Cement your new self-image and maintain momentum",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Rewrite your self-narrative",
+          "description": "The story you tell about yourself shapes your behaviour. Replace 'I'm shy' with 'I'm becoming someone who speaks up'. Write out 5 new identity statements in present tense: 'I am someone who...' This isn't self-deception — it's directing your brain where to grow.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "5 new identity statements written and reviewed daily for 2 weeks"
+        },
+        {
+          "step_number": 8,
+          "title": "Do the thing that scared you most",
+          "description": "Return to the top of your anxiety map. The item that felt impossible in week 1. By now, your comfort zone has expanded dramatically. Doing this item is not just a milestone — it proves to yourself that you are fundamentally different.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Top anxiety-map item confronted"
+        }
+      ],
+      "milestones": ["New self-narrative written", "Biggest fear confronted", "Confidence as identity"]
+    }
+  ]
+}

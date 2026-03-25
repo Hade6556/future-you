@@ -1,0 +1,16 @@
+<svg width="72.00" height="72.00" viewBox="390.00 1920.00 72.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="394" y="1924" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <path d="M429 1951C429 1951.8 428.684 1952.56 428.121 1953.12C427.559 1953.68 426.796 1954 426 1954C425.204 1954 424.441 1953.68 423.879 1953.12C423.316 1952.56 423 1951.8 423 1951L426 1951L429 1951Z" fill="#4B3425" />
+
+  <path d="M434 1957H436" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M416 1957L418 1957" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="423" cy="1957" r="1" fill="#4B3425" />
+
+  <circle cx="429" cy="1957" r="1" fill="#4B3425" />
+
+  <path d="M429 1951C429 1951.8 428.684 1952.56 428.121 1953.12C427.559 1953.68 426.796 1954 426 1954C425.204 1954 424.441 1953.68 423.879 1953.12C423.316 1952.56 423 1951.8 423 1951" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

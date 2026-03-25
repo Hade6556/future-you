@@ -1,0 +1,104 @@
+{
+  "horizon_weeks": 24,
+  "phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "Assessment & Base Building",
+      "duration_weeks": 8,
+      "goal": "Build aerobic base, movement quality, and injury resilience before adding intensity",
+      "steps": [
+        {
+          "step_number": 1,
+          "title": "Movement and fitness assessment",
+          "description": "Get a functional movement screen (FMS) from a sports physio or certified coach. Identify mobility restrictions and muscular imbalances. These are injury risks — address them in warm-ups from day one.",
+          "duration_weeks": 1,
+          "resources": ["https://www.functionalmovement.com"],
+          "success_metric": "FMS score baseline established, top 2 restrictions identified"
+        },
+        {
+          "step_number": 2,
+          "title": "Zone 2 aerobic base training",
+          "description": "80% of all training at a conversational pace (Zone 2: can hold a full conversation). This builds the aerobic engine that powers everything else. Build to 5 hours/week of Zone 2 work over 8 weeks. Do NOT skip this phase — most athletes train too hard too early.",
+          "duration_weeks": 8,
+          "resources": ["https://www.trainingpeaks.com"],
+          "success_metric": "5 hrs/week Zone 2 sustained for 2 consecutive weeks"
+        },
+        {
+          "step_number": 3,
+          "title": "Establish recovery protocols",
+          "description": "Sleep 8–9 hours. Track HRV or resting heart rate each morning. If HRV drops >10% from baseline, take a rest day. Recovery is when adaptation happens — train hard, recover harder.",
+          "duration_weeks": 8,
+          "resources": ["https://www.whoop.com", "https://www.garmin.com"],
+          "success_metric": "Recovery tracking system in place, average sleep 7.5+ hours"
+        }
+      ],
+      "milestones": ["FMS complete", "Zone 2 base established", "Recovery protocol running"]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "Sport-Specific Development",
+      "duration_weeks": 10,
+      "goal": "Build power, speed, and sport-specific skill. Enter first competition.",
+      "steps": [
+        {
+          "step_number": 4,
+          "title": "Choose and register for first target event",
+          "description": "Pick a race, tournament, or competition 10–12 weeks from now. Register and pay immediately — the non-refundable commitment changes your psychology. Tell people about it for accountability.",
+          "duration_weeks": 1,
+          "resources": ["https://www.active.com", "https://www.runningusa.org"],
+          "success_metric": "Event registered, confirmation in hand"
+        },
+        {
+          "step_number": 5,
+          "title": "Work with a coach on periodized training block",
+          "description": "A coach builds you a periodized plan: base → build → peak → taper. Include structured workouts (intervals, tempo, sport-specific drills) and mandatory deload weeks every 3–4 weeks. Do not skip deloads.",
+          "duration_weeks": 9,
+          "resources": ["https://www.trainingpeaks.com/find-a-coach/", "https://www.nsca.com"],
+          "success_metric": "Training block adherence above 85%, all deloads completed"
+        },
+        {
+          "step_number": 6,
+          "title": "Sport-specific strength training",
+          "description": "2x/week lifting targeting sport-specific movement patterns. Runners: single-leg exercises, hip strengthening. Cyclists: squat patterns, core stability. Combat sports: rotational power, grip strength.",
+          "duration_weeks": 10,
+          "resources": [],
+          "success_metric": "Strength benchmarks improving across the block"
+        }
+      ],
+      "milestones": ["First competition registered", "Periodized block completed", "Sport-specific PB achieved"]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "Compete & Reflect",
+      "duration_weeks": 6,
+      "goal": "Execute on race day, debrief, and plan the next training cycle",
+      "steps": [
+        {
+          "step_number": 7,
+          "title": "Taper and race preparation",
+          "description": "Reduce training volume by 40% in the final 2 weeks while maintaining intensity. Do not try anything new (food, gear, sleep schedule). Trust the training. Visualize your race execution daily.",
+          "duration_weeks": 2,
+          "resources": [],
+          "success_metric": "Taper week completed without skipping sessions"
+        },
+        {
+          "step_number": 8,
+          "title": "Competition day",
+          "description": "Execute your pre-planned race strategy. Resist going out too fast. Collect all performance data (splits, power, HR, RPE). Finish — completing your first event matters more than time.",
+          "duration_weeks": 1,
+          "resources": [],
+          "success_metric": "Event completed"
+        },
+        {
+          "step_number": 9,
+          "title": "Post-competition debrief and next cycle",
+          "description": "Within one week: review performance data. Identify top 3 limiters (endurance? speed? mental? technique?). Set the next target event. Begin base-building again immediately — fitness decays fast.",
+          "duration_weeks": 3,
+          "resources": [],
+          "success_metric": "Debrief documented, next event registered, next cycle started"
+        }
+      ],
+      "milestones": ["First competition completed", "Performance data analyzed", "Next event registered"]
+    }
+  ]
+}

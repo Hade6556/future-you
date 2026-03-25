@@ -34,13 +34,13 @@ function getVariantInlineStyles(variant: RitualCardVariant) {
     return {
       backgroundColor: "var(--plan-card-locked-bg)",
       borderColor: "var(--plan-card-locked-border)",
-      boxShadow: "0 4px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03)",
+      boxShadow: "0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
     };
   }
   return {
     background: "var(--plan-card-ready-bg)",
     borderColor: "var(--plan-card-ready-border)",
-    boxShadow: "0 0 0 1px rgba(123,91,255,0.15), 0 8px 24px rgba(0,0,0,0.2)",
+    boxShadow: "0 0 0 1px var(--accent-primary-glow-strong), 0 8px 24px rgba(0,0,0,0.08)",
   };
 }
 
@@ -63,7 +63,7 @@ export function ModeCard({ chip, onClose, enableMotion = false }: ModeCardProps)
         <div
           className="pointer-events-none absolute inset-0 rounded-2xl opacity-30"
           style={{
-            background: "linear-gradient(105deg, transparent 0%, rgba(123,91,255,0.08) 45%, transparent 55%)",
+            background: "linear-gradient(105deg, transparent 0%, var(--accent-primary-glow) 45%, transparent 55%)",
             animation: "card-shimmer 4s ease-in-out infinite",
           }}
           aria-hidden
@@ -71,7 +71,7 @@ export function ModeCard({ chip, onClose, enableMotion = false }: ModeCardProps)
       )}
       <div className="relative flex min-h-0 flex-1 flex-col gap-[var(--space-sm)]">
         <div className="flex items-center justify-between gap-3">
-          <span className="plan-body min-w-0 flex-1 break-words font-semibold text-white">{chip.label}</span>
+          <span className="plan-body min-w-0 flex-1 break-words font-semibold text-foreground">{chip.label}</span>
           {isLocked && (
             <span className="badge-lock-shimmer inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--ritual-red)]/30 bg-[var(--ritual-red)]/10 px-2.5 py-0.5 plan-supporting font-medium text-[var(--ritual-red)]">
               <LockIcon />
@@ -85,14 +85,14 @@ export function ModeCard({ chip, onClose, enableMotion = false }: ModeCardProps)
             <span className="shrink-0 plan-supporting font-medium text-[var(--color-pulse-teal)]">In progress</span>
           )}
         </div>
-        <p className="plan-body break-words text-slate-400">{chip.insight}</p>
-        <p className="plan-supporting break-words text-slate-500">{chip.nextActionLine}</p>
+        <p className="plan-body break-words text-muted-foreground">{chip.insight}</p>
+        <p className="plan-supporting break-words text-muted-foreground">{chip.nextActionLine}</p>
         <div className="mt-1">
           {isReady || isInProgress ? (
             <Link
               href={chip.href}
               onClick={onClose}
-              className="inline-flex h-10 items-center justify-center rounded-full bg-white/10 px-4 plan-supporting font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ion-green)]/50"
+              className="inline-flex h-10 items-center justify-center rounded-full bg-primary/10 px-4 plan-supporting font-medium text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
               {chip.ctaLabel}
             </Link>

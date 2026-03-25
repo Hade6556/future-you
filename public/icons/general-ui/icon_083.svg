@@ -1,0 +1,12 @@
+<svg width="751.00" height="72.00" viewBox="265.00 968.00 751.00 72.00" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M269 1001C269 1000.01 269.293 999.044 269.843 998.222C270.392 997.4 271.173 996.759 272.087 996.381C273 996.002 274.006 995.903 274.975 996.096C275.945 996.289 276.836 996.765 277.536 997.465C278.235 998.164 278.711 999.055 278.904 1000.02C279.097 1000.99 278.998 1002 278.619 1002.91C278.241 1003.83 277.6 1004.61 276.778 1005.16C275.425 1006.06 274 1007.32 274 1008.95V1009" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M350 996V1012" stroke="#9BB068" stroke-width="2" stroke-linejoin="round" />
+
+  <rect x="622" y="972" width="64" height="64" rx="32" fill="#F7F4F2" />
+
+  <rect x="645" y="995" width="18" height="18" rx="9" stroke="#4B3425" stroke-width="2" stroke-linejoin="round" />
+
+  <path d="M659 1004L649 1004" stroke="#9BB068" stroke-width="2" stroke-linejoin="round" />
+
+</svg>

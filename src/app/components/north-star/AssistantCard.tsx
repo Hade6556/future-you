@@ -13,7 +13,6 @@ type AssistantCardProps = {
 
 export function AssistantCard({ status, onClose }: AssistantCardProps) {
   const reduceMotion = useReducedMotion();
-  const duration = reduceMotion ? 0.15 : 0.25;
   const enableMotion = !reduceMotion;
 
   return (
@@ -29,13 +28,13 @@ export function AssistantCard({ status, onClose }: AssistantCardProps) {
 
       <div className="flex flex-col gap-2 pt-0">
         <div className="flex items-center justify-between plan-supporting">
-          <span className="font-medium text-slate-400">Streak</span>
-          <span className="font-semibold text-white">
+          <span className="font-medium text-muted-foreground">Streak</span>
+          <span className="font-semibold text-foreground">
             {status.streak} {status.streak === 1 ? "day" : "days"}
           </span>
         </div>
         <div
-          className="h-1.5 overflow-hidden rounded-full bg-white/10"
+          className="h-1.5 overflow-hidden rounded-full bg-muted"
           role="progressbar"
           aria-valuenow={Math.min(100, status.streak * 4)}
           aria-valuemin={0}

@@ -13,7 +13,6 @@ const NORTH_STAR_PATHS = [
 ];
 
 const MOTION_DURATION = 0.25;
-const ORB_SIZE = 96;
 const INNER_RING_R = 56;
 const OUTER_RING_R = 72;
 const INNER_SIZE = INNER_RING_R * 2;
@@ -40,15 +39,17 @@ export function CommandRosette({ isOpen, onClick, scale = 1 }: CommandRosettePro
       {/* Outer orbital ring (thin, subtle) */}
       {!reduceMotion && (
         <motion.div
-          className="pointer-events-none absolute rounded-full border border-white/20"
+          className="pointer-events-none absolute rounded-full"
           style={{
             width: OUTER_SIZE * scale,
             height: OUTER_SIZE * scale,
             borderWidth: 1,
+            borderStyle: "solid",
+            borderColor: "var(--border)",
           }}
           initial={false}
           animate={{
-            opacity: isOpen ? 0.5 : 0.2,
+            opacity: isOpen ? 0.7 : 0.35,
             rotate: 360,
           }}
           transition={{
@@ -60,16 +61,17 @@ export function CommandRosette({ isOpen, onClick, scale = 1 }: CommandRosettePro
       )}
       {/* Inner orbital ring */}
       <motion.div
-        className="pointer-events-none absolute rounded-full border border-white/25"
+        className="pointer-events-none absolute rounded-full"
         style={{
           width: INNER_SIZE * scale,
           height: INNER_SIZE * scale,
           borderWidth: 1,
+          borderStyle: "solid",
         }}
         initial={false}
         animate={{
-          opacity: isOpen ? 0.6 : 0.25,
-          borderColor: isOpen ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)",
+          opacity: isOpen ? 0.8 : 0.4,
+          borderColor: isOpen ? "var(--accent-primary)" : "var(--border)",
         }}
         transition={{ duration, ease: "easeOut" }}
         aria-hidden
@@ -83,8 +85,10 @@ export function CommandRosette({ isOpen, onClick, scale = 1 }: CommandRosettePro
         {[0, 90, 180, 270].map((deg) => (
           <div
             key={deg}
-            className="absolute left-1/2 top-1/2 h-px w-2 origin-center rounded-full bg-white/40"
+            className="absolute left-1/2 top-1/2 h-px w-2 origin-center rounded-full"
             style={{
+              background: "var(--accent-primary)",
+              opacity: 0.4,
               transform: `translate(-50%, -50%) rotate(${deg}deg) translateY(-${(OUTER_RING_R - 4) * scale}px)`,
             }}
           />
@@ -100,17 +104,17 @@ export function CommandRosette({ isOpen, onClick, scale = 1 }: CommandRosettePro
           aria-hidden
         >
           <span
-            className="absolute left-1/2 top-0 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+            className="absolute left-1/2 top-0 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary"
             style={{
-              boxShadow: "0 0 6px rgba(255,255,255,0.8)",
-              opacity: isOpen ? 1 : 0.5,
+              boxShadow: "0 0 6px var(--accent-primary-glow-strong)",
+              opacity: isOpen ? 1 : 0.6,
             }}
           />
           <span
-            className="absolute bottom-0 left-1/2 h-1 w-1 -translate-x-1/2 translate-y-1/2 rounded-full bg-white"
+            className="absolute bottom-0 left-1/2 h-1 w-1 -translate-x-1/2 translate-y-1/2 rounded-full bg-primary"
             style={{
-              boxShadow: "0 0 6px rgba(255,255,255,0.8)",
-              opacity: isOpen ? 1 : 0.5,
+              boxShadow: "0 0 6px var(--accent-primary-glow-strong)",
+              opacity: isOpen ? 1 : 0.6,
             }}
           />
         </motion.div>
@@ -120,10 +124,10 @@ export function CommandRosette({ isOpen, onClick, scale = 1 }: CommandRosettePro
         type="button"
         onClick={onClick}
         aria-label="Engage Guidance Protocol"
-        className={`relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--night-sky)] ${pulse ? "orb-pulse" : ""}`}
+        className={`relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${pulse ? "orb-pulse" : ""}`}
         style={{
           background: "var(--plasma-glow)",
-          boxShadow: pulse ? undefined : "inset 0 0 32px rgba(255,255,255,0.12)",
+          boxShadow: pulse ? undefined : "inset 0 0 32px rgba(255,255,255,0.15), 0 4px 20px var(--accent-primary-glow-strong)",
         }}
         initial={false}
         animate={{
@@ -134,9 +138,9 @@ export function CommandRosette({ isOpen, onClick, scale = 1 }: CommandRosettePro
         whileTap={{ scale: reduceMotion ? 1 : 0.98 }}
       >
         <span
-          className="pointer-events-none absolute inset-[-6px] rounded-full border-2 border-white/20"
+          className="pointer-events-none absolute inset-[-6px] rounded-full border-2 border-primary/20"
           style={{
-            background: "linear-gradient(120deg, rgba(123,91,255,0.25) 0%, rgba(65,179,255,0.25) 100%)",
+            background: "linear-gradient(120deg, var(--accent-primary-glow) 0%, var(--accent-primary-glow) 100%)",
           }}
           aria-hidden
         />
@@ -144,7 +148,7 @@ export function CommandRosette({ isOpen, onClick, scale = 1 }: CommandRosettePro
           <span
             className="pointer-events-none absolute inset-[-16px] rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(123,91,255,0.35) 0%, rgba(65,179,255,0.2) 40%, transparent 70%)",
+              background: "radial-gradient(circle, var(--accent-primary-glow-strong) 0%, var(--accent-primary-glow) 40%, transparent 70%)",
               filter: "blur(8px)",
             }}
             aria-hidden
