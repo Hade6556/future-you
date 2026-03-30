@@ -76,7 +76,7 @@ export function FutureScoreRing() {
         className="text-[10px] font-bold uppercase tracking-[0.22em]"
         style={{ color: "var(--text-muted)" }}
       >
-        Future Score
+        Behavio Score
       </p>
 
       {/* Ring */}
@@ -85,7 +85,7 @@ export function FutureScoreRing() {
           width={SVG_SIZE}
           height={SVG_SIZE}
           viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
-          aria-label={`Future score: ${Math.round(futureScore)} out of 100`}
+          aria-label={`Behavio score: ${Math.round(futureScore)} out of 100`}
           role="img"
         >
           {/* Background track */}

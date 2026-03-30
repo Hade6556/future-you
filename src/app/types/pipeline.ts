@@ -58,16 +58,43 @@ export type GoalPlan = {
 export type PipelineStatus = "idle" | "loading" | "ready" | "error";
 
 export type UserContext = {
+  // Existing
   timeline?: string | null;
   commitment?: string | null;
   schedule?: string | null;
   obstacles?: string[];
-  // Quiz funnel context — used to personalise the 90-day plan
   primaryGoal?: string | null;
   pastAttempts?: string | null;
   currentState?: string | null;
   vision?: string | null;
   gender?: string | null;
+
+  // Quiz signals
+  ageGroup?: string | null;
+  specificGoals?: string[];
+  motivations?: string[];
+  badHabits?: string[];
+  selfTrust?: string | null;
+  problems?: string[];
+
+  // Intake signals
+  dreamNarrative?: string | null;
+  values?: string[];
+  roles?: string[];
+  intakePaths?: Array<{ name: string; description: string; timeHorizon: string }>;
+
+  // Identity signals
+  archetype?: string | null;
+  ambitionDomain?: string | null;
+
+  // Wellbeing signals
+  moodRating?: number | null;
+  sleepQuality?: string | null;
+  energyLevel?: string | null;
+  stressLevel?: string | null;
+
+  // Domain-specific deep dive answers
+  domainAnswers?: Record<string, string[]>;
 };
 
 // ─── Mentor / Check-in types ─────────────────────────────────────────────────
@@ -84,6 +111,71 @@ export type DailyMentorMessage = {
 export type CheckinResponse = {
   reply: string;
   tomorrowPreview: string | null;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Daily Tasks types ──────────────────────────────────────────────────────
+
+export type EnergyLevel = "low" | "medium" | "high";
+export type TimeAvailable = 15 | 30 | 60 | 120;
+export type ChallengeLevel = "comfort" | "push" | "stretch";
+export type TaskCategory = "plan" | "habit" | "wellbeing" | "custom";
+export type TaskPriority = "must-do" | "should-do" | "bonus";
+export type TaskSource = "ai" | "recurring" | "user";
+export type TaskIntensity = "routine" | "challenging" | "stretch";
+
+export type GeneratedTask = {
+  id: string;
+  label: string;
+  description: string;
+  category: TaskCategory;
+  estimatedMinutes: number;
+  priority: TaskPriority;
+  intensity: TaskIntensity;
+  planStepRef: number | null;
+  source: TaskSource;
+  completed: boolean;
+  deferred: boolean;
+};
+
+export type RecurringTask = {
+  id: string;
+  label: string;
+  estimatedMinutes: number;
+  daysOfWeek: number[]; // 1=Mon, 7=Sun
+  active: boolean;
+};
+
+export type DailyTasksRequest = {
+  currentStep: PipelineStep | null;
+  currentPhase: PipelinePhase | null;
+  nextStep: PipelineStep | null;
+  day: number;
+  totalDays: number;
+  overallProgress: number;
+  userName: string;
+  archetype: string | null;
+  ambitionType: string | null;
+  energy: EnergyLevel;
+  timeAvailable: TimeAvailable;
+  focusArea: string | null;
+  streak: number;
+  completionRate7d: number;
+  avgDailyScore7d: number;
+  lastJournalSentiment: string | null;
+  missedTaskPatterns: string[];
+  dayOfWeek: string;
+  recurringTasks: RecurringTask[];
+  userProfileDigest: string | null;
+  challengeLevel: ChallengeLevel;
+  mustDoCompletionRate7d: number;
+};
+
+export type DailyTasksResponse = {
+  tasks: GeneratedTask[];
+  dayMessage: string;
+  adaptationNote: string | null;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

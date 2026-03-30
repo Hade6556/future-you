@@ -1,4 +1,4 @@
--- Future You: Supabase Schema
+-- Behavio: Supabase Schema
 -- Run this in the Supabase SQL editor after creating your project
 
 -- Enable UUID extension
@@ -84,3 +84,73 @@ alter table public.users
 -- Stripe customer ID (run this after initial setup if schema already exists)
 alter table public.users
   add column if not exists stripe_customer_id text unique;
+
+-- Extended user state for server sync (run after initial setup)
+alter table public.users
+  add column if not exists best_streak integer default 0,
+  add column if not exists streak_shields integer default 0,
+  add column if not exists future_score numeric(5,2) default 0,
+  add column if not exists quiz_data jsonb,
+  add column if not exists onboarding_complete boolean default false;
+
+-- Daily activity log — replaces client-side localStorage for task/score tracking
+create table if not exists public.daily_activity (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.users(id) on delete cascade not null,
+  date date not null default current_date,
+  checkin_status text check (checkin_status in ('pending','done','partial','skipped')) default 'pending',
+  tasks_completed integer default 0,
+  tasks_total integer default 0,
+  journaled boolean default false,
+  daily_score numeric(5,2) default 0,
+  reflection_id uuid references public.reflections(id),
+  created_at timestamptz default now(),
+  unique(user_id, date)
+);
+
+alter table public.daily_activity enable row level security;
+create policy "daily_activity: own rows" on public.daily_activity for all using (auth.uid() = user_id);
+
+-- Morning check-in columns on daily_activity
+alter table public.daily_activity
+  add column if not exists morning_energy text,
+  add column if not exists morning_time_available integer,
+  add column if not exists morning_focus text;
+
+-- Daily tasks — AI-generated + user-added tasks per day
+create table if not exists public.daily_tasks (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.users(id) on delete cascade not null,
+  date date not null default current_date,
+  task_id text not null,
+  label text not null,
+  description text,
+  category text not null default 'plan' check (category in ('plan','habit','wellbeing','custom')),
+  priority text not null default 'should-do' check (priority in ('must-do','should-do','bonus')),
+  estimated_minutes integer default 15,
+  plan_step_ref integer,
+  source text not null default 'ai' check (source in ('ai','recurring','user')),
+  completed boolean default false,
+  deferred boolean default false,
+  completed_at timestamptz,
+  sort_order integer default 0,
+  created_at timestamptz default now(),
+  unique(user_id, date, task_id)
+);
+
+alter table public.daily_tasks enable row level security;
+create policy "daily_tasks: own rows" on public.daily_tasks for all using (auth.uid() = user_id);
+
+-- Recurring tasks — user-defined tasks that repeat on selected days
+create table if not exists public.recurring_tasks (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.users(id) on delete cascade not null,
+  label text not null,
+  estimated_minutes integer default 15,
+  days_of_week integer[] default '{1,2,3,4,5,6,7}',
+  active boolean default true,
+  created_at timestamptz default now()
+);
+
+alter table public.recurring_tasks enable row level security;
+create policy "recurring_tasks: own rows" on public.recurring_tasks for all using (auth.uid() = user_id);

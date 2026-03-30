@@ -4,10 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 import ActionLoader from "../../components/ActionLoader";
+import AmbitionMapOrbs from "../../components/AmbitionMapOrbs";
+import CoachResponseCard from "../../components/CoachResponseCard";
+import { usePlanStore } from "../../state/planStore";
+import type { AmbitionCategory } from "../../state/planStore";
 
 type Mood = "Calm" | "Anxious" | "Energized" | "Sad" | "Focused";
 type Sentiment = "positive" | "neutral" | "negative";
+type PageState = "form" | "processing" | "done";
 
 const MOODS: { label: Mood; color: string; sentiment: Sentiment }[] = [
   { label: "Calm",      color: "#9BB068", sentiment: "neutral"  },
@@ -17,73 +23,296 @@ const MOODS: { label: Mood; color: string; sentiment: Sentiment }[] = [
   { label: "Focused",   color: "#FFCE5C", sentiment: "positive" },
 ];
 
+const LIME = "#C8FF00";
+const NAVY = "#060912";
+const TEXT_HI = "rgba(235,242,255,0.95)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
+
+const FONT_HEADING: React.CSSProperties = {
+  fontFamily: "var(--font-barlow-condensed), sans-serif",
+  fontWeight: 900,
+  fontStyle: "italic",
+};
+const FONT_BODY: React.CSSProperties = {
+  fontFamily: "var(--font-apercu), sans-serif",
+};
+
 export default function NewEntryPage() {
   const router = useRouter();
+
+  // Page state machine
+  const [pageState, setPageState] = useState<PageState>("form");
+  const [coachMessage, setCoachMessage] = useState<string | null>(null);
+  const [coachActionItem, setCoachActionItem] = useState<string | null>(null);
+  const [mapUpdated, setMapUpdated] = useState(false);
+
+  // Form state
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [content, setContent] = useState("");
-  const [saving, setSaving] = useState(false);
+
+  // Zustand selectors
+  const recordJournalEntry = usePlanStore((s) => s.recordJournalEntry);
+  const incrementStreak = usePlanStore((s) => s.incrementStreak);
+  const ambitionCategories = usePlanStore((s) => s.ambitionCategories);
+  const setAmbitionCategories = usePlanStore((s) => s.setAmbitionCategories);
+  const setLastReflection = usePlanStore((s) => s.setLastReflection);
+  const dogArchetype = usePlanStore((s) => s.dogArchetype);
+  const ambitionType = usePlanStore((s) => s.ambitionType);
+  const streak = usePlanStore((s) => s.streak);
+  const userName = usePlanStore((s) => s.userName);
+  const lastReflection = usePlanStore((s) => s.lastReflection);
 
   const selectedMoodData = MOODS.find((m) => m.label === selectedMood);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!content.trim()) return;
-    setSaving(true);
+    const text = content.trim();
+    if (!text) return;
+
+    setPageState("processing");
+    setLastReflection(text);
+
+    // Step 1: analyze + coach in parallel
+    const [analyzeResult, coachResult] = await Promise.allSettled([
+      fetch("/api/analyze-dump", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: text }),
+      }).then((r) => r.json() as Promise<{ categories: Array<{ label: string; pct: number }> }>),
+      fetch("/api/coach", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          mode: "reflect",
+          context: { archetype: dogArchetype, ambitionType, streak, userName, lastReflection },
+        }),
+      }).then((r) => r.json() as Promise<{ message: string; actionItem?: string | null; sentiment?: string }>),
+    ]);
+
+    // Process analyze result
+    if (analyzeResult.status === "fulfilled" && analyzeResult.value.categories?.length) {
+      setAmbitionCategories(
+        analyzeResult.value.categories.map((c): AmbitionCategory => ({
+          label: c.label,
+          shortLabel: c.label.split(" ")[0],
+          pct: c.pct,
+          prevPct: ambitionCategories.find((x) => x.label === c.label)?.pct ?? c.pct,
+        }))
+      );
+      setMapUpdated(true);
+    } else {
+      setMapUpdated(false);
+    }
+
+    // Process coach result
+    let coachMsg = "Reflection saved. Coach is unavailable right now.";
+    let coachAction: string | null = null;
+    let sentiment: Sentiment = selectedMoodData?.sentiment ?? "neutral";
+    if (coachResult.status === "fulfilled") {
+      coachMsg = coachResult.value.message ?? coachMsg;
+      coachAction = coachResult.value.actionItem ?? null;
+      if (coachResult.value.sentiment) {
+        sentiment = coachResult.value.sentiment as Sentiment;
+      }
+    }
+
+    // Step 2: save to brain-dumps with coach response
     try {
       await fetch("/api/brain-dumps", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: content.trim(),
-          sentiment: selectedMoodData?.sentiment ?? null,
-        }),
+        body: JSON.stringify({ content: text, coach_response: coachMsg, sentiment }),
       });
-      router.push("/journal");
-    } finally {
-      setSaving(false);
-    }
+    } catch { /* non-blocking */ }
+
+    // Step 3: update scoring + streak
+    recordJournalEntry();
+    incrementStreak();
+
+    setCoachMessage(coachMsg);
+    setCoachActionItem(coachAction);
+    setPageState("done");
   }
+
+  function resetForm() {
+    setPageState("form");
+    setContent("");
+    setSelectedMood(null);
+    setCoachMessage(null);
+    setCoachActionItem(null);
+    setMapUpdated(false);
+  }
+
+  // ─── Done state: dark navy with ambition map + coach card ───
+  if (pageState === "done") {
+    return (
+      <div style={{ minHeight: "100dvh", background: NAVY, position: "relative", overflow: "hidden" }}>
+        {/* Background mesh */}
+        <div aria-hidden style={{
+          position: "fixed", inset: 0, zIndex: 0,
+          background: "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%), linear-gradient(170deg, #0d1a3a 0%, #060912 55%)",
+          pointerEvents: "none",
+        }} />
+        {/* Grid overlay */}
+        <div aria-hidden style={{
+          position: "fixed", inset: 0, zIndex: 0,
+          backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+          backgroundSize: "48px 48px", pointerEvents: "none",
+        }} />
+
+        <div style={{
+          position: "relative", zIndex: 1,
+          display: "flex", flexDirection: "column", gap: 20,
+          width: "100%", maxWidth: 448, margin: "0 auto", minWidth: 0,
+          padding: "max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2.75rem)) 24px 160px",
+        }}>
+          {/* Header */}
+          <motion.header
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h1 style={{
+              ...FONT_HEADING,
+              fontSize: 38, lineHeight: 0.95, letterSpacing: "-0.03em",
+              color: TEXT_HI, margin: 0,
+            }}>
+              Entry saved
+            </h1>
+            <p style={{
+              ...FONT_BODY,
+              fontSize: 15, lineHeight: 1.6, color: TEXT_MID,
+              marginTop: 8, marginBottom: 0,
+            }}>
+              Here&apos;s what we found in your reflection.
+            </p>
+          </motion.header>
+
+          {/* Ambition map */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.35 }}
+          >
+            <AmbitionMapOrbs categories={ambitionCategories} />
+          </motion.div>
+
+          {/* Map status */}
+          <p style={{ ...FONT_BODY, textAlign: "center", fontSize: 12, color: TEXT_LO, margin: 0 }}>
+            {mapUpdated
+              ? "↑ Ambition map updated"
+              : "Map couldn't be updated — try a longer entry"}
+          </p>
+
+          {/* Coach response */}
+          {coachMessage && (
+            <CoachResponseCard message={coachMessage} actionItem={coachActionItem} />
+          )}
+
+          {/* Actions */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={() => router.push("/journal")}
+              style={{
+                ...FONT_BODY,
+                width: "100%", borderRadius: 999, border: "none", cursor: "pointer",
+                background: LIME, color: NAVY,
+                padding: "14px 24px", fontSize: 15, fontWeight: 700,
+                boxShadow: "0 4px 24px rgba(200,255,0,0.25)",
+              }}
+            >
+              View Journal
+            </button>
+            <button
+              type="button"
+              onClick={resetForm}
+              style={{
+                ...FONT_BODY,
+                background: "transparent", border: "none", cursor: "pointer",
+                padding: "8px 0", fontSize: 14, fontWeight: 500, color: TEXT_MID,
+                textDecoration: "underline", textUnderlineOffset: 2,
+              }}
+            >
+              Write another
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Form state (+ processing overlay) ───
+  const canSubmit = content.trim().length > 0 && pageState !== "processing";
 
   return (
     <>
-    <ActionLoader visible={saving} />
-    <div
-      className="content-padding relative flex min-h-dvh flex-col pb-16 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]"
-      style={{ background: "var(--canvas-base)" }}
-    >
-      <div className="mx-auto flex w-full max-w-md flex-col gap-6 min-w-0">
+    <ActionLoader visible={pageState === "processing"} />
+    <div style={{ minHeight: "100dvh", background: NAVY, position: "relative", overflow: "hidden" }}>
+      {/* Background mesh */}
+      <div aria-hidden style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        background: "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%), linear-gradient(170deg, #0d1a3a 0%, #060912 55%)",
+        pointerEvents: "none",
+      }} />
+      <div aria-hidden style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+        backgroundSize: "48px 48px", pointerEvents: "none",
+      }} />
+
+      <div style={{
+        position: "relative", zIndex: 1,
+        display: "flex", flexDirection: "column", gap: 20,
+        width: "100%", maxWidth: 448, margin: "0 auto", minWidth: 0,
+        padding: "max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2.75rem)) 24px 24px",
+      }}>
 
         {/* Back nav */}
         <Link
           href="/journal"
-          className="flex w-fit items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold transition-colors hover:bg-muted"
-          style={{ color: "var(--text-secondary)" }}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 4, width: "fit-content",
+            ...FONT_BODY, fontSize: 13, fontWeight: 600, color: TEXT_MID,
+            textDecoration: "none", padding: "4px 0",
+          }}
         >
-          <ChevronLeftIcon className="h-4 w-4" />
+          <ChevronLeftIcon style={{ width: 16, height: 16 }} />
           Back
         </Link>
 
         {/* Header */}
         <header>
-          <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-tight text-foreground">
-            New Entry
+          <h1 style={{
+            ...FONT_HEADING,
+            fontSize: 38, lineHeight: 0.95, letterSpacing: "-0.03em",
+            color: TEXT_HI, margin: 0,
+          }}>
+            New entry
           </h1>
-          <p className="mt-1.5 text-[14px] leading-relaxed text-muted-foreground">
+          <p style={{
+            fontFamily: "var(--font-jetbrains-mono), monospace",
+            fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase",
+            color: TEXT_LO, margin: "8px 0 0",
+          }}>
             Get it out. No filter needed.
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
           {/* Mood selector */}
-          <div className="flex flex-col gap-2">
-            <span
-              className="text-[11px] font-bold uppercase tracking-widest"
-              style={{ color: "var(--text-muted)" }}
-            >
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <span style={{
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              fontSize: 9, fontWeight: 500, letterSpacing: "0.14em", textTransform: "uppercase",
+              color: TEXT_LO,
+            }}>
               How are you feeling?
             </span>
-            <div className="flex gap-2">
+            <div style={{ display: "flex", gap: 8 }}>
               {MOODS.map(({ label, color }) => {
                 const active = selectedMood === label;
                 return (
@@ -91,21 +320,23 @@ export default function NewEntryPage() {
                     key={label}
                     type="button"
                     onClick={() => setSelectedMood(active ? null : label)}
-                    className="flex flex-1 flex-col items-center gap-1.5 rounded-2xl py-3 transition-all"
                     style={{
-                      background: active ? color : `${color}28`,
-                      outline: active ? `2px solid ${color}` : "none",
-                      outlineOffset: "2px",
+                      flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                      padding: "12px 0", borderRadius: 14, cursor: "pointer",
+                      background: active ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.05)",
+                      border: active ? `1.5px solid ${color}` : "1.5px solid rgba(255,255,255,0.08)",
+                      transition: "all 0.15s ease",
                     }}
                   >
-                    <span
-                      className="h-4 w-4 rounded-full"
-                      style={{ background: color }}
-                    />
-                    <span
-                      className="text-[10px] font-bold"
-                      style={{ color: active ? "#1F160F" : "var(--text-secondary)" }}
-                    >
+                    <span style={{
+                      width: 20, height: 20, borderRadius: "50%", display: "block",
+                      background: color,
+                      boxShadow: active ? `0 0 10px ${color}80` : "none",
+                    }} />
+                    <span style={{
+                      ...FONT_BODY, fontSize: 10, fontWeight: 600,
+                      color: active ? TEXT_HI : TEXT_MID,
+                    }}>
                       {label}
                     </span>
                   </button>
@@ -115,32 +346,50 @@ export default function NewEntryPage() {
           </div>
 
           {/* Textarea */}
-          <div
-            className="rounded-3xl border p-4"
-            style={{
-              background: "var(--canvas-elevated)",
-              borderColor: "var(--card-stroke)",
-              boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
-            }}
-          >
+          <div style={{
+            position: "relative",
+            background: "rgba(255,255,255,0.07)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            borderRadius: 20, padding: 20,
+            overflow: "hidden",
+          }}>
+            <div aria-hidden style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: 1,
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
+            }} />
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="What's on your mind…"
-              rows={8}
-              className="w-full resize-none bg-transparent text-[15px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
+              rows={6}
               autoFocus
+              style={{
+                width: "100%", resize: "none", background: "transparent",
+                border: "none", outline: "none",
+                ...FONT_BODY, fontSize: 15, lineHeight: 1.7,
+                color: TEXT_HI,
+                boxSizing: "border-box",
+              }}
             />
           </div>
 
           {/* Submit */}
           <button
             type="submit"
-            disabled={saving || !content.trim()}
-            className="h-14 w-full rounded-full text-[15px] font-bold text-white transition-opacity disabled:opacity-40"
-            style={{ background: "#4B3425" }}
+            disabled={!canSubmit}
+            style={{
+              width: "100%", padding: "16px 0", borderRadius: 999, border: "none",
+              cursor: canSubmit ? "pointer" : "default",
+              background: canSubmit ? LIME : "rgba(200,255,0,0.20)",
+              color: NAVY,
+              ...FONT_HEADING, fontSize: 16, letterSpacing: "0.04em",
+              boxShadow: canSubmit ? "0 4px 24px rgba(200,255,0,0.25)" : "none",
+              transition: "all 0.15s ease",
+            }}
           >
-            {saving ? "Saving…" : "Save Entry"}
+            {pageState === "processing" ? "Saving…" : "Save Entry"}
           </button>
 
         </form>

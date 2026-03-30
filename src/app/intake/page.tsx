@@ -2,21 +2,28 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MascotReactor } from "../components/mascot/MascotReactor";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
 
-const PENDING_NARRATIVE_KEY = "future-you-pending-narrative";
+const LIME  = "#C8FF00";
+const TEXT_HI = "rgba(235,242,255,0.92)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
+const GLASS = "rgba(255,255,255,0.07)";
+const GLASS_BORDER = "rgba(255,255,255,0.14)";
+
+const PENDING_NARRATIVE_KEY = "behavio-pending-narrative";
 
 export default function IntakePage() {
   const router = useRouter();
   const dogArchetype = usePlanStore((s) => s.dogArchetype);
   const ambitionType = usePlanStore((s) => s.ambitionType);
+  const userName = usePlanStore((s) => s.userName);
+  const completeOnboarding = usePlanStore((s) => s.completeOnboarding);
   const [narrative, setNarrative] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const canSubmit = narrative.trim().length >= 20;
 
   const handleSubmit = () => {
     const trimmed = narrative.trim();
@@ -25,7 +32,6 @@ export default function IntakePage() {
       return;
     }
 
-    // Enrich narrative with quiz context so API contract is preserved
     const enriched = [
       trimmed,
       ambitionType ? `Goal area: ${ambitionType}` : "",
@@ -40,83 +46,257 @@ export default function IntakePage() {
       // ignore private mode
     }
 
+    completeOnboarding();
     router.push("/generating");
   };
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6 pb-10 pt-14">
-      <div className="mx-auto w-full max-w-md space-y-6">
-        {/* Mascot */}
-        <motion.div
-          className="flex justify-center"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        >
-          <MascotReactor emotion="thinking" size={80} />
-        </motion.div>
+    <div
+      style={{
+        minHeight: "100dvh",
+        background: "#060912",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          background: `
+            radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
+            linear-gradient(170deg, #0d1a3a 0%, #060912 55%)
+          `,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          pointerEvents: "none",
+        }}
+      />
 
-        {/* Badge + heading */}
-        <motion.div
-          className="space-y-3 text-center"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100dvh",
+          padding: "max(5rem, env(safe-area-inset-top, 5rem)) 24px 48px",
+        }}
+      >
+        {/* Logo */}
+        <div
+          style={{
+            position: "absolute",
+            top: "max(3.5rem, env(safe-area-inset-top, 3.5rem))",
+            left: 28,
+            display: "flex",
+            alignItems: "baseline",
+            zIndex: 10,
+          }}
         >
-          <div className="flex justify-center">
-            <Badge variant="secondary">One question</Badge>
-          </div>
-          <h2 className="font-display text-2xl leading-snug text-foreground">
-            Tell me what winning looks like for you.
-          </h2>
-          <p className="text-[14px] text-muted-foreground">
-            Be specific — the more detail, the better your plan.
-          </p>
-        </motion.div>
-
-        {/* Textarea */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="space-y-4"
-        >
-          <textarea
-            className="min-h-[140px] w-full resize-none rounded-2xl border border-input bg-background px-4 py-4 text-[16px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30"
-            value={narrative}
-            onChange={(e) => {
-              setNarrative(e.target.value);
-              if (error) setError(null);
+          <span
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontStyle: "italic",
+              fontSize: 20,
+              color: "rgba(200,255,0,0.85)",
+              letterSpacing: "0.02em",
             }}
-            placeholder="e.g. I want to launch my first product by summer, feel confident enough to pitch investors, and build a small team I'm proud of..."
-            rows={5}
-            autoFocus
-          />
-
-          {error && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-[13px] text-destructive"
-            >
-              {error}
-            </motion.p>
-          )}
-
-          <Button
-            onClick={handleSubmit}
-            disabled={narrative.trim().length < 10}
-            className="w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover"
-            size="lg"
           >
-            Create my plan
-            <ArrowRightIcon className="ml-2 h-4 w-4" aria-hidden />
-          </Button>
+            behavio
+          </span>
+        </div>
 
-          <p className="text-center text-[12px] text-muted-foreground">
-            Quick · Private · No credit card required
-          </p>
-        </motion.div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 0 }}>
+          {/* Eyebrow */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            style={{ marginBottom: 24 }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 700,
+                fontSize: 10,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: LIME,
+                background: "rgba(200,255,0,0.08)",
+                border: "1px solid rgba(200,255,0,0.18)",
+                borderRadius: 100,
+                padding: "6px 14px",
+              }}
+            >
+              One last thing
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.4 }}
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 800,
+              fontStyle: "italic",
+              fontSize: 40,
+              lineHeight: 0.96,
+              letterSpacing: "-0.025em",
+              color: TEXT_HI,
+              margin: "0 0 8px",
+            }}
+          >
+            {userName ? `${userName}, what` : "What"} does{" "}
+            <em style={{ fontStyle: "normal", color: LIME }}>winning</em> look
+            like?
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            style={{
+              fontFamily: "var(--font-body), Georgia, serif",
+              fontWeight: 400,
+              fontSize: 14,
+              color: TEXT_MID,
+              lineHeight: 1.6,
+              margin: "0 0 24px",
+              maxWidth: 300,
+            }}
+          >
+            Be specific — the more detail you give, the sharper your plan.
+          </motion.p>
+
+          {/* Textarea */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            style={{ display: "flex", flexDirection: "column", gap: 14 }}
+          >
+            <textarea
+              value={narrative}
+              onChange={(e) => {
+                setNarrative(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="e.g. I want to launch my first product by summer, feel confident enough to pitch investors, and build a small team I'm proud of..."
+              autoFocus
+              rows={5}
+              style={{
+                width: "100%",
+                minHeight: 140,
+                resize: "none",
+                padding: "16px 18px",
+                background: GLASS,
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                border: `1px solid ${error ? "rgba(255,80,80,0.50)" : GLASS_BORDER}`,
+                borderRadius: 16,
+                color: TEXT_HI,
+                fontFamily: "var(--font-body), Georgia, serif",
+                fontWeight: 400,
+                fontSize: 15,
+                lineHeight: 1.6,
+                outline: "none",
+                boxSizing: "border-box" as const,
+              }}
+            />
+
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    fontFamily: "var(--font-body), Georgia, serif",
+                    fontSize: 12,
+                    color: "#FF5555",
+                    margin: 0,
+                  }}
+                >
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            <motion.button
+              onClick={handleSubmit}
+              animate={{ opacity: canSubmit ? 1 : 0.4 }}
+              whileTap={canSubmit ? { scale: 0.97 } : {}}
+              style={{
+                width: "100%",
+                background: LIME,
+                color: "#060912",
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 700,
+                fontSize: 18,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                borderRadius: 100,
+                padding: "20px 32px",
+                border: "none",
+                cursor: canSubmit ? "pointer" : "default",
+                boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+              }}
+            >
+              Create my plan
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                aria-hidden
+              >
+                <path
+                  d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.button>
+
+            <p
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 10,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: TEXT_LO,
+                textAlign: "center",
+                margin: 0,
+              }}
+            >
+              Quick · Private · No credit card required
+            </p>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

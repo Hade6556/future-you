@@ -11,7 +11,7 @@ type OrbImageProps = {
 export function OrbImage({
   size = 120,
   className = "",
-  alt = "Future Me mascot",
+  alt = "Behavio mascot",
 }: OrbImageProps) {
   return (
     <Image

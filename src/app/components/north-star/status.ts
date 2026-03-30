@@ -43,7 +43,7 @@ export function buildNorthStarStatus(params: {
   if (readyCount === 3) {
     heroHeadline = "Everything is aligned. Let's go.";
     heroCtaLabel = "Open today's brief";
-    heroCtaHref = "/brief";
+    heroCtaHref = "/";
   } else if (planReady && futureScore > 0) {
     heroHeadline = `You're ${futureScore}% through your coaching plan.`;
     heroCtaLabel = inProgressCount > 0 ? "Continue" : "Start daily coaching";
@@ -65,12 +65,12 @@ export function buildNorthStarStatus(params: {
       status: identityStatus,
       href: "/quiz",
       insight: identityComplete
-        ? "Future Me knows who you are and what you want."
-        : "Take the quiz so Future Me can match your energy.",
+        ? "Behavio knows who you are and what you want."
+        : "Take the quiz so Behavio can match your energy.",
       ctaLabel: identityComplete ? "Edit profile" : "Take the quiz",
       nextActionLine: identityStatus === "locked"
         ? "Complete the quiz to unlock your coaching plan."
-        : "Ready. Future Me has your profile.",
+        : "Ready. Behavio has your profile.",
     },
     {
       id: "plan",
@@ -89,7 +89,7 @@ export function buildNorthStarStatus(params: {
       id: "daily",
       label: "Daily Coaching",
       status: dailyStatusChip,
-      href: "/brief",
+      href: "/",
       insight:
         dailyStatusChip === "locked"
           ? "Daily coaching unlocks after you accept your plan."

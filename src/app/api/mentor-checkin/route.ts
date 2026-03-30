@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
+import { requireAuth } from "@/lib/auth";
 import type { CheckinResponse, CheckinStatus } from "../../types/pipeline";
 
 interface CheckinRequest {
@@ -47,7 +48,7 @@ function buildPrompt(req: CheckinRequest): string {
     ? `Tomorrow's task: "${req.nextStepTitle}"`
     : "This is near the end of their plan.";
 
-  return `You are Future Me — a direct mentor responding to a daily check-in.
+  return `You are Behavio — a direct mentor responding to a daily check-in.
 
 ${statusLine}
 User: ${name}, Day ${req.day} of ${req.totalDays}, ${req.streak} day streak
@@ -78,6 +79,9 @@ const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   const limited = rateLimitResponse(request);
   if (limited) return limited;
   try {

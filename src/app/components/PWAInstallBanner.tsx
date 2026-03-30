@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDownTrayIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
-const DISMISSED_KEY = "future-you-pwa-banner-dismissed";
+const DISMISSED_KEY = "behavio-pwa-banner-dismissed";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;

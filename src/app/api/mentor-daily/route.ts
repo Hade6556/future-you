@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
+import { requireAuth } from "@/lib/auth";
 import type { DailyMentorMessage } from "../../types/pipeline";
 
 interface MentorDailyRequest {
@@ -54,7 +55,7 @@ function buildSystemPrompt(req: MentorDailyRequest): string {
           ? "They completed yesterday. Build on that momentum."
           : "";
 
-  return `You are Future Me — a proactive AI mentor who already knows what this person is doing today. You do not ask questions. You do not offer options. You tell them what to do, briefly and specifically.
+  return `You are Behavio — a proactive AI mentor who already knows what this person is doing today. You do not ask questions. You do not offer options. You tell them what to do, briefly and specifically.
 
 Archetype voice: ${voice || "Warm, direct, no fluff."}
 ${yesterdayNote ? `\nContext: ${yesterdayNote}` : ""}
@@ -99,6 +100,9 @@ const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   const limited = rateLimitResponse(request);
   if (limited) return limited;
   try {

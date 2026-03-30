@@ -28,6 +28,7 @@ export function DailyCoachingSection() {
   const dogArchetype = usePlanStore((s) => s.dogArchetype);
   const ambitionType = usePlanStore((s) => s.ambitionType);
   const streak = usePlanStore((s) => s.streak);
+  const recalculateAndPersistScore = usePlanStore((s) => s.recalculateAndPersistScore);
 
   const [uiPhase, setUiPhase] = useState<UiPhase>(
     todayStatus !== "pending" ? "complete" : "loading",
@@ -102,6 +103,7 @@ export function DailyCoachingSection() {
       useStreakShield();
     }
     setTodayStatus(status);
+    recalculateAndPersistScore();
 
     try {
       const res = await fetch("/api/mentor-checkin", {

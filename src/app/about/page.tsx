@@ -50,7 +50,7 @@ export default function AboutPage() {
         <div className="relative h-[280px] w-[240px]">
           <Image
             src="/orb-pointing.png"
-            alt="Future Me mascot"
+            alt="Behavio mascot"
             fill
             className="object-contain"
           />

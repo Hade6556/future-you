@@ -101,7 +101,7 @@ export function CoachChat({ className }: { className?: string }) {
       <div className="flex flex-col gap-3 max-h-72 overflow-y-auto pr-1">
         {messages.length === 0 && (
           <p className="text-center text-sm text-muted-foreground py-4">
-            Ask Future You anything about your goal, habits, or next move.
+            Ask Behavio anything about your goal, habits, or next move.
           </p>
         )}
         <AnimatePresence initial={false}>
@@ -164,7 +164,7 @@ export function CoachChat({ className }: { className?: string }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask Future You..."
+          placeholder="Ask Behavio..."
           rows={1}
           className="flex-1 resize-none rounded-xl border border-border bg-secondary px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
           style={{ minHeight: "48px", maxHeight: "120px" }}

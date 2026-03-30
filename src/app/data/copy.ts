@@ -72,10 +72,10 @@ export const domainQuotes: Record<string, { quote: string; author: string }[]> =
 };
 
 export const BRAND = {
-  name: "Future You",
+  name: "Behavio",
   tagline: "Your AI life coach for any ambition",
   description:
-    "Future You is your personal AI life coach. Whether you want to start a business, get fit, lose weight, or master any skill — Future You builds the plan that fits your personality.",
+    "Behavio is your personal AI life coach. Whether you want to start a business, get fit, lose weight, or master any skill — Behavio builds the plan that fits your personality.",
   cta: {
     quizHook: "Discover your coaching archetype",
     startQuiz: "Take the quiz",
@@ -84,37 +84,37 @@ export const BRAND = {
     continuePlan: "Continue my plan",
     buildPlan: "Build my personalized plan",
     unlockForecast: "Unlock my full forecast",
-    getFullAccess: "Get Full Access",
-    continueForFree: "Continue for Free",
+    getFullAccess: "Start Free Now",
+    continueForFree: "Start Free Now",
   },
   voice: {
     greeting: (name: string, hour?: number) => {
       const h = hour ?? new Date().getHours();
-      if (h < 12) return `Morning, ${name}. Future You showed up. Will you?`;
+      if (h < 12) return `Morning, ${name}. Behavio showed up. Will you?`;
       if (h < 17) return `Still time to make today count, ${name}.`;
       return `End the day strong, ${name}. One thing left.`;
     },
     greetingStreak: (name: string, streak: number) => {
-      if (streak === 0) return `Reset isn't failure. Future You already moved on.`;
-      if (streak >= 30) return `${name}, ${streak} days. Future You is no longer surprised.`;
-      if (streak >= 7) return `${name}, ${streak} days. Future You is starting to believe.`;
+      if (streak === 0) return `Reset isn't failure. Behavio already moved on.`;
+      if (streak >= 30) return `${name}, ${streak} days. Behavio is no longer surprised.`;
+      if (streak >= 7) return `${name}, ${streak} days. Behavio is starting to believe.`;
       return `Hey ${name}, let's make today count. 🔥 Day ${streak}`;
     },
-    momentum: "Future You is proud of you.",
+    momentum: "Behavio is proud of you.",
     noArchetype: "Take the quiz to discover your coaching style.",
     planEmpty: "Your roadmap is waiting. Takes 2 minutes to generate.",
     dailyIntro: "Your coach has today's mission ready.",
-    chatEmpty: "Ask me anything. Future You has no judgment, only questions.",
-    streakBroken: "Reset isn't failure. Future You already moved on.",
+    chatEmpty: "Ask me anything. Behavio has no judgment, only questions.",
+    streakBroken: "Reset isn't failure. Behavio already moved on.",
     dayOne: "Day 1 is just a day that hasn't started yet.",
   },
   hook: {
     headlines: [
-      "Future You already has a plan. Do you?",
+      "Behavio already has a plan. Do you?",
       "Your AI coach has been waiting.",
       "The gap between you and who you want to be? Let\u2019s measure it.",
     ],
-    primary: "Future You already has a plan. Do you?",
+    primary: "Behavio already has a plan. Do you?",
     subtext: "43,000 people already know their archetype. You don\u2019t \u2014 yet.",
     trust: "Quick \u00b7 Private \u00b7 Free",
   },
@@ -122,7 +122,7 @@ export const BRAND = {
     intro: "Quick questions. Honest answers. Your AI coach will figure out the rest.",
     ctaText: "That\u2019s it \u2192",
     emailCta: "Send my results \u2192",
-    timelinePrompt: "Future You sets deadlines and keeps them. What\u2019s yours?",
+    timelinePrompt: "Behavio sets deadlines and keeps them. What\u2019s yours?",
   },
   archetypeReveal: {
     preText: "You\u2019re a\u2026",
@@ -158,13 +158,13 @@ export const BRAND = {
   trajectory: {
     headline: "Your 90-day forecast",
     lockedLabel: "UNLOCKED WITH PRO",
-    lockedHook: "Future You already knows what happens in week 8.",
-    freeDays: "See it free for 14 days",
+    lockedHook: "Behavio already knows what happens in week 8.",
+    freeDays: "3 days free",
   },
   paywall: {
     step1: {
       headline: "Your plan is ready.",
-      subtext: "Future You built this. Now it needs you.",
+      subtext: "Behavio built this. Now it needs you.",
       cta: "See what\u2019s included",
     },
     step2: {
@@ -173,7 +173,7 @@ export const BRAND = {
         "Your full 90-day roadmap",
         "Daily AI coaching",
         "Smart scheduling (auto-added to your calendar)",
-        "Weekly Future You check-ins",
+        "Weekly Behavio check-ins",
       ],
       socialCount: "43,219 people found their path.",
       quote: "\u201cChanged how I think about goals\u201d",
@@ -181,38 +181,36 @@ export const BRAND = {
       cta: "Start my journey today",
     },
     step3: {
-      headline: "Your 90 days start today. Or they don\u2019t.",
+      headline: "Start free today",
       socialCount: "Join 43,219+ who found their path",
-      annualReframe: "Less than a coffee. More clarity than a year of journaling.",
-      weeklyReframe: "One latte. One week of having a coach in your pocket.",
-      freeReframe: "Start here. Future You will upgrade when they\u2019re ready.",
-      trust: ["Cancel anytime", "14-day guarantee", "Instant access"],
+      priceNote: "3 days free, then \u20ac44/year \u00b7 cancel anytime",
+      trust: ["No charge today", "Cancel anytime", "Instant access"],
     },
   },
   dashboard: {
     agenticCard: {
-      label: "FUTURE YOU SCHEDULED",
+      label: "BEHAVIO SCHEDULED",
       calSynced: "Synced to Google Cal \u2713",
-      chatEntry: "Ask Future You anything \u2192",
+      chatEntry: "Ask Behavio anything \u2192",
     },
     agenticMessages: [
-      "Future You already blocked tomorrow 9am for deep work.",
+      "Behavio already blocked tomorrow 9am for deep work.",
       "Your Friday review is on the calendar. No excuses.",
       "AI adjusted your plan based on this week\u2019s progress.",
     ],
   },
   notifications: {
-    morning: "Future You is already up. You?",
+    morning: "Behavio is already up. You?",
     streakAtRisk: (days: number) => `${days}-day streak. Don\u2019t let tonight be the reset.`,
-    milestone: (days: number) => `Day ${days}. Future You is not surprised. Are you?`,
-    reEngagement: "Future You left you a note. Open it?",
+    milestone: (days: number) => `Day ${days}. Behavio is not surprised. Are you?`,
+    reEngagement: "Behavio left you a note. Open it?",
   },
   emptyStates: {
     noStreak: "Day 1 is just a day that hasn\u2019t started yet.",
-    noChat: "Ask me anything. Future You has no judgment, only questions.",
+    noChat: "Ask me anything. Behavio has no judgment, only questions.",
     noPlan: "Your roadmap is waiting. Takes 2 minutes to generate.",
     noPlanLong: "Let\u2019s build your roadmap. Your coach is ready when you are.",
   },
   ambitionPromise:
-    "Entrepreneur. Athlete. Weight loss. Creative. Student. Whatever your ambition \u2014 Future You has a plan for that.",
+    "Entrepreneur. Athlete. Weight loss. Creative. Student. Whatever your ambition \u2014 Behavio has a plan for that.",
 } as const;

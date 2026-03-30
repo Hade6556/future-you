@@ -1,324 +1,775 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePlanStore } from "../state/planStore";
-import type { ArchetypeId } from "../types/plan";
-import { ARCHETYPES } from "../data/archetypes";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ClockIcon, PlusIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { usePlanStore, todayISO } from "../state/planStore";
+import { computeDayInfo } from "../utils/dayEngine";
+import { computeCompletionRate7d, computeAvgScore7d, computeMustDoCompletionRate7d, detectMissedPatterns, getDayOfWeek, getDayOfWeekNumber } from "../utils/taskEngine";
+import { deriveCheckinStatus } from "../utils/taskEngine";
+import { buildUserProfileDigest } from "@/lib/pipeline/profileDigest";
+import type { EnergyLevel, TimeAvailable, ChallengeLevel, GeneratedTask, DailyTasksRequest } from "../types/pipeline";
+import MorningCheckin from "../components/daily/MorningCheckin";
+import DayContextBanner from "../components/daily/DayContextBanner";
+import TaskSection from "../components/daily/TaskSection";
+import EveningWrapup from "../components/daily/EveningWrapup";
+import AddRecurringSheet from "../components/daily/AddRecurringSheet";
+import SwapTaskSheet from "../components/daily/SwapTaskSheet";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
-type Task = {
-  id: string;
-  label: string;
-  time: string;
-  done: boolean;
-  flexible?: boolean;
-};
-
-function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
-}
-
-function getDefaultTasks(archetype: ArchetypeId | null): Task[] {
-  switch (archetype) {
-    case "strategist":
-      return [
-        { id: "1", label: "Deep work block", time: "9:00 AM", done: false },
-        { id: "2", label: "Review goals", time: "12:00 PM", done: false },
-        { id: "3", label: "Remove one distraction", time: "3:00 PM", done: false },
-      ];
-    case "endurance":
-      return [
-        { id: "1", label: "Morning workout", time: "7:00 AM", done: false },
-        { id: "2", label: "Track nutrition", time: "12:00 PM", done: false },
-        { id: "3", label: "10-min walk", time: "5:00 PM", done: false },
-      ];
-    case "creative":
-      return [
-        { id: "1", label: "Creative brainstorm", time: "10:00 AM", done: false },
-        { id: "2", label: "Prototype one idea", time: "2:00 PM", done: false },
-        { id: "3", label: "Share with a friend", time: "6:00 PM", done: false },
-      ];
-    case "guardian":
-      return [
-        { id: "1", label: "Morning meditation", time: "7:30 AM", done: false },
-        { id: "2", label: "Check in with buddy", time: "12:00 PM", done: false },
-        { id: "3", label: "Evening reflection", time: "9:00 PM", done: false },
-      ];
-    case "explorer":
-      return [
-        { id: "1", label: "Try something new", time: "10:00 AM", done: false },
-        { id: "2", label: "Research next step", time: "2:00 PM", done: false },
-        { id: "3", label: "Log what you learned", time: "7:00 PM", done: false },
-      ];
-    default:
-      return [
-        { id: "1", label: "Morning routine", time: "8:00 AM", done: false },
-        { id: "2", label: "Focus session", time: "11:00 AM", done: false },
-        { id: "3", label: "Evening review", time: "8:00 PM", done: false },
-      ];
-  }
-}
+const LIME = "#C8FF00";
+const NAVY = "#060912";
+const TEXT_HI = "rgba(235,242,255,0.95)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const GLASS = "rgba(255,255,255,0.07)";
+const GLASS_BORDER = "rgba(255,255,255,0.14)";
+const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
+const FONT_BODY = "var(--font-apercu), sans-serif";
+const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 
 export default function TasksPage() {
   const userName = usePlanStore((s) => s.userName);
   const archetype = usePlanStore((s) => s.dogArchetype);
+  const ambitionType = usePlanStore((s) => s.ambitionType);
   const quizComplete = usePlanStore((s) => s.quizComplete);
+  const streak = usePlanStore((s) => s.streak);
+  const pipelinePlan = usePlanStore((s) => s.pipelinePlan);
+  const planStartDate = usePlanStore((s) => s.planStartDate);
+  const dailyScores = usePlanStore((s) => s.dailyScores);
+  const taskHistory = usePlanStore((s) => s.taskHistory);
+  const journalDates = usePlanStore((s) => s.journalDates);
+  const lastReflection = usePlanStore((s) => s.lastReflection);
 
-  const [tasks, setTasks] = useState<Task[]>(() => getDefaultTasks(archetype));
-  const [showAddSheet, setShowAddSheet] = useState(false);
+  // User profile fields (for building profile digest)
+  const quizPrimaryGoal = usePlanStore((s) => s.quizPrimaryGoal);
+  const quizPastAttempts = usePlanStore((s) => s.quizPastAttempts);
+  const quizCurrentState = usePlanStore((s) => s.quizCurrentState);
+  const quizVision = usePlanStore((s) => s.quizVision);
+  const quizAgeGroup = usePlanStore((s) => s.quizAgeGroup);
+  const quizDream = usePlanStore((s) => s.quizDream);
+  const quizGender = usePlanStore((s) => s.quizGender);
+  const quizObstacles = usePlanStore((s) => s.quizObstacles);
+  const quizTimeline = usePlanStore((s) => s.quizTimeline);
+  const quizCommitment = usePlanStore((s) => s.quizCommitment);
+  const quizSchedule = usePlanStore((s) => s.quizSchedule);
+  const multiSelectAnswers = usePlanStore((s) => s.multiSelectAnswers);
+  const moodRating = usePlanStore((s) => s.moodRating);
+  const sleepQuality = usePlanStore((s) => s.sleepQuality);
+  const energyLevelQuiz = usePlanStore((s) => s.energyLevel);
+  const stressLevel = usePlanStore((s) => s.stressLevel);
+
+  // Daily tasks state
+  const morningCheckinDate = usePlanStore((s) => s.morningCheckinDate);
+  const morningEnergy = usePlanStore((s) => s.morningEnergy);
+  const morningTimeAvailable = usePlanStore((s) => s.morningTimeAvailable);
+  const morningChallengeLevel = usePlanStore((s) => s.morningChallengeLevel);
+  const todayTasks = usePlanStore((s) => s.todayTasks);
+  const todayTasksDate = usePlanStore((s) => s.todayTasksDate);
+  const todayDayMessage = usePlanStore((s) => s.todayDayMessage);
+  const todayAdaptationNote = usePlanStore((s) => s.todayAdaptationNote);
+  const recurringTasks = usePlanStore((s) => s.recurringTasks);
+
+  // Actions
+  const setMorningCheckin = usePlanStore((s) => s.setMorningCheckin);
+  const setTodayTasks = usePlanStore((s) => s.setTodayTasks);
+  const toggleDailyTask = usePlanStore((s) => s.toggleDailyTask);
+  const deferDailyTask = usePlanStore((s) => s.deferDailyTask);
+  const addCustomDailyTask = usePlanStore((s) => s.addCustomDailyTask);
+  const swapDailyTask = usePlanStore((s) => s.swapDailyTask);
+  const addRecurringTask = usePlanStore((s) => s.addRecurringTask);
+  const setTodayStatus = usePlanStore((s) => s.setTodayStatus);
+  const recalculateAndPersistScore = usePlanStore((s) => s.recalculateAndPersistScore);
+
+  const [loading, setLoading] = useState(false);
+  const [generateError, setGenerateError] = useState(false);
+  const [showAddCustom, setShowAddCustom] = useState(false);
+  const [showAddRecurring, setShowAddRecurring] = useState(false);
+  const [swapTask, setSwapTask] = useState<GeneratedTask | null>(null);
   const [newTaskLabel, setNewTaskLabel] = useState("");
+  const [newTaskMinutes, setNewTaskMinutes] = useState("15");
 
-  const arch = archetype ? ARCHETYPES.find((a) => a.id === archetype) : null;
+  // Compute day info from plan
+  const dayInfo = pipelinePlan && planStartDate ? computeDayInfo(pipelinePlan, planStartDate) : null;
+  const today = todayISO();
+  const checkinDoneToday = morningCheckinDate === today;
+  const tasksLoadedToday = todayTasksDate === today && todayTasks.length > 0;
+  const journaledToday = !!(journalDates ?? {})[today];
 
-  const toggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
-    );
-  };
+  // Determine journal sentiment for recommendations
+  const lastSentiment: string | null = lastReflection ? null : null; // Would come from reflections table in full implementation
 
-  const addTask = () => {
+  // Auto-update checkin status based on task completion
+  useEffect(() => {
+    if (!tasksLoadedToday) return;
+    const activeTasks = todayTasks.filter((t) => !t.deferred);
+    const mustDoTasks = activeTasks.filter((t) => t.priority === "must-do");
+    const mustDoDone = mustDoTasks.filter((t) => t.completed).length;
+    const totalDone = activeTasks.filter((t) => t.completed).length;
+    const status = deriveCheckinStatus(mustDoTasks.length, mustDoDone, totalDone);
+    if (status !== "pending") {
+      setTodayStatus(status);
+    }
+  }, [todayTasks, tasksLoadedToday, setTodayStatus]);
+
+  // Generate tasks after morning check-in
+  const generateTasks = useCallback(
+    async (energy: EnergyLevel, timeAvailable: TimeAvailable, focusArea: string | null, challengeLevel: ChallengeLevel) => {
+      setMorningCheckin(energy, timeAvailable, focusArea, challengeLevel);
+      setLoading(true);
+      setGenerateError(false);
+
+      try {
+        const completionRate = computeCompletionRate7d(dailyScores);
+        const avgScore = computeAvgScore7d(dailyScores);
+        const mustDoRate = computeMustDoCompletionRate7d(dailyScores);
+        const missedPatterns = detectMissedPatterns(taskHistory);
+        const dayOfWeekNum = getDayOfWeekNumber();
+
+        // Filter recurring tasks for today
+        const todayRecurring = recurringTasks.filter((rt) => rt.active && rt.daysOfWeek.includes(dayOfWeekNum));
+
+        // Build user profile digest for richer task generation
+        const domainKeyMap: Record<string, string> = {
+          career: "q_goals_career", finance: "q_goals_money", entrepreneur: "q_goals_career",
+          athlete: "q_goals_health", weight_loss: "q_goals_health", wellness: "q_goals_health",
+          mindfulness: "q_goals_mindset", confidence: "q_goals_mindset",
+          student: "q_goals_education", productivity: "q_goals_productivity",
+        };
+        const goalsKey = domainKeyMap[ambitionType ?? ""] ?? "";
+        const specificGoals = goalsKey ? (multiSelectAnswers[goalsKey] ?? []) : [];
+
+        let profileDigest: string | null = null;
+        try {
+          const userContext = {
+            timeline: quizTimeline ?? undefined,
+            commitment: quizCommitment ?? undefined,
+            schedule: quizSchedule ?? undefined,
+            obstacles: quizObstacles.length > 0 ? quizObstacles : undefined,
+            primaryGoal: quizPrimaryGoal ?? undefined,
+            currentState: quizCurrentState ?? undefined,
+            vision: quizVision ?? undefined,
+            gender: quizGender ?? undefined,
+            ageGroup: quizAgeGroup ?? undefined,
+            specificGoals: specificGoals.length > 0 ? specificGoals : undefined,
+            motivations: multiSelectAnswers["q_motivations"]?.length ? multiSelectAnswers["q_motivations"] : undefined,
+            badHabits: multiSelectAnswers["q_bad_habits"]?.length ? multiSelectAnswers["q_bad_habits"] : undefined,
+            selfTrust: multiSelectAnswers["q_self_trust"]?.[0] ?? undefined,
+            problems: multiSelectAnswers["q_problems"]?.length ? multiSelectAnswers["q_problems"] : undefined,
+            pastAttempts: quizPastAttempts ?? undefined,
+            dreamNarrative: quizDream ?? undefined,
+            archetype: archetype ?? undefined,
+            ambitionDomain: ambitionType ?? undefined,
+            moodRating: moodRating ?? undefined,
+            sleepQuality: sleepQuality ?? undefined,
+            energyLevel: energyLevelQuiz ?? undefined,
+            stressLevel: stressLevel != null ? String(stressLevel) : undefined,
+            domainAnswers: Object.keys(multiSelectAnswers).length > 0 ? multiSelectAnswers : undefined,
+          };
+          const digest = buildUserProfileDigest(userContext);
+          profileDigest = digest.substring(0, 800) || null;
+        } catch { /* profile digest is optional */ }
+
+        const payload: DailyTasksRequest = {
+          currentStep: dayInfo?.currentStep ?? null,
+          currentPhase: dayInfo?.currentPhase ?? null,
+          nextStep: dayInfo?.nextStep ?? null,
+          day: dayInfo?.currentDay ?? 1,
+          totalDays: dayInfo?.totalDays ?? 90,
+          overallProgress: dayInfo?.overallProgress ?? 0,
+          userName,
+          archetype,
+          ambitionType,
+          energy,
+          timeAvailable,
+          focusArea,
+          streak,
+          completionRate7d: completionRate,
+          avgDailyScore7d: avgScore,
+          lastJournalSentiment: lastSentiment,
+          missedTaskPatterns: missedPatterns,
+          dayOfWeek: getDayOfWeek(),
+          recurringTasks: todayRecurring,
+          userProfileDigest: profileDigest,
+          challengeLevel,
+          mustDoCompletionRate7d: mustDoRate,
+        };
+
+        const res = await fetch("/api/daily-tasks/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setTodayTasks(data.tasks ?? [], data.dayMessage ?? "", data.adaptationNote ?? null);
+        } else {
+          setGenerateError(true);
+        }
+      } catch {
+        setGenerateError(true);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      setMorningCheckin, setTodayTasks, dailyScores, taskHistory, recurringTasks,
+      dayInfo, userName, archetype, ambitionType, streak, lastSentiment,
+      quizPrimaryGoal, quizPastAttempts, quizCurrentState, quizVision, quizAgeGroup,
+      quizDream, quizGender, quizObstacles, quizTimeline, quizCommitment, quizSchedule,
+      multiSelectAnswers, moodRating, sleepQuality, energyLevelQuiz, stressLevel,
+    ],
+  );
+
+  // Add custom task
+  function handleAddCustom() {
     if (!newTaskLabel.trim()) return;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-    setTasks((prev) => [
-      ...prev,
-      { id: String(Date.now()), label: newTaskLabel.trim(), time: timeStr, done: false },
-    ]);
+    addCustomDailyTask(newTaskLabel.trim(), parseInt(newTaskMinutes, 10) || 15);
     setNewTaskLabel("");
-    setShowAddSheet(false);
-  };
+    setNewTaskMinutes("15");
+    setShowAddCustom(false);
+  }
 
+  // Handle recurring task add
+  function handleAddRecurring(label: string, minutes: number, daysOfWeek: number[]) {
+    addRecurringTask({
+      id: `rec-${Date.now()}`,
+      label,
+      estimatedMinutes: minutes,
+      daysOfWeek,
+      active: true,
+    });
+  }
+
+  // Handle swap
+  function handleSwap(taskId: string, replacement: GeneratedTask) {
+    swapDailyTask(taskId, replacement);
+    setSwapTask(null);
+  }
+
+  // ─── Not onboarded ──────────────────────────────────────────────────────
   if (!quizComplete) {
     return (
-      <div className="content-padding flex min-h-dvh flex-col items-center justify-center bg-background">
-        <p className="type-body text-center text-text-secondary">
-          Take the quiz first so Future Me can personalize your tasks.
+      <div
+        style={{
+          minHeight: "100dvh",
+          background: NAVY,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 24,
+        }}
+      >
+        <p style={{ fontFamily: FONT_BODY, fontSize: 15, color: TEXT_MID, textAlign: "center", lineHeight: 1.6 }}>
+          Take the quiz first so Behavio can personalize your tasks.
         </p>
-        <Button render={<Link href="/quiz" />} className="mt-6">
+        <Link
+          href="/quiz"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 24,
+            background: LIME,
+            color: NAVY,
+            border: "none",
+            borderRadius: 14,
+            padding: "14px 28px",
+            fontFamily: FONT_HEADING,
+            fontWeight: 800,
+            fontSize: 16,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase" as const,
+            textDecoration: "none",
+          }}
+        >
           Take the quiz
-        </Button>
+        </Link>
       </div>
     );
   }
 
-  const doneCount = tasks.filter((t) => t.done).length;
-  const progressPct = tasks.length > 0 ? (doneCount / tasks.length) * 100 : 0;
-  const hasTasks = tasks.length > 0;
+  // ─── Task grouping ──────────────────────────────────────────────────────
+  const activeTasks = todayTasks.filter((t) => !t.deferred);
+  const mustDoTasks = activeTasks.filter((t) => t.priority === "must-do");
+  const shouldDoTasks = activeTasks.filter((t) => t.priority === "should-do");
+  const bonusTasks = activeTasks.filter((t) => t.priority === "bonus");
+  const doneCount = activeTasks.filter((t) => t.completed).length;
+  const progressPct = activeTasks.length > 0 ? Math.round((doneCount / activeTasks.length) * 100) : 0;
+  const mustDoDone = mustDoTasks.filter((t) => t.completed).length;
+
+  // Suggested focus from current phase
+  const suggestedFocus = dayInfo?.currentPhase?.goal ?? null;
 
   return (
-    <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-      <div className="section-gap mx-auto flex w-full max-w-md flex-col">
-        {/* Header: 8px vertical rhythm */}
+    <div style={{ minHeight: "100dvh", background: NAVY, position: "relative", overflow: "hidden" }}>
+      {/* Background */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          background:
+            "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%), linear-gradient(170deg, #0d1a3a 0%, #060912 55%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          width: "100%",
+          maxWidth: 448,
+          margin: "0 auto",
+          minWidth: 0,
+          padding: "max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2.75rem)) 24px 160px",
+        }}
+      >
+        {/* ─── Header ──────────────────────────────────────────────────── */}
         <header>
-          <h1 className="type-h1">
-            {getGreeting()},<br />{userName || "friend"}
-          </h1>
-          <p className="mt-2 text-[18px] font-semibold tracking-tight text-text-primary">
+          <h1
+            style={{
+              fontFamily: FONT_HEADING,
+              fontWeight: 900,
+              fontStyle: "italic",
+              fontSize: 38,
+              lineHeight: 0.94,
+              letterSpacing: "-0.03em",
+              color: TEXT_HI,
+              margin: 0,
+            }}
+          >
             Today&apos;s tasks
-          </p>
-          <p className="mt-2 type-body font-normal text-microcopy-soft">
-            Knock out the three needle-movers before noon
-          </p>
+          </h1>
+          {streak > 0 && (
+            <p
+              style={{
+                fontFamily: FONT_MONO,
+                fontSize: 12,
+                color: LIME,
+                marginTop: 6,
+                letterSpacing: "0.04em",
+              }}
+            >
+              {streak}-day streak
+            </p>
+          )}
         </header>
 
-        {/* Task list: 44px min touch target per row; 16px horizontal padding */}
-        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card">
-          {hasTasks ? (
-            <ul className="divide-y divide-divider">
-              {tasks.map((task) => (
-                <li key={task.id}>
-                  <button
-                    type="button"
-                    onClick={() => toggleTask(task.id)}
-                    className="touch-target flex min-h-[44px] w-full min-w-0 items-center gap-4 px-4 py-3 text-left transition-colors hover:bg-muted/50 active:bg-muted"
+        {/* ─── Morning Check-in (if not done today) ────────────────────── */}
+        {!checkinDoneToday && !tasksLoadedToday && (
+          <MorningCheckin
+            userName={userName}
+            onSubmit={generateTasks}
+            suggestedFocus={suggestedFocus}
+          />
+        )}
+
+        {/* ─── Loading state ───────────────────────────────────────────── */}
+        {loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+              padding: "40px 24px",
+              textAlign: "center",
+            }}
+          >
+            <motion.div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                border: "3px solid rgba(200,255,0,0.2)",
+                borderTopColor: LIME,
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+            />
+            <p style={{ fontFamily: FONT_BODY, fontSize: 15, color: TEXT_MID }}>
+              Building your personalized tasks...
+            </p>
+          </motion.div>
+        )}
+
+        {/* ─── Tasks loaded ────────────────────────────────────────────── */}
+        {tasksLoadedToday && !loading && (
+          <>
+            {/* Day Context Banner */}
+            {dayInfo && (
+              <DayContextBanner
+                day={dayInfo.currentDay}
+                totalDays={dayInfo.totalDays}
+                phaseName={dayInfo.currentPhase?.phase_name ?? null}
+                stepTitle={dayInfo.currentStep?.title ?? null}
+                dayMessage={todayDayMessage}
+                adaptationNote={todayAdaptationNote}
+              />
+            )}
+
+            {/* Task sections by priority */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <TaskSection
+                priority="must-do"
+                tasks={mustDoTasks}
+                onToggle={(id) => toggleDailyTask(id)}
+                onDefer={(id) => deferDailyTask(id)}
+                onSwap={(id) => setSwapTask(todayTasks.find((t) => t.id === id) ?? null)}
+              />
+              <TaskSection
+                priority="should-do"
+                tasks={shouldDoTasks}
+                onToggle={(id) => toggleDailyTask(id)}
+                onDefer={(id) => deferDailyTask(id)}
+                onSwap={(id) => setSwapTask(todayTasks.find((t) => t.id === id) ?? null)}
+              />
+              <TaskSection
+                priority="bonus"
+                tasks={bonusTasks}
+                onToggle={(id) => toggleDailyTask(id)}
+                onDefer={(id) => deferDailyTask(id)}
+                onSwap={(id) => setSwapTask(todayTasks.find((t) => t.id === id) ?? null)}
+              />
+            </div>
+
+            {/* Progress bar */}
+            {activeTasks.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <p
+                    style={{
+                      fontFamily: FONT_MONO,
+                      fontSize: 11,
+                      fontWeight: 500,
+                      color: TEXT_MID,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase" as const,
+                      margin: 0,
+                    }}
                   >
-                    <div className="shrink-0">
-                      {task.done ? (
-                        <motion.div
-                          className="flex h-5 w-5 items-center justify-center rounded-full bg-primary"
-                          initial={{ scale: 0.8 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M5 12l5 5L20 7" />
-                          </svg>
-                        </motion.div>
-                      ) : (
-                        <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/40" />
-                      )}
-                    </div>
-                    <span
-                      className={`type-body min-w-0 flex-1 font-semibold text-text-primary ${task.done ? "line-through opacity-50" : ""}`}
-                    >
-                      {task.label}
-                    </span>
-                    {task.flexible ? (
-                      <span className="shrink-0 rounded-full border border-border bg-transparent px-2 py-0.5 text-[11px] font-medium tracking-normal text-text-secondary shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]">
-                        Time flexible
-                      </span>
-                    ) : (
-                      <span className="flex shrink-0 items-center gap-1 rounded-full border border-border bg-chip-bg px-2 py-0.5 text-[11px] font-medium tracking-tight text-text-secondary shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]">
-                        <ClockIcon className="h-3 w-3 text-text-secondary" aria-hidden />
-                        {task.time}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            /* Empty state: illustrated card */
-            <Card className="border-0 shadow-none">
-              <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
-                <motion.div
-                  className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/60"
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                >
-                  <CheckBadgeIcon className="h-8 w-8 text-primary/70" aria-hidden />
-                </motion.div>
-                <div>
-                  <p className="type-card-title">No tasks yet</p>
-                  <p className="type-body mt-1 font-normal text-text-secondary">
-                    Add your first task and build momentum for the day.
+                    {mustDoDone}/{mustDoTasks.length} must-do &bull; {doneCount}/{activeTasks.length} total
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: FONT_MONO,
+                      fontSize: 11,
+                      color: TEXT_MID,
+                      margin: 0,
+                    }}
+                  >
+                    {progressPct}%
                   </p>
                 </div>
-                <Button
-                  onClick={() => setShowAddSheet(true)}
-                  size="sm"
-                  variant="default"
-                  className="rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary-hover"
-                >
-                  <PlusIcon className="mr-1 h-4 w-4" aria-hidden />
-                  Add task
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Progress: 16px block gap; Add task 24px below */}
-        {hasTasks && (
-          <div className="block-gap flex flex-col">
-            <div className="flex flex-col gap-2">
-              <p className="type-caption text-text-secondary">
-                Progress • {doneCount} of {tasks.length} done ({Math.round(progressPct)}%)
-              </p>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-                <motion.div
-                  className="h-full rounded-full"
+                <div
                   style={{
-                    width: `${progressPct}%`,
-                    background: progressPct > 0
-                      ? "repeating-linear-gradient( -55deg, var(--progress-fill), var(--progress-fill) 2px, var(--progress-fill-dim) 2px, var(--progress-fill-dim) 4px )"
-                      : "transparent",
+                    height: 8,
+                    width: "100%",
+                    borderRadius: 999,
+                    overflow: "hidden",
+                    background: "rgba(255,255,255,0.10)",
                   }}
-                  initial={false}
-                  animate={{ width: `${progressPct}%` }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                />
+                >
+                  <motion.div
+                    style={{
+                      height: "100%",
+                      borderRadius: 999,
+                      background:
+                        progressPct > 0
+                          ? `repeating-linear-gradient(-55deg, ${LIME}, ${LIME} 2px, rgba(200,255,0,0.55) 2px, rgba(200,255,0,0.55) 4px)`
+                          : "transparent",
+                    }}
+                    initial={false}
+                    animate={{ width: `${progressPct}%` }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  />
+                </div>
               </div>
+            )}
+
+            {/* Action buttons */}
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => setShowAddCustom(true)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: LIME,
+                  color: NAVY,
+                  border: "none",
+                  borderRadius: 14,
+                  padding: "14px 22px",
+                  fontFamily: FONT_HEADING,
+                  fontWeight: 800,
+                  fontSize: 14,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase" as const,
+                  cursor: "pointer",
+                }}
+              >
+                <PlusIcon style={{ width: 16, height: 16 }} aria-hidden />
+                Add task
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddRecurring(true)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "rgba(255,255,255,0.05)",
+                  color: TEXT_HI,
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: 14,
+                  padding: "14px 22px",
+                  fontFamily: FONT_HEADING,
+                  fontWeight: 800,
+                  fontSize: 14,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase" as const,
+                  cursor: "pointer",
+                }}
+              >
+                <PlusIcon style={{ width: 16, height: 16 }} aria-hidden />
+                Recurring
+              </button>
             </div>
 
-            <div className="flex justify-center pt-0">
-              <Button
-                onClick={() => setShowAddSheet(true)}
-                size="sm"
-                variant="default"
-                className="touch-target min-h-[44px] rounded-full bg-primary text-primary-foreground hover:bg-primary-hover px-6 shadow-[var(--nav-shadow)]"
-              >
-                <PlusIcon className="mr-1.5 h-4 w-4" aria-hidden />
-                Add task
-              </Button>
-            </div>
+            {/* Evening Wrap-up */}
+            <EveningWrapup
+              tasks={todayTasks}
+              journaledToday={journaledToday}
+              tomorrowStepTitle={dayInfo?.nextStep?.title ?? null}
+            />
+          </>
+        )}
+
+        {/* ─── Generation failed or stuck — retry ────────────────────────── */}
+        {checkinDoneToday && !tasksLoadedToday && !loading && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+              padding: "40px 24px",
+              textAlign: "center",
+            }}
+          >
+            <p style={{ fontFamily: FONT_BODY, fontSize: 15, color: TEXT_MID, lineHeight: 1.6 }}>
+              Task generation failed. Tap below to try again.
+            </p>
+            <button
+              type="button"
+              onClick={() => generateTasks(morningEnergy ?? "medium", morningTimeAvailable ?? 60, null, morningChallengeLevel ?? "push")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "14px 28px",
+                background: LIME,
+                color: NAVY,
+                border: "none",
+                borderRadius: 14,
+                fontFamily: FONT_HEADING,
+                fontWeight: 800,
+                fontSize: 16,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase" as const,
+                cursor: "pointer",
+              }}
+            >
+              Retry
+            </button>
           </div>
         )}
 
-        {/* Coach card: 16px inner gap; 24px vertical padding */}
-        {arch && (
-          <Card className="mt-auto mb-6 min-w-0 overflow-hidden bg-gradient-to-br from-secondary/60 to-muted/40">
-            <CardContent className="block-gap flex flex-col pb-4 pt-6 leading-relaxed p-4">
-              <div className="flex items-start gap-3">
-                <div
-                  className="-mt-2 h-8 w-8 shrink-0 rounded-full shadow-sm"
-                  style={{
-                    background: `radial-gradient(ellipse 70% 70% at 35% 30%, var(--orb-gradient-start), var(--orb-gradient-end) 85%)`,
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
-                  }}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="type-caps-micro text-text-secondary">
-                    You&apos;re on the {arch.name.replace(/^The\s+/, "")} path
-                  </p>
-                  <p className="type-body mt-1 text-text-primary">
-                    <span className="font-semibold">Today&apos;s focus:</span> {arch.ritualStyle}
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    render={<Link href="/brief" />}
-                    className="touch-target mt-3 min-h-[44px] w-fit rounded-xl border-border text-text-primary"
-                  >
-                    View plan
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* ─── No plan yet ─────────────────────────────────────────────── */}
+        {!pipelinePlan && checkinDoneToday && !loading && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+              padding: "40px 24px",
+              textAlign: "center",
+            }}
+          >
+            <p style={{ fontFamily: FONT_BODY, fontSize: 15, color: TEXT_MID, lineHeight: 1.6 }}>
+              Generate your plan first so we can create targeted daily tasks.
+            </p>
+            <Link
+              href="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "14px 28px",
+                background: LIME,
+                color: NAVY,
+                borderRadius: 14,
+                fontFamily: FONT_HEADING,
+                fontWeight: 800,
+                fontSize: 16,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase" as const,
+                textDecoration: "none",
+              }}
+            >
+              Go to plan
+            </Link>
+          </div>
         )}
       </div>
 
-      {/* Add task sheet */}
+      {/* ─── Bottom sheets ──────────────────────────────────────────────── */}
+
+      {/* Add custom task */}
       <AnimatePresence>
-        {showAddSheet && (
+        {showAddCustom && (
           <>
             <motion.div
-              className="fixed inset-0 z-40 bg-foreground/20"
+              style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setShowAddSheet(false)}
+              onClick={() => setShowAddCustom(false)}
             />
             <motion.div
-              className="content-padding fixed inset-x-0 bottom-0 z-50 rounded-t-xl border-t border-border bg-card pb-10 pt-6 shadow-[0_-2px_8px_rgba(0,0,0,0.15)]"
+              className="app-fixed-phone"
+              style={{
+                bottom: 0,
+                zIndex: 50,
+                background: "rgba(15,32,64,0.98)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+                borderRadius: "24px 24px 0 0",
+                padding: "20px 24px calc(96px + env(safe-area-inset-bottom, 0px))",
+                boxShadow: "0 -12px 30px rgba(0,0,0,0.45)",
+              }}
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 35 }}
             >
-              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
-              <h3 className="type-card-title">Add a task</h3>
-              <Input
+              <div style={{ width: 40, height: 4, borderRadius: 999, background: "rgba(255,255,255,0.14)", margin: "0 auto 14px" }} />
+              <h3 style={{ fontFamily: FONT_HEADING, fontWeight: 900, fontStyle: "italic", fontSize: 20, color: TEXT_HI, margin: 0 }}>
+                Add a task
+              </h3>
+              <input
                 type="text"
                 value={newTaskLabel}
                 onChange={(e) => setNewTaskLabel(e.target.value)}
                 placeholder="What do you need to do?"
                 autoFocus
-                className="mt-4"
-                onKeyDown={(e) => e.key === "Enter" && addTask()}
+                onKeyDown={(e) => e.key === "Enter" && handleAddCustom()}
+                style={{
+                  width: "100%",
+                  marginTop: 14,
+                  padding: "14px 16px",
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: 14,
+                  fontFamily: FONT_BODY,
+                  fontSize: 15,
+                  color: TEXT_HI,
+                  outline: "none",
+                  boxSizing: "border-box" as const,
+                }}
               />
-              <Button
-                onClick={addTask}
-                disabled={!newTaskLabel.trim()}
-                size="sm"
-                variant="default"
-                className="mt-4 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover"
-              >
-                Add
-              </Button>
+              <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontFamily: FONT_BODY, fontSize: 13, color: TEXT_MID }}>Time:</span>
+                  <select
+                    value={newTaskMinutes}
+                    onChange={(e) => setNewTaskMinutes(e.target.value)}
+                    style={{
+                      padding: "8px 12px",
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: 10,
+                      fontFamily: FONT_BODY,
+                      fontSize: 13,
+                      color: TEXT_HI,
+                      outline: "none",
+                    }}
+                  >
+                    <option value="5">5 min</option>
+                    <option value="10">10 min</option>
+                    <option value="15">15 min</option>
+                    <option value="30">30 min</option>
+                    <option value="60">1 hour</option>
+                    <option value="120">2 hours</option>
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddCustom}
+                  disabled={!newTaskLabel.trim()}
+                  style={{
+                    background: newTaskLabel.trim() ? LIME : "rgba(200,255,0,0.25)",
+                    color: NAVY,
+                    border: "none",
+                    borderRadius: 999,
+                    padding: "10px 28px",
+                    fontFamily: FONT_HEADING,
+                    fontWeight: 800,
+                    fontSize: 14,
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase" as const,
+                    cursor: newTaskLabel.trim() ? "pointer" : "default",
+                    boxShadow: newTaskLabel.trim() ? "0 4px 16px rgba(200,255,0,0.25)" : "none",
+                  }}
+                >
+                  Add
+                </button>
+              </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
+
+      {/* Add recurring task */}
+      <AddRecurringSheet
+        open={showAddRecurring}
+        onClose={() => setShowAddRecurring(false)}
+        onAdd={handleAddRecurring}
+      />
+
+      {/* Swap task */}
+      {swapTask && (
+        <SwapTaskSheet
+          task={swapTask}
+          currentStep={dayInfo?.currentStep ?? null}
+          ambitionType={ambitionType}
+          energy={morningEnergy ?? "medium"}
+          timeAvailable={morningTimeAvailable ?? 60}
+          onSwap={handleSwap}
+          onClose={() => setSwapTask(null)}
+        />
+      )}
     </div>
   );
 }

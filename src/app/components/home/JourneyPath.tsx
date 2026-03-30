@@ -171,8 +171,8 @@ export function JourneyPath({ plan, dayInfo }: Props) {
             />
             {/* Sheet */}
             <motion.div
-              className="fixed bottom-0 left-1/2 z-50 w-full max-w-md rounded-t-3xl px-6 pb-10 pt-6"
-              style={{ background: "var(--card-surface)", transform: "translateX(-50%)" }}
+              className="app-fixed-phone bottom-0 z-50 rounded-t-3xl px-6 pb-10 pt-6"
+              style={{ background: "var(--card-surface)" }}
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}

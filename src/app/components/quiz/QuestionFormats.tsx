@@ -4,6 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import type React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { QuizOption } from "../../data/quiz";
+import { usePlanStore } from "../../state/planStore";
+import {
+  buildWinCelebrationLines,
+  WIN_CELEBRATION_BASELINE,
+} from "../../utils/winCelebrationThemes";
 
 /* ─── Design tokens ─── */
 const LIME = "#C8FF00";
@@ -15,30 +20,20 @@ const GLASS = "rgba(255,255,255,0.07)";
 const GLASS_BORDER = "rgba(255,255,255,0.14)";
 
 /* ─── Wordmark ─── */
-function Wordmark({ size = 28 }: { size?: number }) {
+function Wordmark({ size = 22 }: { size?: number }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "baseline", gap: 2, lineHeight: 1 }}>
       <span
         style={{
-          fontFamily: "var(--font-libre-baskerville), serif",
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
           fontStyle: "italic",
-          fontWeight: 400,
-          fontSize: size,
-          color: TEXT_HI,
-        }}
-      >
-        Future
-      </span>
-      <span
-        style={{
-          fontFamily: "var(--font-cormorant), serif",
-          fontStyle: "italic",
-          fontWeight: 600,
+          fontWeight: 700,
           fontSize: size,
           color: LIME,
+          letterSpacing: "0.02em",
         }}
       >
-        YOU
+        behavio
       </span>
     </span>
   );
@@ -58,9 +53,9 @@ export function SplashStep({ onContinue }: { onContinue: () => void }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        justifyContent: "flex-end",
+        justifyContent: "center",
         minHeight: "100dvh",
-        padding: "0 28px 56px",
+        padding: "0 28px 40px",
         gap: 0,
       }}
     >
@@ -93,8 +88,8 @@ export function SplashStep({ onContinue }: { onContinue: () => void }) {
         </h1>
         <p
           style={{
-            fontFamily: "var(--font-barlow), sans-serif",
-            fontWeight: 300,
+            fontFamily: "var(--font-body), Georgia, serif",
+            fontWeight: 400,
             fontSize: 15,
             lineHeight: 1.65,
             color: TEXT_MID,
@@ -259,9 +254,9 @@ export function ListRows({ options, onSelect }: ListRowsProps) {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 14,
-              padding: "16px 18px",
-              borderRadius: 14,
+              gap: 10,
+              padding: "12px 14px",
+              borderRadius: 12,
               border: `1px solid ${isSelected ? "rgba(200,255,0,0.40)" : GLASS_BORDER}`,
               background: isSelected ? "rgba(200,255,0,0.10)" : GLASS,
               backdropFilter: "blur(16px)",
@@ -274,14 +269,14 @@ export function ListRows({ options, onSelect }: ListRowsProps) {
             {opt.icon && (
               <span
                 style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 10,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
                   background: "rgba(255,255,255,0.06)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 18,
+                  fontSize: 15,
                   flexShrink: 0,
                 }}
               >
@@ -292,7 +287,7 @@ export function ListRows({ options, onSelect }: ListRowsProps) {
               style={{
                 fontFamily: "var(--font-barlow-condensed), sans-serif",
                 fontWeight: 700,
-                fontSize: 16,
+                fontSize: 15,
                 color: isSelected ? LIME : TEXT_HI,
                 flex: 1,
               }}
@@ -344,18 +339,288 @@ export function ListRows({ options, onSelect }: ListRowsProps) {
 }
 
 /* ══════════════════════════════════════════════════════
+   MULTI-SELECT — toggle rows + continue
+══════════════════════════════════════════════════════ */
+
+type MultiSelectProps = {
+  options: QuizOption[];
+  onContinue: () => void;
+};
+
+export function MultiSelect({ options, onContinue }: MultiSelectProps) {
+  const [picked, setPicked] = useState<Set<number>>(() => new Set());
+
+  const toggle = (idx: number) => {
+    setPicked((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  const canContinue = picked.size > 0;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
+        {options.map((opt, i) => {
+          const on = picked.has(i);
+          return (
+            <motion.button
+              key={i}
+              type="button"
+              onClick={() => toggle(i)}
+              animate={{
+                background: on ? "rgba(200,255,0,0.10)" : GLASS,
+              }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                padding: "16px 18px",
+                borderRadius: 14,
+                border: `1px solid ${on ? "rgba(200,255,0,0.40)" : GLASS_BORDER}`,
+                background: on ? "rgba(200,255,0,0.10)" : GLASS,
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                cursor: "pointer",
+                textAlign: "left",
+                width: "100%",
+              }}
+            >
+              {opt.icon && (
+                <span
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: "rgba(255,255,255,0.06)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 18,
+                    flexShrink: 0,
+                  }}
+                >
+                  {opt.icon}
+                </span>
+              )}
+              <span
+                style={{
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 700,
+                  fontSize: 16,
+                  color: on ? LIME : TEXT_HI,
+                  flex: 1,
+                }}
+              >
+                {opt.label}
+              </span>
+              <span
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: 6,
+                  border: `2px solid ${on ? LIME : TEXT_LO}`,
+                  background: on ? LIME : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {on && (
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                    <path
+                      d="M1 4L3.5 6.5L9 1"
+                      stroke={NAVY}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </span>
+            </motion.button>
+          );
+        })}
+      </div>
+
+      <motion.button
+        type="button"
+        onClick={() => canContinue && onContinue()}
+        animate={{ opacity: canContinue ? 1 : 0.4 }}
+        whileTap={canContinue ? { scale: 0.97 } : {}}
+        style={{
+          width: "100%",
+          background: LIME,
+          color: "#060912",
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontWeight: 700,
+          fontSize: 18,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          borderRadius: 100,
+          padding: "20px 32px",
+          border: "none",
+          cursor: canContinue ? "pointer" : "default",
+          boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+        }}
+      >
+        Continue
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+          <path
+            d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </motion.button>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   SLIDER SCALE — discrete labels (e.g. Poor → Great)
+══════════════════════════════════════════════════════ */
+
+type SliderScaleProps = {
+  scaleLabels: string[];
+  onContinue: (value: number) => void;
+};
+
+export function SliderScale({ scaleLabels, onContinue }: SliderScaleProps) {
+  const [selected, setSelected] = useState<number | null>(null);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24, width: "100%" }}>
+      <div style={{ display: "flex", gap: 6, width: "100%" }}>
+        {scaleLabels.map((label, i) => {
+          const isSelected = selected === i;
+          return (
+            <motion.button
+              key={i}
+              type="button"
+              onClick={() => setSelected(i)}
+              animate={{
+                background: isSelected ? LIME : GLASS,
+              }}
+              whileTap={{ scale: 0.96 }}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                padding: "14px 6px",
+                borderRadius: 14,
+                border: `1px solid ${isSelected ? LIME : GLASS_BORDER}`,
+                background: isSelected ? LIME : GLASS,
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                cursor: "pointer",
+                minHeight: 72,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 800,
+                  fontSize: 18,
+                  color: isSelected ? NAVY : TEXT_HI,
+                }}
+              >
+                {i + 1}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-jetbrains-mono), monospace",
+                  fontSize: 9,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: isSelected ? "rgba(6,9,18,0.55)" : TEXT_LO,
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                }}
+              >
+                {label}
+              </span>
+            </motion.button>
+          );
+        })}
+      </div>
+
+      <AnimatePresence>
+        {selected !== null && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            type="button"
+            onClick={() => onContinue(selected)}
+            style={{
+              width: "100%",
+              background: LIME,
+              color: "#060912",
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 18,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              borderRadius: 100,
+              padding: "20px 32px",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+            }}
+          >
+            Continue
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+              <path
+                d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
    INSIGHT CARD — belief seed / objection handler
 ══════════════════════════════════════════════════════ */
+
+type InstitutionBadge = { name: string; logo: string };
 
 type InsightCardProps = {
   stat?: string;
   headline: string;
   body?: string;
   ctaLabel?: string;
+  avatars?: string[];
+  badges?: InstitutionBadge[];
   onContinue: () => void;
 };
 
-export function InsightCard({ stat, headline, body, ctaLabel, onContinue }: InsightCardProps) {
+export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, onContinue }: InsightCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -410,8 +675,8 @@ export function InsightCard({ stat, headline, body, ctaLabel, onContinue }: Insi
 
         <p
           style={{
-            fontFamily: "var(--font-barlow), sans-serif",
-            fontWeight: 300,
+            fontFamily: "var(--font-body), Georgia, serif",
+            fontWeight: 400,
             fontSize: 15,
             lineHeight: 1.65,
             color: "rgba(235,242,255,0.82)",
@@ -424,12 +689,105 @@ export function InsightCard({ stat, headline, body, ctaLabel, onContinue }: Insi
           }}
         />
 
+        {/* Logo cluster + "Backed by science" — shown ABOVE the PhD stat when badges exist */}
+        {badges && badges.length > 0 && (
+          <div
+            style={{
+              marginTop: 16,
+              paddingTop: 18,
+              borderTop: "1px solid rgba(255,255,255,0.07)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <div style={{ position: "relative", width: 160, height: 80 }}>
+              {badges[1] && (
+                <img
+                  src={badges[1].logo}
+                  alt={badges[1].name}
+                  style={{
+                    position: "absolute",
+                    width: 52,
+                    height: 52,
+                    objectFit: "contain",
+                    left: 0,
+                    top: 8,
+                    zIndex: 1,
+                  }}
+                />
+              )}
+              {badges[2] && (
+                <img
+                  src={badges[2].logo}
+                  alt={badges[2].name}
+                  style={{
+                    position: "absolute",
+                    width: 52,
+                    height: 52,
+                    objectFit: "contain",
+                    right: 0,
+                    top: 8,
+                    zIndex: 1,
+                  }}
+                />
+              )}
+              {badges[0] && (
+                <img
+                  src={badges[0].logo}
+                  alt={badges[0].name}
+                  style={{
+                    position: "absolute",
+                    width: 72,
+                    height: 72,
+                    objectFit: "contain",
+                    left: "50%",
+                    top: 0,
+                    transform: "translateX(-50%)",
+                    zIndex: 3,
+                    filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.50))",
+                  }}
+                />
+              )}
+            </div>
+
+            <span
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 800,
+                fontStyle: "italic",
+                fontSize: 22,
+                letterSpacing: "-0.02em",
+                color: TEXT_HI,
+                textAlign: "center",
+              }}
+            >
+              Backed by science.
+            </span>
+
+            <span
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 9,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase" as const,
+                color: TEXT_LO,
+                textAlign: "center",
+              }}
+            >
+              {badges.map((b) => b.name).join(" · ")}
+            </span>
+          </div>
+        )}
+
+        {/* PhD stat — shown below logos when badges exist, or standalone */}
         {stat && (
           <div
             style={{
               marginTop: 16,
               paddingTop: 16,
-              borderTop: "1px solid rgba(255,255,255,0.07)",
+              borderTop: badges && badges.length > 0 ? "none" : "1px solid rgba(255,255,255,0.07)",
               display: "flex",
               alignItems: "baseline",
               gap: 6,
@@ -448,8 +806,8 @@ export function InsightCard({ stat, headline, body, ctaLabel, onContinue }: Insi
             </span>
             <span
               style={{
-                fontFamily: "var(--font-barlow), sans-serif",
-                fontWeight: 300,
+                fontFamily: "var(--font-body), Georgia, serif",
+                fontWeight: 400,
                 fontSize: 13,
                 color: TEXT_MID,
               }}
@@ -458,6 +816,52 @@ export function InsightCard({ stat, headline, body, ctaLabel, onContinue }: Insi
             </span>
           </div>
         )}
+
+        {avatars && avatars.length > 0 && !badges && (
+          <div
+            style={{
+              marginTop: 16,
+              paddingTop: 14,
+              borderTop: "1px solid rgba(255,255,255,0.07)",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <div style={{ display: "flex", flexShrink: 0 }}>
+              {avatars.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "2px solid #0f1a2e",
+                    marginLeft: i === 0 ? 0 : -8,
+                    position: "relative",
+                    zIndex: avatars.length - i,
+                  }}
+                />
+              ))}
+            </div>
+            <span
+              style={{
+                fontFamily: "var(--font-body), Georgia, serif",
+                fontWeight: 400,
+                fontSize: 11,
+                color: TEXT_LO,
+                lineHeight: 1.35,
+              }}
+            >
+              Join thousands transforming their lives
+            </span>
+          </div>
+        )}
+
+        {/* Old duplicate badges block removed — now rendered above the stat */}
       </div>
 
       <button
@@ -649,7 +1053,688 @@ export function CommitmentScale({ subtext, onSelect }: CommitmentScaleProps) {
 }
 
 /* ══════════════════════════════════════════════════════
-   WIN CELEBRATION — confetti + "Top 12%"
+   LIVE COUNTER CARD — animated user count + pulsing dot
+══════════════════════════════════════════════════════ */
+
+export function LiveCounterCard({
+  avatars,
+  ctaLabel = "I'm ready",
+  onContinue,
+}: {
+  avatars: string[];
+  ctaLabel?: string;
+  onContinue: () => void;
+}) {
+  const TARGET = 595588;
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const start = TARGET - 588;
+    const duration = 1800;
+    const startTime = performance.now();
+    let animId: number;
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(start + (TARGET - start) * eased));
+      if (progress < 1) animId = requestAnimationFrame(tick);
+    };
+
+    animId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 0,
+        textAlign: "center",
+      }}
+    >
+      <div
+        style={{
+          background: GLASS,
+          border: `1px solid ${GLASS_BORDER}`,
+          borderRadius: 20,
+          padding: "36px 28px 32px",
+          width: "100%",
+          maxWidth: 360,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Scattered avatar cloud background */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: 0.08,
+            pointerEvents: "none",
+          }}
+        >
+          {avatars.slice(0, 6).map((src, i) => {
+            const positions = [
+              { top: "8%", left: "12%" },
+              { top: "15%", right: "10%" },
+              { top: "55%", left: "6%" },
+              { top: "60%", right: "14%" },
+              { top: "35%", left: "80%" },
+              { top: "78%", left: "45%" },
+            ];
+            return (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                style={{
+                  position: "absolute",
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  filter: "blur(1px)",
+                  ...positions[i],
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* LIVE badge */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            marginBottom: 20,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <motion.div
+            animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: "#4ADE80",
+              boxShadow: "0 0 8px rgba(74,222,128,0.6)",
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "#4ADE80",
+            }}
+          >
+            LIVE
+          </span>
+        </div>
+
+        {/* Counter */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 20 }}
+          style={{ position: "relative", zIndex: 1 }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 800,
+              fontSize: 64,
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
+              color: LIME,
+              marginBottom: 8,
+            }}
+          >
+            {count.toLocaleString()}
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-apercu), sans-serif",
+              fontWeight: 500,
+              fontSize: 16,
+              color: TEXT_HI,
+              lineHeight: 1.45,
+              marginBottom: 6,
+            }}
+          >
+            people are building better lives
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-apercu), sans-serif",
+              fontWeight: 600,
+              fontSize: 14,
+              color: LIME,
+              letterSpacing: "0.02em",
+            }}
+          >
+            right now.
+          </div>
+        </motion.div>
+
+        {/* Stacked avatars row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 24,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {avatars.slice(0, 5).map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt=""
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #0f1a2e",
+                marginLeft: i === 0 ? 0 : -10,
+                position: "relative",
+                zIndex: 5 - i,
+              }}
+            />
+          ))}
+        </div>
+
+        <p
+          style={{
+            fontFamily: "var(--font-apercu), sans-serif",
+            fontWeight: 400,
+            fontSize: 13,
+            color: TEXT_MID,
+            lineHeight: 1.5,
+            marginTop: 18,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          Our AI-powered plans are built from real behavioral science — not generic advice.
+        </p>
+      </div>
+
+      <button
+        onClick={onContinue}
+        style={{
+          marginTop: 24,
+          width: "100%",
+          maxWidth: 360,
+          padding: "18px 0",
+          background: LIME,
+          color: NAVY,
+          border: "none",
+          borderRadius: 14,
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontWeight: 700,
+          fontSize: 17,
+          letterSpacing: "0.10em",
+          textTransform: "uppercase",
+          cursor: "pointer",
+        }}
+      >
+        {ctaLabel}
+      </button>
+    </motion.div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   COMPARISON CARD — Books & Courses vs Behavio
+══════════════════════════════════════════════════════ */
+
+function MiniSparkline({ points, color, dashed }: { points: number[]; color: string; dashed?: boolean }) {
+  const w = 100;
+  const h = 36;
+  const pad = 4;
+  const usableW = w - pad * 2;
+  const usableH = h - pad * 2;
+  const d = points
+    .map((v, i) => {
+      const x = pad + (i / (points.length - 1)) * usableW;
+      const y = pad + usableH - v * usableH;
+      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h}>
+      <path
+        d={d}
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={dashed ? "4 3" : undefined}
+      />
+      <circle cx={pad + usableW} cy={pad + usableH - points[points.length - 1] * usableH} r={3} fill={color} />
+    </svg>
+  );
+}
+
+export function ComparisonCard({
+  ctaLabel = "That makes sense",
+  onContinue,
+}: {
+  ctaLabel?: string;
+  onContinue: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 0,
+        textAlign: "center",
+      }}
+    >
+      {/* Header stat */}
+      <div style={{ marginBottom: 24 }}>
+        <span
+          style={{
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 800,
+            fontSize: 52,
+            color: "#FF6B6B",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          92%
+        </span>
+        <div
+          style={{
+            fontFamily: "var(--font-apercu), sans-serif",
+            fontWeight: 500,
+            fontSize: 15,
+            color: TEXT_HI,
+            marginTop: 4,
+          }}
+        >
+          of people fail with information alone.
+        </div>
+      </div>
+
+      {/* Side-by-side comparison */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+          width: "100%",
+          maxWidth: 360,
+        }}
+      >
+        {/* Left — failure */}
+        <div
+          style={{
+            background: "rgba(255,107,107,0.06)",
+            border: "1px solid rgba(255,107,107,0.15)",
+            borderRadius: 16,
+            padding: "20px 14px 16px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 13,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "#FF6B6B",
+              marginBottom: 4,
+            }}
+          >
+            Books & Courses
+          </div>
+          <div style={{ display: "flex", gap: 8, fontSize: 22, opacity: 0.7 }}>
+            <span>📚</span>
+            <span>🎓</span>
+            <span>▶️</span>
+          </div>
+          <MiniSparkline points={[0.5, 0.55, 0.48, 0.42, 0.3]} color="#FF6B6B" dashed />
+          <div
+            style={{
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              color: "#FF6B6B",
+              opacity: 0.8,
+            }}
+          >
+            92% QUIT
+          </div>
+        </div>
+
+        {/* Right — success */}
+        <div
+          style={{
+            background: "rgba(200,255,0,0.06)",
+            border: `1px solid rgba(200,255,0,0.18)`,
+            borderRadius: 16,
+            padding: "20px 14px 16px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 13,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: LIME,
+              marginBottom: 4,
+            }}
+          >
+            Behavio
+          </div>
+          <div style={{ display: "flex", gap: 8, fontSize: 22 }}>
+            <span>✅</span>
+            <span>🔥</span>
+            <span>🎮</span>
+          </div>
+          <MiniSparkline points={[0.2, 0.35, 0.5, 0.72, 0.92]} color={LIME} />
+          <div
+            style={{
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              color: LIME,
+            }}
+          >
+            STICK WITH IT
+          </div>
+        </div>
+      </div>
+
+      <p
+        style={{
+          fontFamily: "var(--font-apercu), sans-serif",
+          fontWeight: 400,
+          fontSize: 13,
+          color: TEXT_MID,
+          lineHeight: 1.5,
+          marginTop: 20,
+          maxWidth: 320,
+        }}
+      >
+        Consistent action beats information. We use{" "}
+        <span style={{ color: LIME, fontWeight: 600 }}>gamification</span> &{" "}
+        <span style={{ color: LIME, fontWeight: 600 }}>behavioral science</span>{" "}
+        to make you take action.
+      </p>
+
+      <button
+        onClick={onContinue}
+        style={{
+          marginTop: 24,
+          width: "100%",
+          maxWidth: 360,
+          padding: "18px 0",
+          background: LIME,
+          color: NAVY,
+          border: "none",
+          borderRadius: 14,
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontWeight: 700,
+          fontSize: 17,
+          letterSpacing: "0.10em",
+          textTransform: "uppercase",
+          cursor: "pointer",
+        }}
+      >
+        {ctaLabel}
+      </button>
+    </motion.div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   TIMELINE CARD — Before/After time savings
+══════════════════════════════════════════════════════ */
+
+export function TimelineCard({
+  ctaLabel = "Continue",
+  onContinue,
+}: {
+  ctaLabel?: string;
+  onContinue: () => void;
+}) {
+  const ROW = {
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    padding: "16px 18px",
+    borderRadius: 14,
+    width: "100%",
+  } as const;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 0,
+        textAlign: "center",
+      }}
+    >
+      {/* Big 10x stat */}
+      <div style={{ marginBottom: 8 }}>
+        <span
+          style={{
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 800,
+            fontStyle: "italic",
+            fontSize: 72,
+            lineHeight: 1,
+            color: LIME,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          10×
+        </span>
+      </div>
+      <p
+        style={{
+          fontFamily: "var(--font-apercu), sans-serif",
+          fontWeight: 500,
+          fontSize: 16,
+          color: TEXT_HI,
+          marginBottom: 28,
+          maxWidth: 300,
+        }}
+      >
+        more efficient than figuring it out alone.
+      </p>
+
+      {/* Two stacked rows */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          width: "100%",
+          maxWidth: 360,
+        }}
+      >
+        {/* Row 1 — Without (red/faded) */}
+        <div
+          style={{
+            ...ROW,
+            background: "rgba(255,107,107,0.06)",
+            border: "1px solid rgba(255,107,107,0.12)",
+          }}
+        >
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              background: "rgba(255,107,107,0.10)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              fontSize: 20,
+            }}
+          >
+            ⏳
+          </div>
+          <div style={{ textAlign: "left" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontWeight: 600,
+                fontSize: 14,
+                color: "#FF6B6B",
+              }}
+            >
+              On your own
+            </div>
+            <div
+              style={{
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontWeight: 400,
+                fontSize: 12,
+                color: TEXT_LO,
+                marginTop: 2,
+              }}
+            >
+              Months of trial, error & guessing
+            </div>
+          </div>
+        </div>
+
+        {/* Row 2 — With Behavio (lime) */}
+        <div
+          style={{
+            ...ROW,
+            background: "rgba(200,255,0,0.06)",
+            border: "1px solid rgba(200,255,0,0.16)",
+          }}
+        >
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              background: "rgba(200,255,0,0.12)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              fontSize: 20,
+            }}
+          >
+            🎯
+          </div>
+          <div style={{ textAlign: "left" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontWeight: 600,
+                fontSize: 14,
+                color: LIME,
+              }}
+            >
+              With Behavio
+            </div>
+            <div
+              style={{
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontWeight: 400,
+                fontSize: 12,
+                color: TEXT_LO,
+                marginTop: 2,
+              }}
+            >
+              15 min/day — guided, focused, effective
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p
+        style={{
+          fontFamily: "var(--font-apercu), sans-serif",
+          fontWeight: 400,
+          fontSize: 13,
+          color: TEXT_MID,
+          lineHeight: 1.5,
+          marginTop: 22,
+          maxWidth: 320,
+        }}
+      >
+        We focus your effort on{" "}
+        <span style={{ color: LIME, fontWeight: 600 }}>what actually matters</span>
+        {" "}— not everything at once.
+      </p>
+
+      <button
+        onClick={onContinue}
+        style={{
+          marginTop: 24,
+          width: "100%",
+          maxWidth: 360,
+          padding: "18px 0",
+          background: LIME,
+          color: NAVY,
+          border: "none",
+          borderRadius: 14,
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontWeight: 700,
+          fontSize: 17,
+          letterSpacing: "0.10em",
+          textTransform: "uppercase",
+          cursor: "pointer",
+        }}
+      >
+        {ctaLabel}
+      </button>
+    </motion.div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   WIN CELEBRATION — congrats + progress chart
 ══════════════════════════════════════════════════════ */
 
 function roundRect(
@@ -673,8 +1758,185 @@ function roundRect(
   ctx.closePath();
 }
 
+type ProgressChartLine = {
+  label: string;
+  emoji: string;
+  color: string;
+  points: number[];
+};
+
+function ProgressChart({
+  lines,
+  baseline,
+}: {
+  lines: ProgressChartLine[];
+  baseline: ProgressChartLine;
+}) {
+  const W = 320;
+  const H = 180;
+  const pad = { top: 10, right: 12, bottom: 28, left: 12 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+  const weeks = ["Now", "WEEK 1", "WEEK 2", "WEEK 3", "WEEK 4"];
+
+  const toX = (i: number) => pad.left + (i / (weeks.length - 1)) * chartW;
+  const toY = (v: number) => pad.top + chartH - v * chartH;
+
+  const makePath = (pts: number[]) =>
+    pts.map((v, i) => `${i === 0 ? "M" : "L"}${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(" ");
+
+  const allLines = [...lines, baseline];
+  const primaryLine = lines[0];
+  const isBaseline = (label: string) => label === baseline.label;
+
+  return (
+    <div
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 16,
+        padding: "20px 16px 12px",
+        width: "100%",
+        maxWidth: 360,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 16,
+          marginBottom: 14,
+          flexWrap: "wrap",
+        }}
+      >
+        {lines.map((l) => (
+          <span
+            key={l.label}
+            style={{
+              fontFamily: "var(--font-apercu), sans-serif",
+              fontSize: 11,
+              color: l.color,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            {l.emoji} {l.label}
+          </span>
+        ))}
+      </div>
+
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
+        {[...Array(5)].map((_, i) => (
+          <line
+            key={i}
+            x1={toX(i)}
+            y1={pad.top}
+            x2={toX(i)}
+            y2={pad.top + chartH}
+            stroke="rgba(255,255,255,0.06)"
+            strokeDasharray="3 4"
+          />
+        ))}
+        {[0, 0.25, 0.5, 0.75, 1].map((v, i) => (
+          <line
+            key={i}
+            x1={pad.left}
+            y1={toY(v)}
+            x2={pad.left + chartW}
+            y2={toY(v)}
+            stroke="rgba(255,255,255,0.04)"
+          />
+        ))}
+
+        {allLines.map((line) => (
+          <path
+            key={line.label}
+            d={makePath(line.points)}
+            fill="none"
+            stroke={line.color}
+            strokeWidth={isBaseline(line.label) ? 1.5 : 2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray={isBaseline(line.label) ? "4 3" : undefined}
+            opacity={isBaseline(line.label) ? 0.7 : 1}
+          />
+        ))}
+
+        {allLines.map((line) =>
+          line.points.map((v, i) =>
+            i === line.points.length - 1 ? (
+              <circle
+                key={`${line.label}-${i}`}
+                cx={toX(i)}
+                cy={toY(v)}
+                r={isBaseline(line.label) ? 3 : 4}
+                fill={line.color}
+              />
+            ) : null,
+          ),
+        )}
+
+        <text
+          x={toX(4) - 4}
+          y={toY(primaryLine.points[4]) - 10}
+          fill={primaryLine.color}
+          fontSize="9"
+          fontFamily="var(--font-apercu), sans-serif"
+          fontWeight="700"
+          textAnchor="end"
+        >
+          Behavio Users
+        </text>
+        <text
+          x={toX(4) - 4}
+          y={toY(baseline.points[4]) + 14}
+          fill={baseline.color}
+          fontSize="8"
+          fontFamily="var(--font-apercu), sans-serif"
+          fontWeight="600"
+          textAnchor="end"
+          opacity={0.8}
+        >
+          {baseline.label}
+        </text>
+
+        {weeks.map((label, i) => (
+          <text
+            key={label}
+            x={toX(i)}
+            y={H - 4}
+            fill="rgba(255,255,255,0.35)"
+            fontSize="8"
+            fontFamily="var(--font-jetbrains-mono), monospace"
+            textAnchor="middle"
+            letterSpacing="0.06em"
+          >
+            {label}
+          </text>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 export function WinCelebration({ onContinue }: { onContinue: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const multiSelectAnswers = usePlanStore((s) => s.multiSelectAnswers);
+  const { themes, headlinePartsLower } = buildWinCelebrationLines(multiSelectAnswers);
+
+  const chartLines = themes.map((t) => ({
+    label: t.shortLabel,
+    emoji: t.emoji,
+    color: t.color,
+    points: t.points,
+  }));
+  const baselineLine = {
+    label: WIN_CELEBRATION_BASELINE.label,
+    emoji: WIN_CELEBRATION_BASELINE.emoji,
+    color: WIN_CELEBRATION_BASELINE.color,
+    points: [...WIN_CELEBRATION_BASELINE.points],
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -684,12 +1946,12 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
 
     const dpr = window.devicePixelRatio || 1;
     const W = canvas.clientWidth || 340;
-    const H = canvas.clientHeight || 280;
+    const H = canvas.clientHeight || 600;
     canvas.width = W * dpr;
     canvas.height = H * dpr;
     ctx.scale(dpr, dpr);
 
-    const colors = ["#C8FF00", "#4CAF7D", "#2DD4C0", "rgba(255,255,255,0.8)", "#F5A623"];
+    const colors = ["#C8FF00", "#4CAF7D", "#2DD4C0", "rgba(255,255,255,0.8)", "#5B8DEF"];
     const particles = Array.from({ length: 80 }, () => ({
       x: Math.random() * W,
       y: -20 - Math.random() * 100,
@@ -704,10 +1966,19 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
 
     let frame = 0;
     let animId: number;
+    const STOP_SPAWNING = 180; // ~3s at 60fps — stop recycling particles
+    const FADE_START = 200;
+    const FADE_END = 280; // fully gone by ~4.7s
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
       frame++;
+
+      if (frame > FADE_END) return; // done
+
+      const fadeAlpha = frame > FADE_START
+        ? 1 - (frame - FADE_START) / (FADE_END - FADE_START)
+        : 1;
 
       particles.forEach((p) => {
         p.x += p.vx;
@@ -715,15 +1986,19 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
         p.vy += 0.06;
         p.rotation += p.rotV;
         if (p.y > H + 20) {
-          p.y = -20;
-          p.x = Math.random() * W;
-          p.vy = 2 + Math.random() * 3;
+          if (frame < STOP_SPAWNING) {
+            p.y = -20;
+            p.x = Math.random() * W;
+            p.vy = 2 + Math.random() * 3;
+          } else {
+            return;
+          }
         }
 
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rotation);
-        ctx.globalAlpha = Math.min(1, frame / 20);
+        ctx.globalAlpha = Math.min(1, frame / 20) * fadeAlpha;
         ctx.fillStyle = p.color;
         roundRect(ctx, -p.w / 2, -p.h / 2, p.w, p.h, 1);
         ctx.fill();
@@ -737,11 +2012,6 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
     return () => cancelAnimationFrame(animId);
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(onContinue, 2800);
-    return () => clearTimeout(timer);
-  }, [onContinue]);
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -751,11 +2021,12 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        minHeight: "55vh",
         position: "relative",
         textAlign: "center",
         gap: 0,
+        paddingTop: 20,
+        paddingBottom: 40,
+        isolation: "isolate" as const,
       }}
     >
       <canvas
@@ -766,51 +2037,103 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
           width: "100%",
           height: "100%",
           pointerEvents: "none",
+          zIndex: -1,
         }}
       />
 
       <motion.div
-        initial={{ scale: 0.5, opacity: 0 }}
+        initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.15, type: "spring", stiffness: 280, damping: 22 }}
-        style={{ zIndex: 1 }}
+        transition={{ delay: 0.1, type: "spring", stiffness: 280, damping: 22 }}
+        style={{
+          zIndex: 2,
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 0,
+          width: "100%",
+          maxWidth: 380,
+          padding: "0 16px",
+        }}
       >
         <div
           style={{
             fontFamily: "var(--font-barlow-condensed), sans-serif",
             fontWeight: 800,
-            fontSize: 11,
-            letterSpacing: "0.20em",
-            textTransform: "uppercase",
-            color: TEXT_LO,
-            marginBottom: 6,
-          }}
-        >
-          You&apos;re in the
-        </div>
-        <div
-          style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
-            fontWeight: 800,
             fontStyle: "italic",
-            fontSize: 96,
+            fontSize: 52,
             lineHeight: 1,
             letterSpacing: "-0.02em",
             color: LIME,
+            marginBottom: 16,
           }}
         >
-          Top 12%
+          CONGRATS!
         </div>
+
         <p
           style={{
-            fontFamily: "var(--font-barlow), sans-serif",
-            fontWeight: 300,
-            fontSize: 16,
-            color: TEXT_MID,
-            marginTop: 12,
+            fontFamily: "var(--font-apercu), sans-serif",
+            fontWeight: 500,
+            fontSize: 17,
+            lineHeight: 1.5,
+            color: TEXT_HI,
+            marginBottom: 28,
+            maxWidth: 340,
           }}
         >
-          Your plan is being built.
+          We created the perfect routine to supercharge your{" "}
+          <span style={{ color: LIME, fontWeight: 700 }}>{headlinePartsLower[0]}</span>,{" "}
+          <span style={{ color: LIME, fontWeight: 700 }}>{headlinePartsLower[1]}</span> &{" "}
+          <span style={{ color: LIME, fontWeight: 700 }}>{headlinePartsLower[2]}</span> in the
+          next 40 days!
+        </p>
+
+        <ProgressChart lines={chartLines} baseline={baselineLine} />
+
+        <button
+          onClick={onContinue}
+          style={{
+            marginTop: 28,
+            width: "100%",
+            maxWidth: 360,
+            padding: "18px 0",
+            background: LIME,
+            color: NAVY,
+            border: "none",
+            borderRadius: 14,
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontSize: 17,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+          }}
+        >
+          CONTINUE
+          <span style={{ fontSize: 18 }}>&rarr;</span>
+        </button>
+
+        <p
+          style={{
+            fontFamily: "var(--font-apercu), sans-serif",
+            fontWeight: 400,
+            fontSize: 14,
+            lineHeight: 1.55,
+            color: TEXT_MID,
+            marginTop: 28,
+            maxWidth: 340,
+          }}
+        >
+          We have analyzed the answers to your quiz and created your custom plan{" "}
+          <span style={{ color: LIME, fontWeight: 600 }}>tailored to your {headlinePartsLower[0]}</span>,{" "}
+          <span style={{ color: LIME, fontWeight: 600 }}>{headlinePartsLower[1]}</span> &{" "}
+          <span style={{ color: LIME, fontWeight: 600 }}>{headlinePartsLower[2]}</span>.
         </p>
       </motion.div>
     </motion.div>
@@ -839,7 +2162,7 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
     border: `1px solid ${GLASS_BORDER}`,
     borderRadius: 14,
     color: TEXT_HI,
-    fontFamily: "var(--font-barlow), sans-serif",
+    fontFamily: "var(--font-body), Georgia, serif",
     fontWeight: 400,
     fontSize: 16,
     outline: "none",
@@ -850,6 +2173,7 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
     <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
       <input
         type="text"
+        className="capture-form-input"
         placeholder="Your first name"
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -858,6 +2182,7 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
       />
       <input
         type="email"
+        className="capture-form-input"
         placeholder="your@email.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -870,7 +2195,7 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
         whileTap={canSubmit ? { scale: 0.97 } : {}}
         style={{
           width: "100%",
-          background: canSubmit ? "#4CAF7D" : LIME,
+          background: LIME,
           color: "#060912",
           fontFamily: "var(--font-barlow-condensed), sans-serif",
           fontWeight: 700,
@@ -882,7 +2207,7 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
           border: "none",
           cursor: canSubmit ? "pointer" : "default",
           marginTop: 4,
-          boxShadow: canSubmit ? "0 8px 32px rgba(76,175,125,0.30)" : "0 8px 32px rgba(200,255,0,0.25)",
+          boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -907,6 +2232,323 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
       >
         Private · no spam · cancel anytime
       </p>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   MULTI-SELECT STEP — checkbox rows, multiple answers
+══════════════════════════════════════════════════════ */
+
+type MultiSelectStepProps = {
+  options: QuizOption[];
+  onSubmit: (selectedIndices: number[]) => void;
+};
+
+export function MultiSelectStep({ options, onSubmit }: MultiSelectStepProps) {
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  const toggle = (idx: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  const hasSelection = selected.size > 0;
+
+  const handleContinue = () => {
+    if (!hasSelection) return;
+    onSubmit(Array.from(selected).sort((a, b) => a - b));
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
+        {options.map((opt, i) => {
+          const isOn = selected.has(i);
+          return (
+            <motion.button
+              key={i}
+              type="button"
+              onClick={() => toggle(i)}
+              animate={{
+                background: isOn ? "rgba(200,255,0,0.10)" : GLASS,
+              }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "12px 14px",
+                borderRadius: 12,
+                border: `1px solid ${isOn ? LIME : GLASS_BORDER}`,
+                background: isOn ? "rgba(200,255,0,0.10)" : GLASS,
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                cursor: "pointer",
+                textAlign: "left",
+                width: "100%",
+              }}
+            >
+              {opt.icon && (
+                <span
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 8,
+                    background: "rgba(255,255,255,0.06)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 15,
+                    flexShrink: 0,
+                  }}
+                >
+                  {opt.icon}
+                </span>
+              )}
+              <span
+                style={{
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  color: isOn ? LIME : TEXT_HI,
+                  flex: 1,
+                }}
+              >
+                {opt.label}
+              </span>
+
+              <span
+                aria-hidden
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: 6,
+                  border: `2px solid ${isOn ? LIME : TEXT_LO}`,
+                  background: isOn ? LIME : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {isOn && (
+                  <motion.svg
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    width="10"
+                    height="8"
+                    viewBox="0 0 10 8"
+                    fill="none"
+                  >
+                    <path
+                      d="M1 4L3.5 6.5L9 1"
+                      stroke={NAVY}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </motion.svg>
+                )}
+              </span>
+            </motion.button>
+          );
+        })}
+      </div>
+
+      <AnimatePresence>
+        {hasSelection && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
+            onClick={handleContinue}
+            style={{
+              width: "100%",
+              background: LIME,
+              color: "#060912",
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 18,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              borderRadius: 100,
+              padding: "20px 32px",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+            }}
+          >
+            Continue
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+              <path d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   SLIDER SCALE — labeled segments + Continue
+══════════════════════════════════════════════════════ */
+
+type SliderScaleStepProps = {
+  labels: string[];
+  onSelect: (value: number) => void;
+};
+
+export function SliderScaleStep({ labels, onSelect }: SliderScaleStepProps) {
+  const [selected, setSelected] = useState<number | null>(null);
+
+  const handleContinue = () => {
+    if (selected === null) return;
+    onSelect(selected);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
+        {/* Indicator row */}
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            minHeight: 18,
+            paddingLeft: 4,
+            paddingRight: 4,
+          }}
+        >
+          {labels.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "flex-end",
+              }}
+            >
+              <motion.div
+                animate={{
+                  scale: selected === i ? 1 : 0,
+                  opacity: selected === i ? 1 : 0,
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: LIME,
+                  boxShadow: "0 0 12px rgba(200,255,0,0.45)",
+                  marginBottom: 2,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Track line */}
+        <div style={{ position: "relative", width: "100%", height: 12, marginTop: -4 }}>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: 8,
+              right: 8,
+              top: "50%",
+              height: 1,
+              transform: "translateY(-50%)",
+              background: GLASS_BORDER,
+            }}
+          />
+        </div>
+
+        {/* Segments */}
+        <div style={{ display: "flex", width: "100%", gap: 4, marginTop: -2 }}>
+          {labels.map((label, i) => {
+            const isOn = selected === i;
+            return (
+              <motion.button
+                key={i}
+                type="button"
+                onClick={() => setSelected(i)}
+                whileTap={{ scale: 0.97 }}
+                style={{
+                  flex: 1,
+                  padding: "12px 6px",
+                  borderRadius: 12,
+                  border: `1px solid ${isOn ? LIME : GLASS_BORDER}`,
+                  background: isOn ? "rgba(200,255,0,0.10)" : GLASS,
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                  color: isOn ? LIME : TEXT_HI,
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                }}
+              >
+                {label}
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {selected !== null && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
+            onClick={handleContinue}
+            style={{
+              width: "100%",
+              background: LIME,
+              color: "#060912",
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 18,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              borderRadius: 100,
+              padding: "20px 32px",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+            }}
+          >
+            Continue
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+              <path d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

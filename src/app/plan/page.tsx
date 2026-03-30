@@ -8,78 +8,329 @@ import type { IntakeResponse } from "../types/plan";
 import type { PipelinePhase } from "../types/pipeline";
 import { usePlanStore } from "../state/planStore";
 import { ARCHETYPES } from "../data/archetypes";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { InspirationQuotes } from "../components/InspirationQuotes";
+import { downloadPlanPDF } from "../components/PlanExportPDF";
 
-const STORAGE_KEY_PREFIX = "future-you-plan-";
+const STORAGE_KEY_PREFIX = "behavio-plan-";
 
-function PhaseCard({ phase, index }: { phase: PipelinePhase; index: number }) {
-  const [open, setOpen] = useState(false);
+const LIME = "#C8FF00";
+const NAVY = "#0A1628";
+const TEXT_HI = "rgba(235,242,255,0.92)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
+const GLASS = "rgba(255,255,255,0.07)";
+const GLASS_BORDER = "rgba(255,255,255,0.14)";
+
+const glassCard: React.CSSProperties = {
+  background: GLASS,
+  border: `1px solid ${GLASS_BORDER}`,
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  borderRadius: 20,
+};
+
+const heading: React.CSSProperties = {
+  fontFamily: "var(--font-barlow-condensed), sans-serif",
+  fontWeight: 800,
+  fontStyle: "italic",
+  color: TEXT_HI,
+  margin: 0,
+};
+
+const bodyText: React.CSSProperties = {
+  fontFamily: "var(--font-body), Georgia, serif",
+  fontWeight: 400,
+  color: TEXT_MID,
+  lineHeight: 1.6,
+  margin: 0,
+};
+
+const eyebrow: React.CSSProperties = {
+  fontFamily: "var(--font-barlow-condensed), sans-serif",
+  fontWeight: 700,
+  textTransform: "uppercase",
+  letterSpacing: "0.2em",
+  fontSize: 10,
+  color: TEXT_LO,
+  margin: 0,
+};
+
+const limeBadge: React.CSSProperties = {
+  display: "inline-block",
+  background: "rgba(200,255,0,0.08)",
+  border: "1px solid rgba(200,255,0,0.18)",
+  color: LIME,
+  borderRadius: 100,
+  padding: "6px 16px",
+  fontFamily: "var(--font-barlow-condensed), sans-serif",
+  fontWeight: 700,
+  fontSize: 11,
+  textTransform: "uppercase",
+  letterSpacing: "0.15em",
+};
+
+const ctaButton: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  background: LIME,
+  color: "#060912",
+  fontFamily: "var(--font-barlow-condensed), sans-serif",
+  fontWeight: 800,
+  fontSize: 16,
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  borderRadius: 100,
+  padding: "20px 32px",
+  border: "none",
+  cursor: "pointer",
+  boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+  textAlign: "center" as const,
+};
+
+const outlineButton: React.CSSProperties = {
+  display: "flex",
+  width: "100%",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 10,
+  background: "rgba(255,255,255,0.04)",
+  color: TEXT_MID,
+  fontFamily: "var(--font-barlow-condensed), sans-serif",
+  fontWeight: 700,
+  fontSize: 14,
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  borderRadius: 100,
+  padding: "16px 28px",
+  border: `1px solid ${GLASS_BORDER}`,
+  cursor: "pointer",
+};
+
+function LockIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function LockedPhaseOverlay({ onUnlock }: { onUnlock: () => void }) {
   return (
     <div
-      className="rounded-2xl border border-border bg-card overflow-hidden"
-      style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 2,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10,
+        background: "rgba(6,9,18,0.70)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
+        borderRadius: 20,
+        cursor: "pointer",
+      }}
+      onClick={onUnlock}
     >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          color: LIME,
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontWeight: 700,
+          fontSize: 13,
+          textTransform: "uppercase",
+          letterSpacing: "0.10em",
+        }}
+      >
+        <LockIcon />
+        Unlock full plan
+      </div>
+      <p
+        style={{
+          fontFamily: "var(--font-body), Georgia, serif",
+          fontSize: 12,
+          color: TEXT_LO,
+          margin: 0,
+        }}
+      >
+        Tap to see pricing
+      </p>
+    </div>
+  );
+}
+
+function PhaseCard({
+  phase,
+  index,
+  locked,
+  onUnlock,
+}: {
+  phase: PipelinePhase;
+  index: number;
+  locked?: boolean;
+  onUnlock?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ ...glassCard, overflow: "hidden", position: "relative" }}>
+      {locked && onUnlock && <LockedPhaseOverlay onUnlock={onUnlock} />}
       <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-start gap-3 p-4 text-left"
+        onClick={() => !locked && setOpen((v) => !v)}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 14,
+          padding: 20,
+          textAlign: "left",
+          background: "none",
+          border: "none",
+          cursor: locked ? "default" : "pointer",
+          opacity: locked ? 0.35 : 1,
+          filter: locked ? "blur(2px)" : "none",
+          transition: "opacity 0.2s, filter 0.2s",
+        }}
       >
         <span
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-          style={{ background: "var(--accent-primary)" }}
+          style={{
+            display: "flex",
+            height: 32,
+            width: 32,
+            flexShrink: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "50%",
+            background: locked ? TEXT_LO : LIME,
+            color: "#060912",
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 800,
+            fontSize: 14,
+          }}
         >
           {index + 1}
         </span>
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[15px] text-foreground leading-snug">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p
+            style={{
+              ...heading,
+              fontSize: 16,
+              lineHeight: 1.3,
+            }}
+          >
             {phase.phase_name}
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p
+            style={{
+              ...bodyText,
+              fontSize: 12,
+              color: TEXT_LO,
+              marginTop: 3,
+            }}
+          >
             {phase.duration_weeks} week{phase.duration_weeks !== 1 ? "s" : ""}
           </p>
         </div>
-        <span className="text-muted-foreground text-sm shrink-0 mt-0.5">{open ? "▲" : "▼"}</span>
+        <span
+          style={{
+            color: TEXT_LO,
+            fontSize: 13,
+            flexShrink: 0,
+            marginTop: 2,
+          }}
+        >
+          {locked ? <LockIcon /> : open ? "▲" : "▼"}
+        </span>
       </button>
 
-      {open && (
-        <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
-          <p className="text-[14px] text-muted-foreground">{phase.goal}</p>
+      {open && !locked && (
+        <div
+          style={{
+            padding: "0 20px 20px",
+            borderTop: `1px solid ${GLASS_BORDER}`,
+            paddingTop: 16,
+          }}
+        >
+          <p style={{ ...bodyText, fontSize: 14 }}>{phase.goal}</p>
 
           {phase.milestones.length > 0 && (
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Milestones
-              </p>
-              <ul className="space-y-1">
+            <div style={{ marginTop: 16 }}>
+              <p style={{ ...eyebrow, marginBottom: 10 }}>Milestones</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {phase.milestones.map((m, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[14px] text-foreground">
-                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: "var(--accent-primary)" }} />
-                    {m}
-                  </li>
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 10,
+                    }}
+                  >
+                    <span
+                      style={{
+                        marginTop: 7,
+                        height: 5,
+                        width: 5,
+                        borderRadius: "50%",
+                        background: LIME,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ ...bodyText, fontSize: 14, color: TEXT_HI }}>
+                      {m}
+                    </span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {phase.steps.length > 0 && (
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Steps
-              </p>
-              <ol className="space-y-2">
+            <div style={{ marginTop: 16 }}>
+              <p style={{ ...eyebrow, marginBottom: 10 }}>Steps</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {phase.steps.map((step) => (
-                  <li key={step.step_number} className="text-[14px] text-foreground">
-                    <span className="font-semibold">{step.step_number}. {step.title}</span>
-                    <p className="text-muted-foreground mt-0.5 text-[13px]">{step.description}</p>
-                    <p className="text-[12px] mt-0.5" style={{ color: "var(--accent-secondary)" }}>
+                  <div key={step.step_number}>
+                    <span
+                      style={{
+                        ...heading,
+                        fontSize: 14,
+                        fontStyle: "normal",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {step.step_number}. {step.title}
+                    </span>
+                    <p
+                      style={{
+                        ...bodyText,
+                        fontSize: 13,
+                        marginTop: 3,
+                      }}
+                    >
+                      {step.description}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-body), Georgia, serif",
+                        fontSize: 12,
+                        color: LIME,
+                        marginTop: 4,
+                        margin: 0,
+                        marginBlockStart: 4,
+                      }}
+                    >
                       ✓ {step.success_metric}
                     </p>
-                  </li>
+                  </div>
                 ))}
-              </ol>
+              </div>
             </div>
           )}
         </div>
@@ -114,6 +365,11 @@ export default function PlanPage() {
   const ambitionType = usePlanStore((s) => s.ambitionType);
   const googleCalendarConnected = usePlanStore((s) => s.googleCalendarConnected);
   const setGoogleCalendarConnected = usePlanStore((s) => s.setGoogleCalendarConnected);
+  const isPremium = usePlanStore((s) => s.isPremium);
+
+  const handleUnlockPlan = () => {
+    router.push("/paywall");
+  };
 
   const arch = archetype ? ARCHETYPES.find((a) => a.id === archetype) : null;
 
@@ -135,7 +391,6 @@ export default function PlanPage() {
     return () => clearTimeout(id);
   }, [planId, setPlanReady]);
 
-  // Detect redirect back from Google OAuth
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const calStatus = params.get("calendar");
@@ -170,26 +425,96 @@ export default function PlanPage() {
 
   const handleDropIn = () => {
     acceptPlan();
-    router.push("/brief");
+    router.push("/");
   };
 
+  /* ── Loading state ─────────────────────────────────────────────── */
   if (plan === undefined) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-background px-6">
-        <p className="text-muted-foreground">Loading…</p>
+      <div
+        style={{
+          minHeight: "100dvh",
+          background: "#060912",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 24px",
+        }}
+      >
+        <p style={{ ...bodyText, color: TEXT_LO }}>Loading…</p>
       </div>
     );
   }
 
+  /* ── No plan state ─────────────────────────────────────────────── */
   if (!plan) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6">
-        <p className="text-center text-[15px] text-muted-foreground">
-          No plan yet. Let&apos;s build your roadmap — your coach is ready.
-        </p>
-        <Button render={<Link href="/intake" />} className="mt-6">
-          Start my plan
-        </Button>
+      <div
+        style={{
+          minHeight: "100dvh",
+          background: "#060912",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Gradient mesh */}
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 0,
+            background: `
+              radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
+              linear-gradient(170deg, #0d1a3a 0%, #060912 55%)
+            `,
+            pointerEvents: "none",
+          }}
+        />
+        {/* Grid overlay */}
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 0,
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100dvh",
+            padding: "0 32px",
+            textAlign: "center",
+          }}
+        >
+          <p style={{ ...bodyText, fontSize: 15, maxWidth: 280 }}>
+            No plan yet. Let&apos;s build your roadmap — your coach is ready.
+          </p>
+          <Link
+            href="/intake"
+            style={{
+              ...ctaButton,
+              display: "inline-block",
+              width: "auto",
+              marginTop: 28,
+              textDecoration: "none",
+            }}
+          >
+            Start my plan
+          </Link>
+        </div>
       </div>
     );
   }
@@ -197,107 +522,252 @@ export default function PlanPage() {
   const path = plan.paths[pathIndex];
   const hasAlternatives = plan.paths.length > 1;
 
-  // Day 1 step for reveal mode
   const day1Step = pipelinePlan?.phases[0]?.steps[0] ?? null;
   const phase1 = pipelinePlan?.phases[0] ?? null;
 
   return (
-    <div className="relative min-h-dvh bg-background px-4 pb-32 pt-14">
-      <div className="mx-auto max-w-md space-y-5">
+    <div
+      style={{
+        minHeight: "100dvh",
+        background: "#060912",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* ── Background gradient mesh ──────────────────────────────── */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          background: `
+            radial-gradient(ellipse 70% 55% at 50% 20%, rgba(200,255,0,0.10) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 10% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
+            linear-gradient(170deg, #0f1e3a 0%, #060912 55%)
+          `,
+          pointerEvents: "none",
+        }}
+      />
 
-        {/* ── Reveal mode: Day 1 hero ─────────────────────────────────── */}
-        {isReveal && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-4"
-          >
-            <div className="space-y-1.5">
-              <span
-                className="inline-block rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
-                style={{ background: "var(--accent-secondary)" }}
-              >
-                Your plan is ready
-              </span>
-              <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-foreground">
-                {userName ? `${userName}, here's` : "Here's"} your Day 1.
-              </h1>
-              {phase1 && (
-                <p className="text-[14px] text-muted-foreground">
-                  {phase1.phase_name} · {phase1.duration_weeks} week{phase1.duration_weeks !== 1 ? "s" : ""}
-                </p>
-              )}
-            </div>
+      {/* ── Subtle grid overlay ───────────────────────────────────── */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          pointerEvents: "none",
+        }}
+      />
 
-            {day1Step && (
-              <Card
-                className="border-0 shadow-md"
-                style={{ background: "var(--card-surface)", boxShadow: "0 4px 20px rgba(232,98,42,0.12)" }}
-              >
-                <CardContent className="p-5 space-y-2">
-                  <span
-                    className="inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest text-white"
-                    style={{ background: "var(--accent-primary)" }}
-                  >
-                    Day 1
-                  </span>
-                  <h3 className="text-[20px] font-extrabold text-foreground">{day1Step.title}</h3>
-                  <p className="text-[14px] leading-relaxed text-muted-foreground">{day1Step.description}</p>
-                  {day1Step.success_metric && (
-                    <p className="text-[12px] italic text-muted-foreground">
-                      Done when: {day1Step.success_metric}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            <button
-              onClick={handleDropIn}
-              className="w-full rounded-full py-4 text-[16px] font-bold text-white shadow-md"
-              style={{ background: "var(--accent-primary)" }}
-            >
-              Begin Day 1
-            </button>
-
-            <div className="flex items-center gap-3 pt-2">
-              <div className="h-px flex-1 bg-border" />
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                Your full roadmap
-              </p>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-          </motion.div>
-        )}
-
-        {!isReveal && (
+      <div style={{ position: "relative", zIndex: 1, padding: "0 20px 140px" }}>
+        {/* ── Behavio Logo ──────────────────────────────────────── */}
+        <div
+          style={{
+            paddingTop: "max(3.5rem, env(safe-area-inset-top, 3.5rem))",
+            paddingBottom: 28,
+            display: "flex",
+            alignItems: "baseline",
+          }}
+        >
           <span
-            className="inline-block rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
-            style={{ background: "var(--accent-secondary)" }}
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontStyle: "italic",
+              fontSize: 20,
+              color: "rgba(200,255,0,0.85)",
+              letterSpacing: "0.02em",
+            }}
           >
-            Your coaching plan
+            behavio
           </span>
-        )}
+        </div>
 
-        {!isReveal && arch && (
-          <p className="text-sm font-medium text-muted-foreground">
-            Built for {arch.name}s
-          </p>
-        )}
+        <div style={{ maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
+          {/* ── Reveal mode: Day 1 hero ───────────────────────────── */}
+          {isReveal && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {/* Hero */}
+              <div style={{ marginBottom: 28, textAlign: "center" }}>
+                <span style={limeBadge}>Your plan is ready</span>
+                <h1
+                  style={{
+                    ...heading,
+                    fontSize: 44,
+                    lineHeight: 0.96,
+                    letterSpacing: "-0.03em",
+                    marginTop: 18,
+                  }}
+                >
+                  {userName ? `${userName},` : "Here's"}<br />
+                  <span style={{ color: TEXT_HI }}>{userName ? "here's your " : "your "}</span>
+                  <em style={{ fontStyle: "normal", color: LIME }}>Day 1.</em>
+                </h1>
+                {phase1 && (
+                  <p style={{ ...bodyText, fontSize: 13, marginTop: 10, color: TEXT_LO }}>
+                    {phase1.phase_name} · {phase1.duration_weeks} week
+                    {phase1.duration_weeks !== 1 ? "s" : ""}
+                  </p>
+                )}
+              </div>
 
-        {/* Values */}
-        <Card className="border border-border shadow-sm" style={{ background: "var(--card-surface)" }}>
-          <CardContent className="p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-              Your Values & Strengths
+              {/* Day 1 task card */}
+              {day1Step && (
+                <div
+                  style={{
+                    background: "rgba(200,255,0,0.04)",
+                    border: "1px solid rgba(200,255,0,0.16)",
+                    backdropFilter: "blur(16px)",
+                    WebkitBackdropFilter: "blur(16px)",
+                    borderRadius: 20,
+                    padding: "28px 24px",
+                    marginBottom: 24,
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 1,
+                      background: "linear-gradient(90deg, transparent, rgba(200,255,0,0.30), transparent)",
+                    }}
+                  />
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 12,
+                        background: LIME,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: "var(--font-barlow-condensed), sans-serif",
+                        fontWeight: 900,
+                        fontSize: 18,
+                        color: "#060912",
+                        flexShrink: 0,
+                      }}
+                    >
+                      1
+                    </div>
+                    <div>
+                      <p style={{ ...eyebrow, color: "rgba(200,255,0,0.60)", fontSize: 9, letterSpacing: "0.22em" }}>
+                        Today&apos;s focus
+                      </p>
+                      <h3
+                        style={{
+                          ...heading,
+                          fontSize: 22,
+                          lineHeight: 1.15,
+                          marginTop: 2,
+                        }}
+                      >
+                        {day1Step.title}
+                      </h3>
+                    </div>
+                  </div>
+                  <p style={{ ...bodyText, fontSize: 14, marginBottom: day1Step.success_metric ? 14 : 0 }}>
+                    {day1Step.description}
+                  </p>
+                  {day1Step.success_metric && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        paddingTop: 14,
+                        borderTop: "1px solid rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                        <path d="M3 7l2.5 2.5L11 4" stroke={LIME} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <p style={{ ...bodyText, fontSize: 12, color: TEXT_LO, fontStyle: "italic" }}>
+                        {day1Step.success_metric}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button onClick={handleDropIn} style={ctaButton}>
+                Begin Day 1
+              </button>
+
+              {/* Divider */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  marginTop: 32,
+                  marginBottom: 8,
+                }}
+              >
+                <div
+                  style={{ flex: 1, height: 1, background: GLASS_BORDER }}
+                />
+                <p style={eyebrow}>Your full roadmap</p>
+                <div
+                  style={{ flex: 1, height: 1, background: GLASS_BORDER }}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {!isReveal && (
+            <div style={{ marginBottom: 8 }}>
+              <span style={limeBadge}>Your coaching plan</span>
+            </div>
+          )}
+
+          {!isReveal && arch && (
+            <p
+              style={{
+                ...bodyText,
+                fontSize: 14,
+                fontWeight: 500,
+                marginBottom: 20,
+              }}
+            >
+              Built for {arch.name}s
             </p>
-            <div className="mt-3 flex flex-wrap gap-2">
+          )}
+
+          {/* ── Values & Strengths ────────────────────────────────── */}
+          <div style={{ ...glassCard, padding: 24, marginBottom: 20 }}>
+            <p style={eyebrow}>Your Values & Strengths</p>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                marginTop: 14,
+              }}
+            >
               {plan.values.map((v) => (
                 <span
                   key={v}
-                  className="rounded-full px-3 py-1 text-[12px] font-semibold"
-                  style={{ background: "var(--badge-bg)", color: "var(--text-secondary)" }}
+                  style={{
+                    ...limeBadge,
+                    fontSize: 12,
+                    padding: "5px 14px",
+                  }}
                 >
                   {v}
                 </span>
@@ -305,108 +775,283 @@ export default function PlanPage() {
               {plan.roles.map((r) => (
                 <span
                   key={r}
-                  className="rounded-full px-3 py-1 text-[12px] font-semibold text-white"
-                  style={{ background: "var(--accent-secondary)" }}
+                  style={{
+                    display: "inline-block",
+                    background: "rgba(200,255,0,0.18)",
+                    border: "1px solid rgba(200,255,0,0.30)",
+                    color: LIME,
+                    borderRadius: 100,
+                    padding: "5px 14px",
+                    fontFamily: "var(--font-barlow-condensed), sans-serif",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    letterSpacing: "0.08em",
+                  }}
                 >
                   {r}
                 </span>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Path */}
-        <Card className="border border-border shadow-sm" style={{ background: "var(--card-surface)" }}>
-          <CardContent className="p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-              Your path forward
-            </p>
+          {/* ── Path Forward ──────────────────────────────────────── */}
+          <div style={{ ...glassCard, padding: 24, marginBottom: 20 }}>
+            <p style={eyebrow}>Your path forward</p>
             {path && (
               <>
-                <h3 className="mt-3 text-[22px] font-extrabold tracking-tight text-foreground">
+                <h3
+                  style={{
+                    ...heading,
+                    fontSize: 24,
+                    lineHeight: 1.15,
+                    letterSpacing: "-0.02em",
+                    marginTop: 14,
+                  }}
+                >
                   {path.name}
                 </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{path.description}</p>
+                <p style={{ ...bodyText, fontSize: 15, marginTop: 10 }}>
+                  {path.description}
+                </p>
                 {hasAlternatives && (
                   <button
-                    onClick={() => setPathIndex((i) => (i + 1) % plan.paths.length)}
-                    className="mt-4 text-sm font-bold"
-                    style={{ color: "var(--accent-primary)" }}
+                    onClick={() =>
+                      setPathIndex((i) => (i + 1) % plan.paths.length)
+                    }
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      marginTop: 16,
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      color: LIME,
+                      cursor: "pointer",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                    }}
                   >
-                    View alternative path
+                    View alternative path →
                   </button>
                 )}
               </>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Inspiration quotes — domain-matched famous quotes */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.35 }}
-        >
-          <InspirationQuotes domain={ambitionType} />
-        </motion.div>
-
-        {/* Pipeline roadmap phases */}
-        {pipelinePlan && pipelinePlan.phases.length > 0 && (
-          <div className="space-y-3">
-            <p className="font-accent text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              Your {pipelinePlan.horizon_weeks}-week roadmap
-            </p>
-            {pipelinePlan.phases.map((phase, i) => (
-              <PhaseCard key={phase.phase_number} phase={phase} index={i} />
-            ))}
           </div>
-        )}
 
-        {/* Google Calendar connect / sync */}
-        {pipelinePlan && (
-          <div className="space-y-2">
-            {!googleCalendarConnected ? (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => { window.location.href = "/api/auth/google-calendar"; }}
-              >
-                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M3 9h18" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-                Connect Google Calendar
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => void handleCalendarSync()}
-                disabled={calendarSyncing}
-              >
-                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M3 9h18" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  <path d="M8 14l2.5 2.5L16 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {calendarSyncing ? "Syncing…" : "Sync Plan to Calendar"}
-              </Button>
-            )}
-            {calendarSyncError && (
-              <p className="text-center text-xs text-destructive">{calendarSyncError}</p>
-            )}
-          </div>
-        )}
+          {/* ── Inspiration quotes ────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.35 }}
+            style={{ marginBottom: 20 }}
+          >
+            <InspirationQuotes domain={ambitionType} />
+          </motion.div>
 
-        <button
-          onClick={handleDropIn}
-          className="w-full rounded-full py-4 text-[16px] font-bold text-white shadow-md"
-          style={{ background: "var(--accent-primary)" }}
-        >
-          Start my daily coaching
-        </button>
+          {/* ── Pipeline roadmap phases ───────────────────────────── */}
+          {pipelinePlan && pipelinePlan.phases.length > 0 && (
+            <div style={{ marginBottom: 24 }}>
+              <p style={{ ...eyebrow, marginBottom: 14 }}>
+                Your {pipelinePlan.horizon_weeks}-week roadmap
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                }}
+              >
+                {pipelinePlan.phases.map((phase, i) => (
+                  <PhaseCard
+                    key={phase.phase_number}
+                    phase={phase}
+                    index={i}
+                    locked={!isPremium && i > 0}
+                    onUnlock={handleUnlockPlan}
+                  />
+                ))}
+              </div>
+
+              {/* Unlock CTA banner for free users */}
+              {!isPremium && pipelinePlan.phases.length > 1 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.3 }}
+                  style={{
+                    marginTop: 16,
+                    background: "rgba(200,255,0,0.04)",
+                    border: "1px solid rgba(200,255,0,0.16)",
+                    borderRadius: 16,
+                    padding: "20px 24px",
+                    textAlign: "center",
+                  }}
+                >
+                  <p
+                    style={{
+                      ...heading,
+                      fontSize: 18,
+                      lineHeight: 1.3,
+                      marginBottom: 6,
+                    }}
+                  >
+                    {pipelinePlan.phases.length - 1} more phase{pipelinePlan.phases.length - 1 !== 1 ? "s" : ""} waiting for you
+                  </p>
+                  <p
+                    style={{
+                      ...bodyText,
+                      fontSize: 13,
+                      color: TEXT_LO,
+                      marginBottom: 16,
+                    }}
+                  >
+                    Your full roadmap is built. Unlock it to keep going.
+                  </p>
+                  <button
+                    onClick={handleUnlockPlan}
+                    style={{
+                      ...ctaButton,
+                      maxWidth: 280,
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                      fontSize: 14,
+                      padding: "16px 28px",
+                    }}
+                  >
+                    Unlock full plan
+                  </button>
+                </motion.div>
+              )}
+            </div>
+          )}
+
+          {/* ── Google Calendar connect / sync ────────────────────── */}
+          {pipelinePlan && (
+            <div style={{ marginBottom: 24 }}>
+              {!googleCalendarConnected ? (
+                <button
+                  onClick={() => {
+                    window.location.href = "/api/auth/google-calendar";
+                  }}
+                  style={outlineButton}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M3 9h18"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M8 2v4M16 2v4"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  Connect Google Calendar
+                </button>
+              ) : (
+                <button
+                  onClick={() => void handleCalendarSync()}
+                  disabled={calendarSyncing}
+                  style={{
+                    ...outlineButton,
+                    opacity: calendarSyncing ? 0.5 : 1,
+                    cursor: calendarSyncing ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M3 9h18"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M8 2v4M16 2v4"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M8 14l2.5 2.5L16 11"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {calendarSyncing ? "Syncing…" : "Sync Plan to Calendar"}
+                </button>
+              )}
+              {calendarSyncError && (
+                <p
+                  style={{
+                    ...bodyText,
+                    textAlign: "center",
+                    fontSize: 13,
+                    color: "#ff6b6b",
+                    marginTop: 10,
+                  }}
+                >
+                  {calendarSyncError}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ── Export Plan (premium only) ────────────────────────── */}
+          {isPremium && pipelinePlan && (
+            <button
+              onClick={() => downloadPlanPDF(pipelinePlan, userName)}
+              style={{
+                ...outlineButton,
+                marginBottom: 16,
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              Export plan as PDF
+            </button>
+          )}
+
+          {/* ── Main CTA ─────────────────────────────────────────── */}
+          <button onClick={handleDropIn} style={ctaButton}>
+            Start my daily coaching
+          </button>
+        </div>
       </div>
     </div>
   );

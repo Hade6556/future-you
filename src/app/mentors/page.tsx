@@ -3,10 +3,20 @@
 import { useState, useEffect } from "react";
 import { ChevronRightIcon, CheckBadgeIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { usePlanStore } from "../state/planStore";
 import { AMBITION_GOAL_MAP, type PipelineExpert } from "../types/pipeline";
+
+const LIME = "#C8FF00";
+const NAVY = "#060912";
+const TEXT_HI = "rgba(235,242,255,0.95)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
+const GLASS = "rgba(255,255,255,0.07)";
+const GLASS_BORDER = "rgba(255,255,255,0.14)";
+
+const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
+const FONT_BODY = "var(--font-apercu), sans-serif";
+const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 
 function stripMarkdown(text: string): string {
   return text
@@ -29,12 +39,21 @@ function ExpertLogo({ expert }: { expert: PipelineExpert }) {
         src={logoSrc}
         alt={expert.name}
         onError={() => setFailed(true)}
-        className="h-10 w-10 shrink-0 rounded-xl object-contain bg-white p-1.5 border border-border"
+        style={{
+          height: 40, width: 40, flexShrink: 0, borderRadius: 12,
+          objectFit: "contain", background: "#fff", padding: 6,
+          border: "1px solid " + GLASS_BORDER,
+        }}
       />
     );
   }
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-primary-foreground font-bold text-sm">
+    <div style={{
+      display: "flex", alignItems: "center", justifyContent: "center",
+      height: 40, width: 40, flexShrink: 0, borderRadius: "50%",
+      background: "rgba(200,255,0,0.15)", color: LIME, border: "none",
+      fontWeight: 700, fontSize: 14, fontFamily: FONT_BODY,
+    }}>
       {expert.name.charAt(0)}
     </div>
   );
@@ -43,30 +62,43 @@ function ExpertLogo({ expert }: { expert: PipelineExpert }) {
 function ExpertCard({ expert }: { expert: PipelineExpert }) {
   const bio = expert.bio_snippet ? stripMarkdown(expert.bio_snippet) : null;
   return (
-    <div className="flex min-w-0 items-start gap-3 rounded-xl border border-border bg-card p-4">
+    <div style={{
+      display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0,
+      background: GLASS, border: "1px solid " + GLASS_BORDER,
+      borderRadius: 16, backdropFilter: "blur(16px)", padding: 16,
+    }}>
       <ExpertLogo expert={expert} />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <p className="text-[15px] font-semibold text-text-primary leading-snug">{expert.name}</p>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+          <p style={{ fontSize: 15, fontWeight: 600, color: TEXT_HI, lineHeight: 1.3, fontFamily: FONT_BODY, margin: 0 }}>
+            {expert.name}
+          </p>
           {expert.verified && (
-            <CheckBadgeIcon className="h-4 w-4 shrink-0 text-primary" aria-label="Verified" />
+            <CheckBadgeIcon style={{ height: 16, width: 16, flexShrink: 0, color: LIME }} aria-label="Verified" />
           )}
         </div>
-        <p className="text-xs text-microcopy-soft">{expert.role}</p>
+        <p style={{ fontSize: 12, color: TEXT_LO, fontFamily: FONT_BODY, margin: 0 }}>{expert.role}</p>
         {expert.specialty && (
-          <p className="mt-0.5 text-xs text-text-secondary">{expert.specialty}</p>
+          <p style={{ marginTop: 2, fontSize: 12, color: TEXT_MID, fontFamily: FONT_BODY, margin: "2px 0 0" }}>{expert.specialty}</p>
         )}
         {bio && (
-          <p className="mt-1.5 text-[13px] text-text-secondary line-clamp-3">{bio}</p>
+          <p style={{
+            marginTop: 6, fontSize: 13, color: TEXT_MID, fontFamily: FONT_BODY,
+            display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden",
+          }}>{bio}</p>
         )}
         <Link
           href={expert.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline underline-offset-2"
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 4,
+            marginTop: 8, fontSize: 14, fontWeight: 600, color: LIME,
+            textDecoration: "none", fontFamily: FONT_BODY,
+          }}
         >
           View profile
-          <ChevronRightIcon className="h-3.5 w-3.5 shrink-0" />
+          <ChevronRightIcon style={{ height: 14, width: 14, flexShrink: 0 }} />
         </Link>
       </div>
     </div>
@@ -75,12 +107,16 @@ function ExpertCard({ expert }: { expert: PipelineExpert }) {
 
 function SkeletonCard() {
   return (
-    <div className="flex min-w-0 items-start gap-3 rounded-xl border border-border bg-card p-4 animate-pulse">
-      <div className="h-10 w-10 shrink-0 rounded-xl bg-border" />
-      <div className="min-w-0 flex-1 space-y-2">
-        <div className="h-4 w-1/2 rounded bg-border" />
-        <div className="h-3 w-1/3 rounded bg-border" />
-        <div className="h-3 w-3/4 rounded bg-border" />
+    <div className="animate-pulse" style={{
+      display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0,
+      background: GLASS, border: "1px solid " + GLASS_BORDER,
+      borderRadius: 16, backdropFilter: "blur(16px)", padding: 16,
+    }}>
+      <div style={{ height: 40, width: 40, flexShrink: 0, borderRadius: 12, background: "rgba(255,255,255,0.06)" }} />
+      <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ height: 16, width: "50%", borderRadius: 6, background: "rgba(255,255,255,0.06)" }} />
+        <div style={{ height: 12, width: "33%", borderRadius: 6, background: "rgba(255,255,255,0.06)" }} />
+        <div style={{ height: 12, width: "75%", borderRadius: 6, background: "rgba(255,255,255,0.06)" }} />
       </div>
     </div>
   );
@@ -127,14 +163,36 @@ export default function MentorsPage() {
   const experts: PipelineExpert[] = pipelinePlan?.recommended_experts ?? [];
 
   const wrapper = (children: React.ReactNode) => (
-    <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-      <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
+    <div style={{ minHeight: "100dvh", background: NAVY, position: "relative", overflow: "hidden" }}>
+      <div aria-hidden style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        background: "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%), linear-gradient(170deg, #0d1a3a 0%, #060912 55%)",
+        pointerEvents: "none",
+      }} />
+      <div aria-hidden style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+        backgroundSize: "48px 48px", pointerEvents: "none",
+      }} />
+      <div style={{
+        position: "relative", zIndex: 1,
+        display: "flex", flexDirection: "column", gap: 20,
+        width: "100%", maxWidth: 448, margin: "0 auto", minWidth: 0,
+        padding: "max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2.75rem)) 24px 160px",
+      }}>
         <header>
-          <div className="flex items-center gap-2">
-            <UserGroupIcon className="h-5 w-5" style={{ color: "var(--accent-primary)" }} aria-hidden />
-            <h1 className="type-h1 text-text-primary">Who to Follow</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <UserGroupIcon style={{ height: 20, width: 20, color: LIME }} aria-hidden />
+            <h1 style={{
+              fontSize: 42, fontWeight: 900, fontStyle: "italic",
+              lineHeight: 0.94, letterSpacing: "-0.03em", color: TEXT_HI,
+              fontFamily: FONT_HEADING, margin: 0,
+            }}>Who to Follow</h1>
           </div>
-          <p className="mt-2 type-body font-normal text-microcopy-soft">
+          <p style={{
+            marginTop: 8, fontSize: 15, fontWeight: 400, lineHeight: 1.6,
+            color: TEXT_MID, fontFamily: FONT_BODY,
+          }}>
             Experts and mentors matched to your ambition.
           </p>
         </header>
@@ -151,13 +209,22 @@ export default function MentorsPage() {
         <SkeletonCard />
         <SkeletonCard />
         <SkeletonCard />
-        <div className="flex min-w-0 items-start gap-3 rounded-xl border border-border bg-card p-4">
-          <div className="h-8 w-8 shrink-0 rounded-full border border-border bg-muted" />
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] font-semibold leading-relaxed text-text-primary">
+        <div style={{
+          display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0,
+          background: GLASS, border: "1px solid " + GLASS_BORDER,
+          borderRadius: 16, backdropFilter: "blur(16px)", padding: 16,
+        }}>
+          <div style={{
+            height: 32, width: 32, flexShrink: 0, borderRadius: "50%",
+            border: "1px solid " + GLASS_BORDER, background: "rgba(255,255,255,0.04)",
+          }} />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.6, color: TEXT_HI, fontFamily: FONT_BODY, margin: 0 }}>
               Searching for mentors and experts…
             </p>
-            <p className="mt-1 text-xs text-microcopy-soft">This takes about 30–60 seconds.</p>
+            <p style={{ marginTop: 4, fontSize: 12, color: TEXT_LO, fontFamily: FONT_BODY }}>
+              This takes about 30–60 seconds.
+            </p>
           </div>
         </div>
       </>
@@ -166,67 +233,103 @@ export default function MentorsPage() {
 
   if (!ambitionType || !AMBITION_GOAL_MAP[ambitionType]) {
     return wrapper(
-      <Card className="min-w-0 border border-border shadow-sm">
-        <CardContent className="p-6 text-center">
-          <p className="text-[15px] text-text-secondary">
-            {ambitionType
-              ? "Mentor search for your ambition type is coming soon."
-              : "Complete the quiz so we can find mentors matched to your goal."}
-          </p>
-        </CardContent>
-      </Card>
+      <div style={{
+        background: GLASS, border: "1px solid " + GLASS_BORDER,
+        borderRadius: 16, backdropFilter: "blur(16px)", padding: 24,
+        textAlign: "center", minWidth: 0,
+      }}>
+        <p style={{ fontSize: 15, color: TEXT_MID, fontFamily: FONT_BODY, margin: 0 }}>
+          {ambitionType
+            ? "Mentor search for your ambition type is coming soon."
+            : "Complete the quiz so we can find mentors matched to your goal."}
+        </p>
+      </div>
     );
   }
 
   if (pipelineStatus === "idle") {
     return wrapper(
-      <Card className="min-w-0 border border-border shadow-sm">
-        <CardContent className="p-6 space-y-4">
-          <input
-            type="text"
-            value={locationInput}
-            onChange={(e) => setLocationInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && fetchMentors()}
-            placeholder="e.g. Vilnius, Lithuania"
-            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-          <Button
-            className="w-full min-h-[44px] bg-primary text-primary-foreground hover:bg-primary-hover"
-            onClick={fetchMentors}
-            disabled={!locationInput.trim()}
-          >
-            Find Mentors
-          </Button>
-        </CardContent>
-      </Card>
+      <div style={{
+        background: GLASS, border: "1px solid " + GLASS_BORDER,
+        borderRadius: 16, backdropFilter: "blur(16px)", padding: 24,
+        display: "flex", flexDirection: "column", gap: 16, minWidth: 0,
+      }}>
+        <input
+          type="text"
+          value={locationInput}
+          onChange={(e) => setLocationInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && fetchMentors()}
+          placeholder="e.g. Vilnius, Lithuania"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid " + GLASS_BORDER,
+            borderRadius: 14, padding: "14px 18px", fontSize: 15,
+            color: TEXT_HI, outline: "none", fontFamily: FONT_BODY,
+            width: "100%", boxSizing: "border-box",
+          }}
+        />
+        <button
+          onClick={fetchMentors}
+          disabled={!locationInput.trim()}
+          style={{
+            background: LIME, color: NAVY, border: "none",
+            borderRadius: 14, padding: "16px 0", width: "100%",
+            fontFamily: FONT_HEADING, fontWeight: 800, fontSize: 16,
+            textTransform: "uppercase", cursor: locationInput.trim() ? "pointer" : "not-allowed",
+            opacity: locationInput.trim() ? 1 : 0.5,
+          }}
+        >
+          Find Mentors
+        </button>
+      </div>
     );
   }
 
   if (pipelineStatus === "error") {
     return wrapper(
-      <Card className="min-w-0 border border-border shadow-sm">
-        <CardContent className="p-6 text-center">
-          <p className="text-[15px] text-text-secondary">Couldn&apos;t load mentors right now.</p>
-          {pipelineError && (
-            <p className="mt-2 text-xs font-mono text-destructive bg-muted px-3 py-2 rounded-lg break-all">
-              {pipelineError}
-            </p>
-          )}
-          <Button className="mt-4" onClick={() => setPipelineStatus("idle")}>Retry</Button>
-        </CardContent>
-      </Card>
+      <div style={{
+        background: GLASS, border: "1px solid " + GLASS_BORDER,
+        borderRadius: 16, backdropFilter: "blur(16px)", padding: 24,
+        textAlign: "center", minWidth: 0,
+      }}>
+        <p style={{ fontSize: 15, color: TEXT_MID, fontFamily: FONT_BODY, margin: 0 }}>
+          Couldn&apos;t load mentors right now.
+        </p>
+        {pipelineError && (
+          <p style={{
+            marginTop: 8, fontSize: 12, fontFamily: FONT_MONO,
+            color: "#ff6b6b", background: "rgba(255,255,255,0.04)",
+            padding: "8px 12px", borderRadius: 8, wordBreak: "break-all",
+          }}>
+            {pipelineError}
+          </p>
+        )}
+        <button
+          onClick={() => setPipelineStatus("idle")}
+          style={{
+            marginTop: 16, background: LIME, color: NAVY, border: "none",
+            borderRadius: 14, padding: "16px 0", width: "100%",
+            fontFamily: FONT_HEADING, fontWeight: 800, fontSize: 16,
+            textTransform: "uppercase", cursor: "pointer",
+          }}
+        >
+          Retry
+        </button>
+      </div>
     );
   }
 
   if (pipelineStatus === "ready" && experts.length === 0) {
     return wrapper(
-      <Card className="min-w-0 border border-border shadow-sm">
-        <CardContent className="p-6 text-center">
-          <p className="text-[15px] text-text-secondary">
-            No mentors found right now. Check back soon.
-          </p>
-        </CardContent>
-      </Card>
+      <div style={{
+        background: GLASS, border: "1px solid " + GLASS_BORDER,
+        borderRadius: 16, backdropFilter: "blur(16px)", padding: 24,
+        textAlign: "center", minWidth: 0,
+      }}>
+        <p style={{ fontSize: 15, color: TEXT_MID, fontFamily: FONT_BODY, margin: 0 }}>
+          No mentors found right now. Check back soon.
+        </p>
+      </div>
     );
   }
 
@@ -235,13 +338,16 @@ export default function MentorsPage() {
       {experts.map((expert) => (
         <ExpertCard key={expert.resource_id} expert={expert} />
       ))}
-      <Button
-        variant="ghost"
-        className="w-full min-h-[44px] text-text-secondary"
+      <button
         onClick={() => setPipelineStatus("idle")}
+        style={{
+          background: "transparent", border: "none",
+          color: TEXT_MID, fontSize: 14, cursor: "pointer",
+          fontFamily: FONT_BODY, padding: "12px 0", width: "100%",
+        }}
       >
         Search again
-      </Button>
+      </button>
     </>
   );
 }

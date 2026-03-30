@@ -48,7 +48,7 @@ const MOCK_RESPONSE: IntakeApiResponse = {
   ],
 };
 
-const SYSTEM_PROMPT = `You are Future Me, an AI life coach that helps people with any ambition — business, fitness, weight loss, creativity, academics, or personal wellness. You are warm, focused, and action-oriented.
+const SYSTEM_PROMPT = `You are Behavio, an AI life coach that helps people with any ambition — business, fitness, weight loss, creativity, academics, or personal wellness. You are warm, focused, and action-oriented.
 
 Extract identity signals from the user's narrative and return a JSON object with this exact shape:
 {
@@ -136,7 +136,7 @@ Narrative: ${narrative}`;
   } catch (error) {
     console.error("/api/intake error", error);
     return NextResponse.json(
-      { error: "Future Me hit a snag. Try again in a moment." },
+      { error: "Behavio hit a snag. Try again in a moment." },
       { status: 500 }
     );
   }

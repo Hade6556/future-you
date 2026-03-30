@@ -43,27 +43,15 @@ export default function SplashScreen() {
       <div style={{ display: "flex", alignItems: "baseline", gap: 0 }}>
         <span
           style={{
-            fontFamily: "var(--font-libre-baskerville), serif",
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
             fontStyle: "italic",
-            fontWeight: 400,
-            fontSize: 26,
-            color: "rgba(235,242,255,0.92)",
-          }}
-        >
-          Future
-        </span>
-        <span
-          style={{
-            fontFamily: "var(--font-cormorant), serif",
-            fontStyle: "italic",
-            fontWeight: 600,
-            fontSize: 32,
-            lineHeight: 0.85,
+            fontWeight: 700,
+            fontSize: 28,
             color: "#C8FF00",
-            letterSpacing: "0.01em",
+            letterSpacing: "0.02em",
           }}
         >
-          YOU
+          behavio
         </span>
       </div>
 

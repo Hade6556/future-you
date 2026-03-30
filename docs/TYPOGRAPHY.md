@@ -1,6 +1,6 @@
-# Future Me – Typography (Dashboard & handoff)
+# Behavio – Typography (Dashboard & handoff)
 
-Mobile-first type scale and tokens for iOS/Android. Keeps the warm Future Me brand with clear hierarchy and contrast. For the North Star color palette (canvas, text, accent, tabs, orb gradient), see [PALETTE.md](./PALETTE.md).
+Mobile-first type scale and tokens for iOS/Android. Keeps the warm Behavio brand with clear hierarchy and contrast. For the North Star color palette (canvas, text, accent, tabs, orb gradient), see [PALETTE.md](./PALETTE.md).
 
 ---
 

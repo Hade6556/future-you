@@ -16,6 +16,7 @@ export default function SignupPage() {
   const userName = usePlanStore((s) => s.userName);
   const onboardingComplete = usePlanStore((s) => s.onboardingComplete);
   const setEmail = usePlanStore((s) => s.setEmail);
+  const syncToServer = usePlanStore((s) => s.syncToServer);
 
   const [mode, setMode] = useState<AuthMode>("signup");
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -25,7 +26,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const supabase = createClient();
-  const destination = onboardingComplete ? "/" : "/onboarding";
+  const destination = onboardingComplete ? "/" : "/quiz/result";
 
   async function handleEmailAuth() {
     if (!email || !password) {
@@ -44,6 +45,8 @@ export default function SignupPage() {
         setError(authError.message);
       } else {
         setEmail(email);
+        // Sync localStorage state to server after successful auth
+        await syncToServer();
         router.push(destination);
       }
     } finally {
@@ -80,7 +83,7 @@ export default function SignupPage() {
         >
           <Image
             src="/orb-pointing.png"
-            alt="Future You"
+            alt="Behavio"
             fill
             className="object-contain drop-shadow-2xl"
             priority

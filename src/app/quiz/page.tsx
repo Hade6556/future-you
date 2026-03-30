@@ -14,8 +14,34 @@ import {
   CommitmentScale,
   WinCelebration,
   CaptureForm,
+  MultiSelectStep,
+  SliderScaleStep,
+  LiveCounterCard,
+  ComparisonCard,
+  TimelineCard,
 } from "../components/quiz/QuestionFormats";
 import type { ArchetypeId, AmbitionDomain } from "../types/plan";
+
+const SOCIAL_PROOF_AVATARS = [
+  "/mock/people/alex-chen.jpg",
+  "/mock/people/sarah-jones.jpg",
+  "/mock/people/emma-wilson.jpg",
+  "/mock/people/david-kim.jpg",
+  "/mock/people/carlos-garcia.jpg",
+  "/mock/people/nina-patel.jpg",
+];
+
+const RESEARCH_BADGES = [
+  { name: "Harvard", logo: "/icons/unis/harvard.png" },
+  { name: "Stanford", logo: "/icons/unis/stanford.png" },
+  { name: "MIT", logo: "/icons/unis/mit.png" },
+  { name: "Oxford", logo: "/icons/unis/oxford.png" },
+  { name: "Cambridge", logo: "/icons/unis/cambridge.png" },
+];
+
+const INSIGHT_BADGES: Record<string, typeof RESEARCH_BADGES | undefined> = {
+  insight_expert: RESEARCH_BADGES,
+};
 
 export default function QuizPage() {
   const router = useRouter();
@@ -25,33 +51,64 @@ export default function QuizPage() {
 
   const screen = QUIZ_SCREENS[currentScreen];
   const total = QUIZ_SCREENS.length;
+  const answers = store.multiSelectAnswers;
+
+  const freshAnswers = () => usePlanStore.getState().multiSelectAnswers;
+  const isVisibleNow = (scr: (typeof QUIZ_SCREENS)[number]) =>
+    !scr.showWhen || scr.showWhen(freshAnswers());
 
   const advance = useCallback(() => {
-    if (currentScreen >= total - 1) {
-      router.push("/quiz/result");
+    let next = currentScreen + 1;
+    while (next < total && !isVisibleNow(QUIZ_SCREENS[next])) next++;
+    if (next >= total) {
+      router.push("/intake");
       return;
     }
-    setCurrentScreen((n) => n + 1);
+    setCurrentScreen(next);
   }, [currentScreen, total, router]);
 
   const goBack = useCallback(() => {
-    if (currentScreen === 0) {
+    let prev = currentScreen - 1;
+    while (prev > 0 && !isVisibleNow(QUIZ_SCREENS[prev])) prev--;
+    if (prev < 0) {
       router.back();
       return;
     }
-    setCurrentScreen((n) => n - 1);
+    setCurrentScreen(prev);
   }, [currentScreen, router]);
 
   const handleSelect = useCallback(
     (screenId: string, value: number) => {
       const scr = QUIZ_SCREENS.find((s) => s.id === screenId);
       const opts = scr?.options ?? [];
+      const label = opts[value]?.label ?? "";
 
       if (screenId === "q_gender") {
-        store.setGender(opts[value]?.label ?? "");
+        store.setGender(label);
       }
-      if (screenId === "q_field" && opts[value]?.ambition) {
-        selectedAmbition.current = opts[value].ambition as AmbitionDomain;
+      if (screenId === "q_goal_area") {
+        store.setMultiSelectAnswer(screenId, [label]);
+        if (label.includes("Career") || label.includes("Money") || label.includes("Learning") || label.includes("Creativity"))
+          selectedAmbition.current = "career";
+        else if (label.includes("Health"))
+          selectedAmbition.current = "athlete";
+        else
+          selectedAmbition.current = "confidence";
+      }
+      if (screenId === "q_age") {
+        store.setMentalHealthData({ quizAgeGroup: label });
+      }
+      if (screenId === "q_current_state") {
+        store.setMentalHealthData({ quizCurrentState: label });
+      }
+      if (screenId === "q_time_per_day") {
+        store.setQuizContext({ schedule: label });
+      }
+      if (screenId === "q_sleep_quality") {
+        store.setMentalHealthData({ sleepQuality: label });
+      }
+      if (screenId === "q_self_trust") {
+        store.setMultiSelectAnswer(screenId, [label]);
       }
 
       advance();
@@ -69,17 +126,20 @@ export default function QuizPage() {
     [advance, store],
   );
 
+  const INSIGHT_TYPES = ["insight-card", "live-counter", "comparison-card", "timeline-card"];
   const isSplash = screen?.type === "splash";
-  const isInsight = screen?.type === "insight-card";
+  const isInsight = INSIGHT_TYPES.includes(screen?.type ?? "");
   const isWin = screen?.type === "win-celebration";
   const showHeader = !isSplash && !isWin;
 
-  // Progress: count only non-splash, non-insight, non-win screens
-  const questionScreens = QUIZ_SCREENS.filter(
-    (s) => !["splash", "insight-card", "win-celebration"].includes(s.type),
+  const NON_PROGRESS_TYPES = ["splash", "win-celebration", ...INSIGHT_TYPES];
+  const isVisibleForRender = (scr: (typeof QUIZ_SCREENS)[number]) =>
+    !scr.showWhen || scr.showWhen(answers);
+  const visibleQuestionScreens = QUIZ_SCREENS.filter(
+    (s) => !NON_PROGRESS_TYPES.includes(s.type) && isVisibleForRender(s),
   );
-  const currentQIdx = questionScreens.findIndex((s) => s.id === screen?.id);
-  const progressFraction = currentQIdx >= 0 ? (currentQIdx + 1) / questionScreens.length : 0;
+  const currentQIdx = visibleQuestionScreens.findIndex((s) => s.id === screen?.id);
+  const progressFraction = currentQIdx >= 0 ? (currentQIdx + 1) / visibleQuestionScreens.length : 0;
   const showProgress = !isSplash && !isInsight && !isWin && currentQIdx >= 0;
 
   const renderStep = () => {
@@ -96,16 +156,20 @@ export default function QuizPage() {
       case "list-rows":
         return <ListRows options={opts} onSelect={(val) => handleSelect(screen.id, val)} />;
 
-      case "insight-card":
+      case "insight-card": {
+        const screenBadges = INSIGHT_BADGES[screen.id];
         return (
           <InsightCard
             stat={screen.stat}
             headline={screen.headline ?? ""}
             body={screen.body}
             ctaLabel={screen.ctaLabel}
+            avatars={SOCIAL_PROOF_AVATARS}
+            badges={screenBadges}
             onContinue={advance}
           />
         );
+      }
 
       case "yes-no":
         return <YesNoPills onSelect={(val) => handleSelect(screen.id, val)} />;
@@ -115,6 +179,54 @@ export default function QuizPage() {
           <CommitmentScale
             subtext={screen.subtext}
             onSelect={() => advance()}
+          />
+        );
+
+      case "multi-select":
+        return (
+          <MultiSelectStep
+            options={opts}
+            onSubmit={(indices) => {
+              store.setMultiSelectAnswer(screen.id, indices.map((i) => opts[i]?.label ?? ""));
+              advance();
+            }}
+          />
+        );
+
+      case "slider-scale":
+        return (
+          <SliderScaleStep
+            labels={screen.scaleLabels ?? ["Poor", "Fair", "Good", "Great"]}
+            onSelect={(val) => {
+              const scaleLabels = screen.scaleLabels ?? ["Poor", "Fair", "Good", "Great"];
+              store.setMultiSelectAnswer(screen.id, [scaleLabels[val]]);
+              advance();
+            }}
+          />
+        );
+
+      case "live-counter":
+        return (
+          <LiveCounterCard
+            avatars={SOCIAL_PROOF_AVATARS}
+            ctaLabel={screen.ctaLabel}
+            onContinue={advance}
+          />
+        );
+
+      case "comparison-card":
+        return (
+          <ComparisonCard
+            ctaLabel={screen.ctaLabel}
+            onContinue={advance}
+          />
+        );
+
+      case "timeline-card":
+        return (
+          <TimelineCard
+            ctaLabel={screen.ctaLabel}
+            onContinue={advance}
           />
         );
 
@@ -175,7 +287,7 @@ export default function QuizPage() {
 
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* ── Logo (always shown outside splash) ── */}
-        {!isSplash && (
+        {!isSplash && !isWin && (
           <div
             style={{
               position: "absolute",
@@ -188,27 +300,15 @@ export default function QuizPage() {
           >
             <span
               style={{
-                fontFamily: "var(--font-libre-baskerville), serif",
-                fontWeight: 400,
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 700,
                 fontStyle: "italic",
-                fontSize: 21,
-                color: "rgba(235,242,255,0.92)",
+                fontSize: 20,
+                color: "rgba(200,255,0,0.85)",
+                letterSpacing: "0.02em",
               }}
             >
-              Future
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-cormorant), serif",
-                fontWeight: 600,
-                fontStyle: "italic",
-                fontSize: 31,
-                lineHeight: 0.82,
-                color: "#C8FF00",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              YOU
+              behavio
             </span>
           </div>
         )}
@@ -306,7 +406,7 @@ export default function QuizPage() {
         {/* ── Question heading ── */}
         {showHeader &&
           screen?.question &&
-          !["win-celebration", "capture-form"].includes(screen.type) && (
+          !["win-celebration", "capture-form", ...INSIGHT_TYPES].includes(screen.type) && (
             <div style={{ padding: "0 20px 20px" }}>
               <h2
                 style={{
@@ -325,8 +425,8 @@ export default function QuizPage() {
               {screen.subtext && (
                 <p
                   style={{
-                    fontFamily: "var(--font-barlow), sans-serif",
-                    fontWeight: 300,
+                    fontFamily: "var(--font-body), Georgia, serif",
+                    fontWeight: 400,
                     fontSize: 13,
                     color: "rgba(120,155,195,0.50)",
                     lineHeight: 1.55,
@@ -359,8 +459,8 @@ export default function QuizPage() {
             </h2>
             <p
               style={{
-                fontFamily: "var(--font-barlow), sans-serif",
-                fontWeight: 300,
+                fontFamily: "var(--font-body), Georgia, serif",
+                fontWeight: 400,
                 fontSize: 14,
                 color: "rgba(120,155,195,0.50)",
                 lineHeight: 1.6,

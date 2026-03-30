@@ -95,8 +95,8 @@ function ColorSwatch({ hex, name, role }: { hex: string; name: string; role: str
         </p>
         <p
           style={{
-            fontFamily: "var(--font-barlow), sans-serif",
-            fontWeight: 300,
+            fontFamily: "var(--font-body), Georgia, serif",
+            fontWeight: 400,
             fontSize: 11,
             color: T.textMid,
             margin: 0,
@@ -133,21 +133,12 @@ const TYPE_SPECIMENS = [
     italic: true,
   },
   {
-    family: "Libre Baskerville",
-    role: "Logo (Future)",
-    fontVar: "var(--font-libre-baskerville)",
-    sample: "Future",
-    size: 42,
-    weight: 400,
-    italic: true,
-  },
-  {
-    family: "Cormorant",
-    role: "Logo (YOU)",
-    fontVar: "var(--font-cormorant)",
-    sample: "YOU",
+    family: "Barlow Condensed",
+    role: "Logo (Behavio)",
+    fontVar: "var(--font-barlow-condensed)",
+    sample: "behavio",
     size: 48,
-    weight: 600,
+    weight: 700,
     italic: true,
   },
   {
@@ -253,28 +244,15 @@ export default function BrandBookPage() {
                 margin: "0 0 24px",
               }}
             >
-              Future YOU · Brand System · v1
+              Behavio · Brand System · v1
             </p>
 
             {/* Wordmark */}
             <div style={{ display: "flex", alignItems: "baseline", gap: 0, marginBottom: 24 }}>
               <span
                 style={{
-                  fontFamily: "var(--font-libre-baskerville), serif",
-                  fontWeight: 400,
-                  fontStyle: "italic",
-                  fontSize: 84,
-                  lineHeight: 0.9,
-                  letterSpacing: "-0.02em",
-                  color: T.textHi,
-                }}
-              >
-                Future
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-cormorant), serif",
-                  fontWeight: 600,
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 700,
                   fontStyle: "italic",
                   fontSize: 84,
                   lineHeight: 0.9,
@@ -282,14 +260,14 @@ export default function BrandBookPage() {
                   color: T.lime,
                 }}
               >
-                YOU
+                behavio
               </span>
             </div>
 
             <p
               style={{
-                fontFamily: "var(--font-barlow), sans-serif",
-                fontWeight: 300,
+                fontFamily: "var(--font-body), Georgia, serif",
+                fontWeight: 400,
                 fontSize: 16,
                 color: T.textMid,
                 maxWidth: 400,
@@ -356,8 +334,8 @@ export default function BrandBookPage() {
           >
             <p
               style={{
-                fontFamily: "var(--font-barlow), sans-serif",
-                fontWeight: 300,
+                fontFamily: "var(--font-body), Georgia, serif",
+                fontWeight: 400,
                 fontSize: 13,
                 color: T.textMid,
                 margin: 0,
@@ -517,7 +495,7 @@ export default function BrandBookPage() {
                 </p>
                 <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                   <span style={{ fontFamily: "var(--font-barlow-condensed), sans-serif", fontWeight: 900, fontSize: 48, color: T.lime, letterSpacing: "-0.02em", lineHeight: 1 }}>74%</span>
-                  <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 13, color: T.textMid }}>closed this month</span>
+                  <span style={{ fontFamily: "var(--font-body), Georgia, serif", fontWeight: 400, fontSize: 13, color: T.textMid }}>closed this month</span>
                 </div>
               </div>
             </div>
@@ -598,12 +576,12 @@ export default function BrandBookPage() {
                   <span style={{ display: "block", width: 16, height: 1, background: "rgba(200,255,0,0.40)" }} />
                   What the data shows
                 </div>
-                <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(235,242,255,0.82)", lineHeight: 1.65, margin: "0 0 16px" }}>
+                <p style={{ fontFamily: "var(--font-body), Georgia, serif", fontWeight: 400, fontSize: 15, color: "rgba(235,242,255,0.82)", lineHeight: 1.65, margin: "0 0 16px" }}>
                   People who feel exactly what you described are <strong style={{ fontWeight: 500, color: T.textHi }}>not behind.</strong> They&apos;re at the precise point where the right system makes all the difference.
                 </p>
                 <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "baseline", gap: 6 }}>
                   <span style={{ fontFamily: "var(--font-barlow-condensed), sans-serif", fontWeight: 700, fontSize: 34, color: T.lime, letterSpacing: "-0.02em" }}>87%</span>
-                  <span style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 13, color: T.textMid }}>hit their first milestone in under 90 days</span>
+                  <span style={{ fontFamily: "var(--font-body), Georgia, serif", fontWeight: 400, fontSize: 13, color: T.textMid }}>hit their first milestone in under 90 days</span>
                 </div>
               </div>
             </div>
@@ -635,7 +613,7 @@ export default function BrandBookPage() {
                 <p style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: T.teal, margin: "0 0 4px" }}>
                   {key}
                 </p>
-                <p style={{ fontFamily: "var(--font-barlow), sans-serif", fontWeight: 300, fontSize: 13, color: T.textHi, margin: 0 }}>
+                <p style={{ fontFamily: "var(--font-body), Georgia, serif", fontWeight: 400, fontSize: 13, color: T.textHi, margin: 0 }}>
                   {value}
                 </p>
               </div>

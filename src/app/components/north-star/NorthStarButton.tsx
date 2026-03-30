@@ -28,7 +28,7 @@ export function NorthStarButton({ isOpen, onClick }: NorthStarButtonProps) {
     <motion.button
       type="button"
       onClick={onClick}
-      aria-label="Open Future Me coach"
+      aria-label="Open Behavio coach"
       className={`relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cool/60 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas-frame ${pulse ? "orb-pulse" : ""}`}
       style={{
         background: "var(--plasma-glow)",

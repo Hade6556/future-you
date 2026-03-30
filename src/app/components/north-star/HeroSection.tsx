@@ -25,7 +25,7 @@ export function HeroSection({ onOpen }: HeroSectionProps) {
         <CommandRosette isOpen={false} onClick={onOpen} />
       </div>
       <p className="operator-label text-center text-foreground" style={{ fontSize: "clamp(11px, 1.2vw, 13px)" }}>
-        Future Me
+        Behavio
       </p>
       <p className="plan-body text-center text-foreground">
         Tap to check in with your coach.

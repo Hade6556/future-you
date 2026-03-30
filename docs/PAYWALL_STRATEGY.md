@@ -15,7 +15,7 @@ We use **free app + paywall + trial** (not paid download). Bootstrapped app play
 | Placement | Status | Notes |
 |-----------|--------|--------|
 | **Onboarding (quiz result)** | Implemented | Multi-step paywall (3 value steps + price step). User taps "Get my full plan" on result page. |
-| **Session start** | Implemented | Once per calendar day for non-premium users on Home. Short variant (1 value step + prices). Key: `sessionStorage["future-you-paywall-last-date"]`. |
+| **Session start** | Implemented | Once per calendar day for non-premium users on Home. Short variant (1 value step + prices). Key: `sessionStorage["behavio-paywall-last-date"]`. |
 | **Transaction abandonment** | Planned | When IAP exists: on native payment cancel, show discount paywall. See below. |
 | **After N key actions** | Planned | e.g. after first "brief" completed; show paywall. |
 | **Cancel trial** | Planned | When user cancels trial, show discount/win-back offer. |

@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
       ...newTokens,
       access_token: newTokens.access_token ?? storedTokens.access_token,
       refresh_token: newTokens.refresh_token ?? storedTokens.refresh_token,
+      token_type: newTokens.token_type ?? storedTokens.token_type ?? "Bearer",
     };
     await admin
       .from("users")

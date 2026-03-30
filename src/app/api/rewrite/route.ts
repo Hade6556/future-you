@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { requireAuth } from "@/lib/auth";
 
 interface RewriteRequest {
   transcript: string;
@@ -7,6 +8,9 @@ interface RewriteRequest {
 }
 
 export async function POST(req: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   const { transcript, lang } = (await req.json()) as RewriteRequest;
 
   if (!transcript?.trim()) {

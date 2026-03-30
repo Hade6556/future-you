@@ -5,12 +5,18 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Future YOU — Brand System
+ * Behavio — Brand System
  * Dark navy / glassmorphism / lime CTA
  * Source of truth: CLAUDE.md
  */
 
 :root {
+  --app-phone-max-width: 430px;
+  --font-barlow: var(--font-apercu);
+  --font-libre-baskerville: var(--font-apercu);
+  --font-cormorant: var(--font-apercu);
+  --font-manrope: var(--font-apercu);
+  --font-urbanist: var(--font-apercu);
   /* ── Primitives ── */
   --p-navy-950: #060912;
   --p-navy-900: #0A1628;
@@ -243,49 +249,50 @@
   --radius-3xl: 30px;
   --radius-4xl: 9999px;
 
-  --font-sans:               var(--font-barlow), -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display:            var(--font-barlow-condensed), -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:               var(--font-jetbrains-mono), monospace;
-  --font-onboarding-display: var(--font-barlow-condensed), -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-accent:             var(--font-barlow-condensed), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:               var(--font-apercu), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:               var(--font-apercu), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display:            var(--font-apercu), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:               var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-onboarding-display: var(--font-apercu), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-accent:             var(--font-apercu), -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* ── Type scale ── */
   --type-display-size:    52px;
-  --type-display-weight:  700;
+  --type-display-weight:  600;
   --type-display-line:    1.0;
   --type-display-tracking: -0.02em;
 
   --type-h1-size:    40px;
-  --type-h1-weight:  700;
+  --type-h1-weight:  600;
   --type-h1-line:    1.05;
   --type-h1-tracking: -0.01em;
 
   --type-h2-size:    32px;
-  --type-h2-weight:  800;
+  --type-h2-weight:  600;
   --type-h2-line:    1.1;
   --type-h2-tracking: 0.04em;
 
   --type-h3-size:    22px;
-  --type-h3-weight:  700;
+  --type-h3-weight:  600;
   --type-h3-line:    1.2;
 
   --type-card-title-size:   17px;
-  --type-card-title-weight: 700;
+  --type-card-title-weight: 600;
   --type-card-title-line:   1.3;
 
   --type-body-l-size:   16px;
-  --type-body-l-weight: 300;
+  --type-body-l-weight: 400;
   --type-body-l-line:   1.75;
 
   --type-body-size:   16px;
-  --type-body-weight: 300;
+  --type-body-weight: 400;
   --type-body-line:   1.75;
 
   --type-body-s-size:   14px;
-  --type-body-s-weight: 300;
+  --type-body-s-weight: 400;
 
   --type-label-size:     11px;
-  --type-label-weight:   700;
+  --type-label-weight:   600;
   --type-label-tracking: 0.16em;
 
   --type-caption-size:   11px;
@@ -306,7 +313,7 @@
     @apply text-foreground;
   }
   html {
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
   }
   .font-accent {
     font-family: var(--font-display);
@@ -363,21 +370,21 @@
     color: var(--text-primary);
   }
   .type-body {
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: var(--type-body-size);
     font-weight: var(--type-body-weight);
     line-height: var(--type-body-line);
     color: var(--text-secondary);
   }
   .type-body-l {
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: var(--type-body-l-size);
     font-weight: var(--type-body-l-weight);
     line-height: var(--type-body-l-line);
     color: var(--text-secondary);
   }
   .type-body-s {
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: var(--type-body-s-size);
     font-weight: var(--type-body-s-weight);
     line-height: 1.5;
@@ -400,7 +407,7 @@
     color: var(--p-lime);
   }
   .type-caption {
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: var(--type-caption-size);
     font-weight: var(--type-caption-weight);
     color: var(--text-secondary);
@@ -453,10 +460,10 @@
     background: #C8FF00;
     color: #060912;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: 18px;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-transform: none;
     border-radius: 100px;
     padding: 20px 32px;
     border: none;
@@ -479,10 +486,10 @@
     border-radius: 100px;
     padding: 12px 24px;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: 13px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-transform: none;
     cursor: pointer;
   }
 
@@ -496,13 +503,13 @@
 
 /* ── Font utilities ── */
 @utility font-display {
-  font-family: var(--font-barlow-condensed);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.005em;
 }
 @utility font-body {
-  font-family: var(--font-barlow);
-  font-weight: 300;
+  font-family: var(--font-body);
+  font-weight: 400;
 }
 
 html {
@@ -520,6 +527,94 @@ body {
   position: relative;
   overflow-x: hidden;
   max-width: 100%;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100dvh;
+  background: #060912;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.app-phone-canvas {
+  position: relative;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: var(--app-phone-max-width);
+  margin-inline: auto;
+}
+
+.app-fixed-phone {
+  position: fixed;
+  left: max(calc((100vw - var(--app-phone-max-width)) / 2), 0px);
+  width: min(100vw, var(--app-phone-max-width));
+  max-width: var(--app-phone-max-width);
+}
+
+.app-fixed-phone-inset {
+  position: fixed;
+  left: max(calc((100vw - var(--app-phone-max-width)) / 2 + 1.25rem), 1.25rem);
+  width: min(calc(100vw - 2.5rem), calc(var(--app-phone-max-width) - 2.5rem));
+  max-width: calc(var(--app-phone-max-width) - 2.5rem);
+}
+
+.product-badge {
+  --laurel-size: 56px;
+  --laurel-inward: 26px;
+  --laurel-lift: -12px;
+  --laurel-angle: 18deg;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 22px;
+  position: relative;
+  color: #a7b1c2;
+}
+
+.badge-text {
+  text-align: center;
+  line-height: 1.08;
+}
+
+.badge-small {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  margin-bottom: 6px;
+  opacity: 0.85;
+}
+
+.badge-big {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.1;
+  opacity: 0.95;
+}
+
+.laurel {
+  width: var(--laurel-size);
+  height: var(--laurel-size);
+  opacity: 0.74;
+  position: relative;
+  top: var(--laurel-lift);
+  flex-shrink: 0;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.laurel.right {
+  transform: translateX(calc(-1 * var(--laurel-inward))) translateY(16px) rotate(calc(var(--laurel-angle) + 40deg)) scale(2.5);
+}
+
+.laurel-left-from-right {
+  transform: translateX(var(--laurel-inward)) translateY(16px) scaleX(-1) rotate(calc(-1 * (var(--laurel-angle) + 40deg) + 108deg)) scale(2.5);
 }
 
 @supports (padding: env(safe-area-inset-bottom)) {
@@ -654,7 +749,7 @@ nextjs-portal > * { pointer-events: auto; }
   50%       { transform: translateY(-5px); }
 }
 @keyframes oq-bounce-in {
-  0%   { transform: scale(0.8) translateY(6px); opacity: 0; }
+  0%   { transform: scale(0.8) translateY(16px); opacity: 0; }
   60%  { transform: scale(1.08) translateY(-2px); opacity: 1; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
@@ -715,6 +810,23 @@ nextjs-portal > * { pointer-events: auto; }
 .quiz-option-btn--something-else:hover {
   background: rgba(255,255,255,0.06);
   border-color: rgba(255,255,255,0.24);
+}
+
+/* Lead capture — keep glass look; override Chrome autofill on email */
+.capture-form-input {
+  transition: border-color 0.15s ease;
+}
+.capture-form-input:focus {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+.capture-form-input:-webkit-autofill,
+.capture-form-input:-webkit-autofill:hover,
+.capture-form-input:-webkit-autofill:focus,
+.capture-form-input:-webkit-autofill:active {
+  -webkit-text-fill-color: rgba(235, 242, 255, 0.92) !important;
+  caret-color: #c8ff00;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.07) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 @media (prefers-reduced-motion: reduce) {

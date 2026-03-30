@@ -1,8 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type CSSProperties } from "react";
 import Link from "next/link";
 import { ChevronLeftIcon, PlusIcon } from "@heroicons/react/24/outline";
+
+const LIME = "#C8FF00";
+const TEXT_HI = "rgba(235,242,255,0.92)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
+const GLASS = "rgba(255,255,255,0.07)";
+const GLASS_BORDER = "rgba(255,255,255,0.14)";
 
 type Reflection = {
   id: string;
@@ -24,16 +31,18 @@ function getDateLabel(isoString: string): string {
   return created.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-const sentimentColor: Record<string, string> = {
-  positive: "bg-accent",
-  neutral: "bg-amber-400",
-  negative: "bg-destructive",
-};
-
 const sentimentDot: Record<string, string> = {
   positive: "#5C8B4A",
   neutral: "#C49A2A",
   negative: "#D94F3A",
+};
+
+const glassCard: CSSProperties = {
+  background: GLASS,
+  border: `1px solid ${GLASS_BORDER}`,
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  borderRadius: 16,
 };
 
 function ReflectionCard({ reflection }: { reflection: Reflection }) {
@@ -42,56 +51,111 @@ function ReflectionCard({ reflection }: { reflection: Reflection }) {
   const isLong = content.length > 200;
 
   return (
-    <div
-      className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5"
-      style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div style={{ ...glassCard, display: "flex", flexDirection: "column", gap: 12, padding: 20, boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span
-          className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide"
-          style={{ background: "var(--badge-bg)", color: "var(--text-secondary)" }}
+          style={{
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontSize: 10,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: TEXT_LO,
+          }}
         >
           {getDateLabel(reflection.created_at)}
         </span>
         {reflection.sentiment && (
           <span
-            className="h-2.5 w-2.5 rounded-full"
-            style={{ background: sentimentDot[reflection.sentiment] ?? "var(--muted)" }}
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              flexShrink: 0,
+              background: sentimentDot[reflection.sentiment] ?? TEXT_LO,
+            }}
           />
         )}
       </div>
 
-      {/* Transcript */}
-      <p className={`text-[15px] leading-relaxed text-foreground ${expanded || !isLong ? "" : "line-clamp-4"}`}>
+      <p
+        style={{
+          fontFamily: "var(--font-body), Georgia, serif",
+          fontSize: 15,
+          lineHeight: 1.65,
+          color: TEXT_MID,
+          margin: 0,
+          ...(expanded || !isLong
+            ? {}
+            : {
+                display: "-webkit-box",
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: "vertical" as const,
+                overflow: "hidden",
+              }),
+        }}
+      >
         {content}
       </p>
       {isLong && (
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="self-start rounded-full text-xs font-semibold"
-          style={{ color: "var(--accent-primary)" }}
+          style={{
+            alignSelf: "flex-start",
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            padding: "4px 0",
+            fontSize: 12,
+            fontWeight: 600,
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            letterSpacing: "0.04em",
+            color: LIME,
+          }}
         >
           {expanded ? "Show less" : "Show more"}
         </button>
       )}
 
-      {/* Coach response */}
       {reflection.coach_response && (
-        <details className="mt-1">
+        <details style={{ marginTop: 4 }}>
           <summary
-            className="cursor-pointer list-none text-xs font-semibold"
-            style={{ color: "var(--text-secondary)" }}
+            style={{
+              cursor: "pointer",
+              listStyle: "none",
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              letterSpacing: "0.06em",
+              color: TEXT_MID,
+            }}
           >
-            Future Me said →
+            Behavio said →
           </summary>
-          <p
-            className="mt-2 border-l-2 pl-3 text-[13px] leading-relaxed"
-            style={{ borderColor: "var(--accent-primary)", color: "var(--text-secondary)" }}
+          <div
+            style={{
+              marginTop: 12,
+              padding: 14,
+              borderRadius: 12,
+              border: "1px solid rgba(200,255,0,0.22)",
+              background: "rgba(200,255,0,0.04)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }}
           >
-            {reflection.coach_response}
-          </p>
+            <p
+              style={{
+                margin: 0,
+                fontFamily: "var(--font-body), Georgia, serif",
+                fontSize: 13,
+                lineHeight: 1.65,
+                color: TEXT_MID,
+              }}
+            >
+              {reflection.coach_response}
+            </p>
+          </div>
         </details>
       )}
     </div>
@@ -99,18 +163,34 @@ function ReflectionCard({ reflection }: { reflection: Reflection }) {
 }
 
 function SkeletonCard() {
+  const bar = (w: string): CSSProperties => ({
+    height: 10,
+    width: w,
+    borderRadius: 9999,
+    background: "rgba(255,255,255,0.08)",
+    animation: "journalSk 1.2s ease-in-out infinite",
+  });
+
   return (
-    <div className="flex animate-pulse flex-col gap-3 rounded-xl border border-border bg-card p-4">
-      <div className="flex justify-between">
-        <div className="h-3 w-16 rounded-full bg-border" />
-        <div className="h-2 w-2 rounded-full bg-border" />
+    <div
+      style={{
+        ...glassCard,
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        padding: 16,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div style={bar("64px")} />
+        <div style={{ ...bar("8px"), width: 8 }} />
       </div>
-      <div className="space-y-2">
-        <div className="h-3 w-full rounded-full bg-border" />
-        <div className="h-3 w-4/5 rounded-full bg-border" />
-        <div className="h-3 w-3/5 rounded-full bg-border" />
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={bar("100%")} />
+        <div style={bar("80%")} />
+        <div style={bar("60%")} />
       </div>
-      <div className="h-3 w-24 rounded-full bg-border" />
+      <div style={bar("96px")} />
     </div>
   );
 }
@@ -144,76 +224,266 @@ export default function JournalPage() {
   }, []);
 
   return (
-    <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-      <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
-        {/* Back nav */}
-        <Link
-          href="/structure"
-          className="flex w-fit items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold transition-colors hover:bg-muted"
-          style={{ color: "var(--text-secondary)" }}
-        >
-          <ChevronLeftIcon className="h-4 w-4" />
-          Back
-        </Link>
+    <>
+      <style>{`
+        @keyframes journalSk { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.55; } }
+        details > summary::-webkit-details-marker { display: none; }
+      `}</style>
+      <div
+        style={{
+          minHeight: "100dvh",
+          background: "#060912",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 0,
+            background: `
+              radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
+              linear-gradient(170deg, #0d1a3a 0%, #060912 55%)
+            `,
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 0,
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            pointerEvents: "none",
+          }}
+        />
 
-        {/* Header */}
-        <header className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-tight text-foreground">
-              Brain dumps
-            </h1>
-            <p className="mt-2 text-[15px] font-normal leading-relaxed text-muted-foreground">
-              Every thought you&apos;ve spoken aloud.
-            </p>
-          </div>
-          <Link
-            href="/journal/new"
-            className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition-opacity hover:opacity-90"
-            style={{ background: "var(--accent-primary)" }}
-            aria-label="New entry"
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div
+            style={{
+              position: "absolute",
+              top: "max(3.5rem, env(safe-area-inset-top, 3.5rem))",
+              left: 28,
+              display: "flex",
+              alignItems: "baseline",
+              zIndex: 10,
+            }}
           >
-            <PlusIcon className="h-5 w-5" />
-          </Link>
-        </header>
-
-        {/* Content */}
-        {loading ? (
-          <div className="flex flex-col gap-3">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </div>
-        ) : reflections.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <div
-              className="flex h-16 w-16 items-center justify-center rounded-full text-3xl"
-              style={{ background: "var(--badge-bg)" }}
-              aria-hidden
+            <span
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 700,
+                fontStyle: "italic",
+                fontSize: 20,
+                color: "rgba(200,255,0,0.85)",
+                letterSpacing: "0.02em",
+              }}
             >
-              🎙
-            </div>
-            <div>
-              <p className="text-[16px] font-bold text-foreground">No brain dumps yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Tap the mic on Structure to record your first reflection.
-              </p>
-            </div>
+              behavio
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 20,
+              width: "100%",
+              maxWidth: 448,
+              marginLeft: "auto",
+              marginRight: "auto",
+              minWidth: 0,
+              padding:
+                "max(5.5rem, calc(env(safe-area-inset-top, 3.5rem) + 2rem)) 24px max(9rem, env(safe-area-inset-bottom, 2rem))",
+            }}
+          >
             <Link
               href="/structure"
-              className="rounded-full px-5 py-2.5 text-sm font-bold text-white"
-              style={{ background: "var(--accent-primary)" }}
+              style={{
+                display: "flex",
+                width: "fit-content",
+                alignItems: "center",
+                gap: 6,
+                borderRadius: 9999,
+                padding: "8px 14px",
+                textDecoration: "none",
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                letterSpacing: "0.02em",
+                color: TEXT_MID,
+                border: `1px solid ${GLASS_BORDER}`,
+                background: GLASS,
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+              }}
             >
-              Go to Structure →
+              <ChevronLeftIcon style={{ width: 16, height: 16 }} />
+              Back
             </Link>
+
+            <header
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <h1
+                  style={{
+                    fontFamily: "var(--font-barlow-condensed), sans-serif",
+                    fontWeight: 800,
+                    fontStyle: "italic",
+                    fontSize: 34,
+                    lineHeight: 1.05,
+                    letterSpacing: "-0.025em",
+                    color: TEXT_HI,
+                    margin: 0,
+                  }}
+                >
+                  Journal
+                </h1>
+                <p
+                  style={{
+                    margin: "10px 0 0",
+                    fontFamily: "var(--font-body), Georgia, serif",
+                    fontSize: 15,
+                    fontWeight: 400,
+                    lineHeight: 1.6,
+                    color: TEXT_MID,
+                  }}
+                >
+                  Every thought you&apos;ve spoken aloud.
+                </p>
+              </div>
+              <Link
+                href="/journal/new"
+                aria-label="New entry"
+                style={{
+                  marginTop: 4,
+                  flexShrink: 0,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  padding: "10px 18px",
+                  borderRadius: 9999,
+                  textDecoration: "none",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "#060912",
+                  background: LIME,
+                  boxShadow: "0 4px 24px rgba(200,255,0,0.25)",
+                }}
+              >
+                <PlusIcon style={{ width: 18, height: 18 }} />
+                New entry
+              </Link>
+            </header>
+
+            {loading ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+              </div>
+            ) : reflections.length === 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 20,
+                  paddingTop: 48,
+                  paddingBottom: 48,
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    width: 64,
+                    height: 64,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "50%",
+                    fontSize: 28,
+                    background: "rgba(200,255,0,0.08)",
+                    border: "1px solid rgba(200,255,0,0.18)",
+                  }}
+                  aria-hidden
+                >
+                  🎙
+                </div>
+                <div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontSize: 18,
+                      fontWeight: 700,
+                      fontStyle: "italic",
+                      color: TEXT_HI,
+                    }}
+                  >
+                    No brain dumps yet
+                  </p>
+                  <p
+                    style={{
+                      margin: "8px 0 0",
+                      fontFamily: "var(--font-body), Georgia, serif",
+                      fontSize: 14,
+                      lineHeight: 1.55,
+                      color: TEXT_LO,
+                      maxWidth: 280,
+                    }}
+                  >
+                    Tap the mic on Structure to record your first reflection.
+                  </p>
+                </div>
+                <Link
+                  href="/structure"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "12px 24px",
+                    borderRadius: 9999,
+                    textDecoration: "none",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    fontFamily: "var(--font-barlow-condensed), sans-serif",
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    color: "#060912",
+                    background: LIME,
+                    boxShadow: "0 4px 24px rgba(200,255,0,0.25)",
+                  }}
+                >
+                  Go to Structure →
+                </Link>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {reflections.map((r) => (
+                  <ReflectionCard key={r.id} reflection={r} />
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {reflections.map((r) => (
-              <ReflectionCard key={r.id} reflection={r} />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

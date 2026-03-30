@@ -2,36 +2,49 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
-import { Button } from "@/components/ui/button";
-import { TrustpilotStars } from "@/components/ui/TrustpilotStars";
 import { BRAND } from "../../data/copy";
-
-type Plan = "free" | "weekly" | "annual";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  /** Onboarding = 3 value steps then prices; session = 1 value step then prices. */
   variant?: "onboarding" | "session";
 };
 
-// Animated progress ring for step 1
+const LIME = "#C8FF00";
+const NAVY = "#060912";
+const TEXT_HI = "rgba(235,242,255,0.95)";
+const TEXT_MID = "rgba(120,155,195,0.80)";
+const TEXT_LO = "rgba(120,155,195,0.50)";
+const GLASS = "rgba(15,32,64,0.92)";
+const GLASS_BORDER = "rgba(255,255,255,0.10)";
+
 function ProgressRing({ size = 56 }: { size?: number }) {
   const r = (size - 6) / 2;
   const circ = 2 * Math.PI * r;
   return (
-    <motion.div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90" viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border)" strokeWidth={3} />
+    <motion.div style={{ position: "relative", width: size, height: size }}>
+      <svg
+        width={size}
+        height={size}
+        style={{ transform: "rotate(-90deg)" }}
+        viewBox={`0 0 ${size} ${size}`}
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth={3}
+        />
         <motion.circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="var(--accent-success)"
+          stroke={LIME}
           strokeWidth={3}
           strokeLinecap="round"
           strokeDasharray={circ}
@@ -40,12 +53,20 @@ function ProgressRing({ size = 56 }: { size?: number }) {
           transition={{ duration: 1.2, ease: "easeInOut", delay: 0.2 }}
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <motion.span
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.4, type: "spring", stiffness: 300, damping: 20 }}
-          className="text-[18px]"
+          style={{ fontSize: 18, color: LIME }}
         >
           ✓
         </motion.span>
@@ -56,11 +77,8 @@ function ProgressRing({ size = 56 }: { size?: number }) {
 
 export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
   const router = useRouter();
-  const setPremium = usePlanStore((s) => s.setPremium);
   const startTrial = usePlanStore((s) => s.startTrial);
   const setPaywallSeen = usePlanStore((s) => s.setPaywallSeen);
-  const [selected, setSelected] = useState<Plan>("annual");
-  // onboarding: 3 steps (value, features, pricing); session: 2 steps (value, pricing)
   const maxStep = variant === "onboarding" ? 3 : 2;
   const [step, setStep] = useState(1);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -69,31 +87,26 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
     if (open) setStep(1);
   }, [open]);
 
-  const handleCta = async () => {
+  const handleStartFree = async () => {
     setPaywallSeen();
-    if (selected === "free") {
-      startTrial();
-      router.push("/signup");
-      return;
-    }
-
-    const stripePlan = selected === "annual" ? "pro_annual" : "pro_monthly";
+    startTrial();
     setCheckoutLoading(true);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: stripePlan }),
+        body: JSON.stringify({ plan: "pro_annual" }),
       });
-      const data = await res.json() as { url?: string; error?: string };
+      const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setPremium();
+        // Stripe not configured — grant access locally for dev
+        usePlanStore.getState().setPremium();
         router.push("/signup");
       }
     } catch {
-      setPremium();
+      usePlanStore.getState().setPremium();
       router.push("/signup");
     } finally {
       setCheckoutLoading(false);
@@ -102,31 +115,105 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
 
   const showPriceStep = step === maxStep;
 
+  const heading: React.CSSProperties = {
+    fontFamily: "var(--font-barlow-condensed), sans-serif",
+    fontWeight: 900,
+    fontStyle: "italic",
+    color: TEXT_HI,
+    margin: 0,
+  };
+
+  const bodyText: React.CSSProperties = {
+    fontFamily: "var(--font-apercu), sans-serif",
+    fontWeight: 400,
+    color: TEXT_MID,
+    margin: 0,
+  };
+
+  const ctaButton: React.CSSProperties = {
+    width: "100%",
+    padding: "16px 0",
+    borderRadius: 16,
+    border: "none",
+    cursor: "pointer",
+    fontFamily: "var(--font-barlow-condensed), sans-serif",
+    fontWeight: 800,
+    fontSize: 16,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase",
+    background: LIME,
+    color: NAVY,
+  };
+
+  const eyebrow: React.CSSProperties = {
+    fontFamily: "var(--font-jetbrains-mono), monospace",
+    fontSize: 10,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase" as const,
+    color: TEXT_LO,
+    margin: 0,
+  };
+
   return (
     <AnimatePresence>
       {open && (
         <>
+          {/* Backdrop — z-[70] to fully cover NavBar (z-40) and FAB (z-50) */}
           <motion.div
-            className="fixed inset-0 z-40 bg-foreground/25"
+            key="paywall-backdrop"
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 70,
+              background: "rgba(6,9,18,0.80)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
+
+          {/* Sheet */}
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-50 max-h-[90dvh] overflow-y-auto rounded-t-2xl border-t border-border bg-card px-6 pb-10 shadow-[0_-2px_16px_rgba(0,0,0,0.2)]"
+            key="paywall-sheet"
+            style={{
+              position: "fixed",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 80,
+              maxHeight: "85dvh",
+              overflowY: "auto",
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              background: GLASS,
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
+              borderTop: `1px solid ${GLASS_BORDER}`,
+              boxShadow: "0 -4px 40px rgba(0,0,0,0.50)",
+              padding: "0 24px 120px",
+            }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 40 }}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pb-4 pt-3">
-              <div className="h-1 w-10 rounded-full bg-border" />
+            <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 20px" }}>
+              <div
+                style={{
+                  width: 40,
+                  height: 4,
+                  borderRadius: 2,
+                  background: "rgba(255,255,255,0.15)",
+                }}
+              />
             </div>
 
             <AnimatePresence mode="wait">
-              {/* ── Step 1: Value / Progress ── */}
+              {/* Step 1 — Value / Progress */}
               {step === 1 && (
                 <motion.div
                   key="step1"
@@ -134,31 +221,36 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -12 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="flex flex-col items-center pb-6 text-center"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    paddingBottom: 24,
+                  }}
                 >
                   <ProgressRing size={64} />
 
-                  <h2 className="mt-5 font-display text-[28px] font-bold leading-tight text-foreground">
+                  <h2 style={{ ...heading, fontSize: 28, lineHeight: 1.15, marginTop: 20 }}>
                     {BRAND.paywall.step1.headline}
                   </h2>
-                  <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+                  <p style={{ ...bodyText, fontSize: 15, lineHeight: 1.6, marginTop: 12 }}>
                     {BRAND.paywall.step1.subtext}
                   </p>
-                  <p className="mt-4 text-[12px] font-medium uppercase tracking-widest text-muted-foreground">
+                  <p style={{ ...eyebrow, marginTop: 16 }}>
                     Join 43,219+ who found their path
                   </p>
 
-                  <Button
+                  <button
                     onClick={() => setStep(variant === "onboarding" ? 2 : maxStep)}
-                    className="mt-8 w-full rounded-full"
-                    size="lg"
+                    style={{ ...ctaButton, marginTop: 28 }}
                   >
                     {BRAND.paywall.step1.cta}
-                  </Button>
+                  </button>
                 </motion.div>
               )}
 
-              {/* ── Step 2: Features + Social Proof (onboarding only) ── */}
+              {/* Step 2 — Features (onboarding only) */}
               {variant === "onboarding" && step === 2 && (
                 <motion.div
                   key="step2"
@@ -166,53 +258,84 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -12 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="flex flex-col pb-6"
+                  style={{ display: "flex", flexDirection: "column", paddingBottom: 24 }}
                 >
-                  <h2 className="text-center font-display text-[24px] font-bold text-foreground">
+                  <h2 style={{ ...heading, fontSize: 24, textAlign: "center" }}>
                     {BRAND.paywall.step2.headline}
                   </h2>
 
-                  <ul className="mt-5 space-y-3">
+                  <ul style={{ listStyle: "none", padding: 0, margin: "20px 0 0", display: "flex", flexDirection: "column", gap: 12 }}>
                     {BRAND.paywall.step2.features.map((f) => (
-                      <li key={f} className="flex items-start gap-3 text-[15px] text-foreground">
-                        <span className="mt-0.5 h-4 w-4 flex-shrink-0 rounded-full bg-accent text-[10px] font-bold text-white flex items-center justify-center">✓</span>
+                      <li
+                        key={f}
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: 12,
+                          ...bodyText,
+                          fontSize: 15,
+                          color: TEXT_HI,
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: 18,
+                            height: 18,
+                            borderRadius: "50%",
+                            background: LIME,
+                            color: NAVY,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            flexShrink: 0,
+                            marginTop: 2,
+                          }}
+                        >
+                          ✓
+                        </span>
                         {f}
                       </li>
                     ))}
                   </ul>
 
-                  {/* Social proof */}
-                  <div className="mt-6 rounded-xl border border-border bg-secondary p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-muted">
-                        <Image
-                          src="https://api.dicebear.com/7.x/avataaars/png?seed=MayaR&size=80"
-                          alt=""
-                          width={40}
-                          height={40}
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <TrustpilotStars rating={5} size="sm" className="mb-1" />
-                        <p className="text-[13px] font-semibold text-foreground">Maya R.</p>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-[14px] leading-relaxed text-foreground">
+                  {/* Quote */}
+                  <div
+                    style={{
+                      marginTop: 24,
+                      borderRadius: 16,
+                      border: `1px solid ${GLASS_BORDER}`,
+                      background: "rgba(255,255,255,0.04)",
+                      padding: 16,
+                    }}
+                  >
+                    <p style={{ ...bodyText, fontSize: 14, lineHeight: 1.6, color: TEXT_HI }}>
                       {BRAND.paywall.step2.quote}
                     </p>
-                    <p className="mt-2 text-[11px] uppercase tracking-widest text-muted-foreground">
+                    <p
+                      style={{
+                        ...bodyText,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        marginTop: 8,
+                        color: TEXT_MID,
+                      }}
+                    >
+                      — {BRAND.paywall.step2.reviewer}
+                    </p>
+                    <p style={{ ...eyebrow, marginTop: 8 }}>
                       {BRAND.paywall.step2.socialCount}
                     </p>
                   </div>
 
-                  <Button onClick={() => setStep(3)} className="mt-6 w-full rounded-full" size="lg">
+                  <button onClick={() => setStep(3)} style={{ ...ctaButton, marginTop: 24 }}>
                     {BRAND.paywall.step2.cta}
-                  </Button>
+                  </button>
                 </motion.div>
               )}
 
-              {/* ── Pricing step ── */}
+              {/* Pricing step — single "Start Free Now" CTA */}
               {showPriceStep && (
                 <motion.div
                   key="prices"
@@ -220,95 +343,56 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -12 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="flex flex-col"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                  }}
                 >
-                  <h2 className="text-center font-display text-[24px] font-bold leading-tight text-foreground">
+                  <h2 style={{ ...heading, fontSize: 28, lineHeight: 1.15 }}>
                     {BRAND.paywall.step3.headline}
                   </h2>
-                  <p className="mt-2 text-center text-[12px] font-medium uppercase tracking-widest text-muted-foreground">
+                  <p style={{ ...eyebrow, marginTop: 8 }}>
                     {BRAND.paywall.step3.socialCount}
                   </p>
 
-                  <div className="mt-5 flex flex-col gap-3">
-                    {/* Annual — default selected */}
-                    <button
-                      onClick={() => setSelected("annual")}
-                      className={`relative flex flex-col rounded-2xl border p-4 text-left transition-all ${
-                        selected === "annual"
-                          ? "border-primary bg-primary/8 ring-2 ring-primary/25"
-                          : "border-border bg-card"
-                      }`}
-                    >
-                      {/* Amber "Most Popular" badge */}
-                      <span className="absolute -top-3 right-4 rounded-full bg-accent-warm px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                        Most Popular · Save 58%
-                      </span>
-                      <div className="flex items-center justify-between">
-                        <p className="text-[15px] font-semibold text-foreground">Annual</p>
-                        <span className="text-[16px] font-bold text-foreground">$49.99/yr</span>
-                      </div>
-                      <p className={`mt-0.5 text-[13px] ${selected === "annual" ? "text-primary" : "text-muted-foreground"}`}>
-                        $4.17/mo · $0.14/day
-                      </p>
-                      <p className="mt-1 text-[11px] text-muted-foreground italic">
-                        {BRAND.paywall.step3.annualReframe}
-                      </p>
-                    </button>
-
-                    {/* Weekly */}
-                    <button
-                      onClick={() => setSelected("weekly")}
-                      className={`flex items-center justify-between rounded-2xl border p-4 transition-all ${
-                        selected === "weekly"
-                          ? "border-primary bg-primary/8 ring-2 ring-primary/25"
-                          : "border-border bg-card"
-                      }`}
-                    >
-                      <div className="text-left">
-                        <p className="text-[15px] font-semibold text-foreground">Weekly</p>
-                        <p className="text-[12px] text-muted-foreground italic">
-                          {BRAND.paywall.step3.weeklyReframe}
-                        </p>
-                      </div>
-                      <span className="text-[16px] font-bold text-foreground">$9.99/wk</span>
-                    </button>
-
-                    {/* Free trial */}
-                    <button
-                      onClick={() => setSelected("free")}
-                      className={`flex items-center justify-between rounded-2xl border border-dashed p-4 transition-all ${
-                        selected === "free" ? "border-muted-foreground ring-1 ring-border" : "border-border"
-                      } bg-transparent`}
-                    >
-                      <div className="text-left">
-                        <p className="text-[15px] font-semibold text-foreground">Free Trial</p>
-                        <p className="text-[12px] text-muted-foreground italic">
-                          {BRAND.paywall.step3.freeReframe}
-                        </p>
-                      </div>
-                      <span className="text-[13px] font-semibold text-muted-foreground">14 days</span>
-                    </button>
-                  </div>
-
-                  <Button
-                    onClick={() => void handleCta()}
+                  <button
+                    onClick={() => void handleStartFree()}
                     disabled={checkoutLoading}
-                    variant={selected === "free" ? "outline" : "default"}
-                    className={`mt-6 w-full rounded-full ${
-                      selected === "free" ? "border-border text-foreground" : "bg-primary text-primary-foreground hover:bg-primary-hover"
-                    }`}
-                    size="lg"
+                    style={{
+                      ...ctaButton,
+                      marginTop: 28,
+                      opacity: checkoutLoading ? 0.6 : 1,
+                      boxShadow: "0 8px 32px rgba(200,255,0,0.20)",
+                    }}
                   >
-                    {checkoutLoading
-                      ? "Redirecting..."
-                      : selected === "free"
-                      ? BRAND.cta.continueForFree
-                      : BRAND.cta.getFullAccess}
-                  </Button>
+                    {checkoutLoading ? "Redirecting..." : "Start Free Now"}
+                  </button>
 
-                  <div className="mt-4 flex items-center justify-center gap-4">
+                  {/* Price note — small, muted */}
+                  <p
+                    style={{
+                      ...bodyText,
+                      fontSize: 12,
+                      color: TEXT_LO,
+                      marginTop: 10,
+                    }}
+                  >
+                    {BRAND.paywall.step3.priceNote}
+                  </p>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 16,
+                      marginTop: 16,
+                    }}
+                  >
                     {BRAND.paywall.step3.trust.map((t) => (
-                      <span key={t} className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      <span key={t} style={{ ...eyebrow, fontSize: 9 }}>
                         {t}
                       </span>
                     ))}

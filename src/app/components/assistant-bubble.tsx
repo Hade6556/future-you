@@ -52,7 +52,7 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
   const chips: { id: ChipId; label: string; status: TileStatus; href: string; cta: string; disabled: boolean }[] = [
     { id: "identity", label: "Quiz & Profile", status: identityStatus, href: "/quiz", cta: "Take quiz", disabled: false },
     { id: "plan", label: "Coaching Plan", status: planStatus, href: "/plan", cta: "View plan", disabled: !planReady },
-    { id: "daily", label: "Daily Coaching", status: dailyStatusTile, href: "/brief", cta: "Open session", disabled: !planReady },
+    { id: "daily", label: "Daily Coaching", status: dailyStatusTile, href: "/", cta: "Open session", disabled: !planReady },
   ];
 
   const duration = reduceMotion ? 0.2 : 0.35;
@@ -64,8 +64,8 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
   return (
     <motion.div
       role="dialog"
-      aria-label="Future Me coach"
-      className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-5 right-5 z-50 max-h-[60dvh] overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg md:left-1/2 md:right-auto md:w-full md:max-w-lg md:-translate-x-1/2"
+      aria-label="Behavio coach"
+      className="app-fixed-phone-inset bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-50 max-h-[60dvh] overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg"
       drag="y"
       dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={{ top: 0, bottom: 0.4 }}
@@ -78,7 +78,7 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
       <div className="flex max-h-[55dvh] flex-col gap-5 overflow-y-auto">
         <div className="flex items-start justify-between gap-3">
           <p className="text-[15px] leading-relaxed text-foreground">
-            Future Me: {statusMessage}
+            Behavio: {statusMessage}
           </p>
           <button
             type="button"

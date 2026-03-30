@@ -19,7 +19,7 @@ module.exports = {
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
     {
-      name: "future-you-app",
+      name: "behavio-app",
       script: "node_modules/next/dist/bin/next",
       args: ["start"],
       cwd: APP_DIR,

@@ -106,7 +106,7 @@ export function NavBar() {
   });
 
   const labelStyle = (active: boolean): React.CSSProperties => ({
-    fontFamily: "var(--font-barlow-condensed), sans-serif",
+    fontFamily: "var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif",
     fontWeight: 700,
     fontSize: 9,
     letterSpacing: "0.10em",
@@ -132,7 +132,7 @@ export function NavBar() {
       </AnimatePresence>
 
       <nav
-        className="fixed left-0 right-0 z-40"
+        className="app-fixed-phone z-40"
         style={{ bottom: 0 }}
         aria-label="Main navigation"
       >
@@ -272,7 +272,7 @@ export function NavBar() {
                     <action.Icon style={{ width: 20, height: 20, color: "rgba(235,242,255,0.92)" }} aria-hidden />
                   </div>
                   <span style={{
-                    fontFamily: "var(--font-barlow-condensed), sans-serif",
+                    fontFamily: "var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif",
                     fontWeight: 700,
                     fontSize: 9,
                     letterSpacing: "0.10em",

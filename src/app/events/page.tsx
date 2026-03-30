@@ -11,12 +11,129 @@ import {
   CheckBadgeIcon,
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { usePlanStore } from "../state/planStore";
 import { AMBITION_GOAL_MAP, type PipelineEvent, type PipelineExpert } from "../types/pipeline";
 
-/** Remove markdown syntax from a string (handles cached data pre-backend fix) */
+/* ── Design tokens ──────────────────────────────────────────────────────── */
+
+const LIME = "#C8FF00";
+const NAVY = "#060912";
+const TEXT_HI = "rgba(235,242,255,0.95)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
+const GLASS = "rgba(255,255,255,0.07)";
+const GLASS_BORDER = "rgba(255,255,255,0.14)";
+
+const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
+const FONT_BODY = "var(--font-apercu), sans-serif";
+const FONT_MONO = "var(--font-jetbrains-mono), monospace";
+
+/* ── Shared inline-style objects ────────────────────────────────────────── */
+
+const shellStyle: React.CSSProperties = {
+  minHeight: "100dvh",
+  background: NAVY,
+  position: "relative",
+  overflow: "hidden",
+};
+
+const meshStyle: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  zIndex: 0,
+  background:
+    "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%), linear-gradient(170deg, #0d1a3a 0%, #060912 55%)",
+  pointerEvents: "none",
+};
+
+const gridStyle: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  zIndex: 0,
+  backgroundImage:
+    "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+  backgroundSize: "48px 48px",
+  pointerEvents: "none",
+};
+
+const innerStyle: React.CSSProperties = {
+  position: "relative",
+  zIndex: 1,
+  display: "flex",
+  flexDirection: "column",
+  gap: 20,
+  width: "100%",
+  maxWidth: 448,
+  margin: "0 auto",
+  minWidth: 0,
+  padding: "max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2.75rem)) 24px 160px",
+};
+
+const cardStyle: React.CSSProperties = {
+  background: GLASS,
+  border: "1px solid " + GLASS_BORDER,
+  borderRadius: 20,
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid " + GLASS_BORDER,
+  borderRadius: 14,
+  padding: "14px 18px",
+  fontSize: 15,
+  color: TEXT_HI,
+  outline: "none",
+  fontFamily: FONT_BODY,
+};
+
+const ctaStyle: React.CSSProperties = {
+  background: LIME,
+  color: NAVY,
+  border: "none",
+  borderRadius: 14,
+  padding: "16px 0",
+  width: "100%",
+  fontFamily: FONT_HEADING,
+  fontWeight: 800,
+  fontSize: 16,
+  textTransform: "uppercase",
+  cursor: "pointer",
+  fontStyle: "italic",
+};
+
+const ghostStyle: React.CSSProperties = {
+  background: "transparent",
+  border: "1px solid " + GLASS_BORDER,
+  color: TEXT_MID,
+  borderRadius: 14,
+  padding: "14px 0",
+  fontFamily: FONT_BODY,
+  fontSize: 14,
+  cursor: "pointer",
+  flex: 1,
+  textAlign: "center",
+};
+
+const sourceBadgeStyle: React.CSSProperties = {
+  background: "rgba(0,0,0,0.30)",
+  border: "1px solid rgba(255,255,255,0.20)",
+  borderRadius: 999,
+  padding: "4px 10px",
+  fontSize: 11,
+  color: "#fff",
+  backdropFilter: "blur(8px)",
+  WebkitBackdropFilter: "blur(8px)",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  fontWeight: 500,
+};
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
+
 function stripMarkdown(text: string): string {
   return text
     .replace(/\*{1,3}([\s\S]*?)\*{1,3}/g, "$1")
@@ -28,14 +145,12 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
-/** Strip source suffix from scraped titles like "Event Name - Eventbrite" */
 function cleanTitle(raw: string): string {
   return raw
     .replace(/\s[-|]\s*(Eventbrite|Meetup|Ticketmaster|Strava|F6S|Founders Network)$/i, "")
     .trim();
 }
 
-/** If text looks like XML/sitemap garbage, return fallback; otherwise return cleaned text. */
 function sanitizeEventText(text: string | null | undefined, fallback: string): string {
   if (!text || typeof text !== "string") return fallback;
   const t = text.trim();
@@ -74,29 +189,19 @@ function formatDate(iso: string | null): string | null {
 }
 
 const SOURCE_META: Record<string, { label: string; emoji: string; color: string }> = {
-  eventbrite:      { label: "Eventbrite",       emoji: "🎟",  color: "#f05537" },
-  meetup:          { label: "Meetup",            emoji: "👥",  color: "#e0393e" },
-  ticketmaster:    { label: "Ticketmaster",      emoji: "🎫",  color: "#026cdf" },
-  strava:          { label: "Strava",            emoji: "🏃",  color: "#fc4c02" },
-  founders_network:{ label: "Founders Network", emoji: "🚀",  color: "#6c47ff" },
-  luma:            { label: "Luma",              emoji: "✨",  color: "#7c3aed" },
-  linkedin:        { label: "LinkedIn",          emoji: "💼",  color: "#0a66c2" },
-  facebook:        { label: "Facebook",          emoji: "📘",  color: "#1877f2" },
-  f6s:             { label: "F6S",               emoji: "🚀",  color: "#ff6b35" },
-  garysguide:      { label: "Gary's Guide",      emoji: "📅",  color: "#333333" },
-  allevents:       { label: "AllEvents",         emoji: "🗓",  color: "#5b21b6" },
+  eventbrite:       { label: "Eventbrite",       emoji: "🎟",  color: "#f05537" },
+  meetup:           { label: "Meetup",            emoji: "👥",  color: "#e0393e" },
+  ticketmaster:     { label: "Ticketmaster",      emoji: "🎫",  color: "#026cdf" },
+  strava:           { label: "Strava",            emoji: "🏃",  color: "#fc4c02" },
+  founders_network: { label: "Founders Network",  emoji: "🚀",  color: "#6c47ff" },
+  luma:             { label: "Luma",              emoji: "✨",  color: "#7c3aed" },
+  linkedin:         { label: "LinkedIn",          emoji: "💼",  color: "#0a66c2" },
+  facebook:         { label: "Facebook",          emoji: "📘",  color: "#1877f2" },
+  f6s:              { label: "F6S",               emoji: "🚀",  color: "#ff6b35" },
+  garysguide:       { label: "Gary's Guide",      emoji: "📅",  color: "#333333" },
+  allevents:        { label: "AllEvents",         emoji: "🗓",  color: "#5b21b6" },
 };
 
-function SourceBadge({ source }: { source: string }) {
-  const meta = SOURCE_META[source];
-  return (
-    <span className="rounded-full bg-chip-bg px-2 py-0.5 text-xs text-muted-foreground border border-border">
-      {meta ? `${meta.emoji} ${meta.label}` : source}
-    </span>
-  );
-}
-
-/** Deterministic gradient from event title — unique per event */
 function titleToGradient(title: string): string {
   let hash = 0;
   for (let i = 0; i < title.length; i++) {
@@ -105,6 +210,37 @@ function titleToGradient(title: string): string {
   const h1 = hash % 360;
   const h2 = (h1 + 40 + (hash >> 8) % 80) % 360;
   return `linear-gradient(135deg, hsl(${h1}deg 55% 20%), hsl(${h2}deg 45% 12%))`;
+}
+
+function isFarAway(eventLocation: string | null, userLocation: string): boolean {
+  if (!eventLocation || !userLocation) return false;
+  const evtLower = eventLocation.toLowerCase();
+  const userLower = userLocation.toLowerCase();
+  const tokens = userLower.split(/[\s,]+/).filter((t) => t.length > 2);
+  return tokens.length > 0 && !tokens.some((t) => evtLower.includes(t));
+}
+
+/* ── Shell wrapper ───────────────────────────────────────────────────────── */
+
+function PageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={shellStyle}>
+      <div aria-hidden style={meshStyle} />
+      <div aria-hidden style={gridStyle} />
+      <div style={innerStyle}>{children}</div>
+    </div>
+  );
+}
+
+/* ── Sub-components ──────────────────────────────────────────────────────── */
+
+function SourceBadge({ source }: { source: string }) {
+  const meta = SOURCE_META[source];
+  return (
+    <span style={sourceBadgeStyle}>
+      {meta ? `${meta.emoji} ${meta.label}` : source}
+    </span>
+  );
 }
 
 function ExpertLogo({ expert }: { expert: PipelineExpert }) {
@@ -117,12 +253,36 @@ function ExpertLogo({ expert }: { expert: PipelineExpert }) {
         src={logoSrc}
         alt={expert.name}
         onError={() => setFailed(true)}
-        className="h-10 w-10 shrink-0 rounded-xl object-contain bg-white p-1.5 border border-border"
+        style={{
+          height: 40,
+          width: 40,
+          flexShrink: 0,
+          borderRadius: 12,
+          objectFit: "contain",
+          background: "#fff",
+          padding: 6,
+          border: "1px solid " + GLASS_BORDER,
+        }}
       />
     );
   }
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-foreground text-primary-foreground font-bold text-sm">
+    <div
+      style={{
+        display: "flex",
+        height: 40,
+        width: 40,
+        flexShrink: 0,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "50%",
+        background: TEXT_HI,
+        color: NAVY,
+        fontWeight: 700,
+        fontSize: 14,
+        fontFamily: FONT_BODY,
+      }}
+    >
       {expert.name.charAt(0)}
     </div>
   );
@@ -130,30 +290,64 @@ function ExpertLogo({ expert }: { expert: PipelineExpert }) {
 
 function ExpertCard({ expert }: { expert: PipelineExpert }) {
   return (
-    <div className="flex min-w-0 items-start gap-3 rounded-xl border border-border bg-card p-4">
+    <div
+      style={{
+        ...cardStyle,
+        display: "flex",
+        minWidth: 0,
+        alignItems: "flex-start",
+        gap: 12,
+        padding: 16,
+      }}
+    >
       <ExpertLogo expert={expert} />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <p className="text-[15px] font-semibold text-text-primary leading-snug">{expert.name}</p>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+          <p style={{ fontSize: 15, fontWeight: 600, color: TEXT_HI, lineHeight: 1.3, fontFamily: FONT_BODY }}>
+            {expert.name}
+          </p>
           {expert.verified && (
-            <CheckBadgeIcon className="h-4 w-4 shrink-0 text-primary" aria-label="Verified" />
+            <CheckBadgeIcon style={{ height: 16, width: 16, flexShrink: 0, color: LIME }} aria-label="Verified" />
           )}
         </div>
-        <p className="text-xs text-microcopy-soft">{expert.role}</p>
+        <p style={{ fontSize: 12, color: TEXT_LO, fontFamily: FONT_BODY }}>{expert.role}</p>
         {expert.specialty && (
-          <p className="mt-0.5 text-xs text-text-secondary">{expert.specialty}</p>
+          <p style={{ marginTop: 2, fontSize: 12, color: TEXT_MID, fontFamily: FONT_BODY }}>{expert.specialty}</p>
         )}
         {expert.bio_snippet && (
-          <p className="mt-1.5 text-[13px] text-text-secondary line-clamp-3">{expert.bio_snippet}</p>
+          <p
+            style={{
+              marginTop: 6,
+              fontSize: 13,
+              color: TEXT_MID,
+              fontFamily: FONT_BODY,
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {expert.bio_snippet}
+          </p>
         )}
         <Link
           href={expert.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline underline-offset-2"
+          style={{
+            marginTop: 8,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            fontSize: 14,
+            fontWeight: 500,
+            color: LIME,
+            textDecoration: "none",
+            fontFamily: FONT_BODY,
+          }}
         >
           View profile
-          <ChevronRightIcon className="h-3.5 w-3.5 shrink-0" />
+          <ChevronRightIcon style={{ height: 14, width: 14, flexShrink: 0 }} />
         </Link>
       </div>
     </div>
@@ -162,39 +356,39 @@ function ExpertCard({ expert }: { expert: PipelineExpert }) {
 
 function EventsOrb() {
   return (
-    <div className="h-8 w-8 shrink-0 rounded-full border border-border bg-muted" />
+    <div
+      style={{
+        height: 32,
+        width: 32,
+        flexShrink: 0,
+        borderRadius: "50%",
+        border: "1px solid " + GLASS_BORDER,
+        background: GLASS,
+      }}
+    />
   );
 }
 
 function SkeletonCard() {
   return (
-    <Card className="min-w-0 overflow-hidden border border-border shadow-sm animate-pulse">
-      <CardContent className="flex flex-col gap-6 p-4 pb-6">
-        <div className="flex items-center justify-between gap-2">
-          <div className="h-9 w-24 rounded-full bg-border" />
-          <div className="h-6 w-32 rounded-full bg-border" />
+    <div className="animate-pulse" style={{ ...cardStyle, overflow: "hidden" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 24, padding: "16px 16px 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <div style={{ height: 36, width: 96, borderRadius: 999, background: "rgba(255,255,255,0.08)" }} />
+          <div style={{ height: 24, width: 128, borderRadius: 999, background: "rgba(255,255,255,0.08)" }} />
         </div>
-        <div className="rounded-xl bg-border h-28" />
-        <div className="space-y-2">
-          <div className="h-5 w-3/4 rounded bg-border" />
-          <div className="h-4 w-1/2 rounded bg-border" />
+        <div style={{ borderRadius: 12, background: "rgba(255,255,255,0.08)", height: 112 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ height: 20, width: "75%", borderRadius: 6, background: "rgba(255,255,255,0.08)" }} />
+          <div style={{ height: 16, width: "50%", borderRadius: 6, background: "rgba(255,255,255,0.08)" }} />
         </div>
-        <div className="flex gap-2">
-          <div className="h-11 flex-1 rounded-lg bg-border" />
-          <div className="h-11 flex-1 rounded-lg bg-border" />
+        <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ height: 44, flex: 1, borderRadius: 10, background: "rgba(255,255,255,0.08)" }} />
+          <div style={{ height: 44, flex: 1, borderRadius: 10, background: "rgba(255,255,255,0.08)" }} />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
-}
-
-function isFarAway(eventLocation: string | null, userLocation: string): boolean {
-  if (!eventLocation || !userLocation) return false;
-  const evtLower = eventLocation.toLowerCase();
-  const userLower = userLocation.toLowerCase();
-  // Split user location into tokens (e.g. "Vilnius, Lithuania" → ["vilnius", "lithuania"])
-  const tokens = userLower.split(/[\s,]+/).filter((t) => t.length > 2);
-  return tokens.length > 0 && !tokens.some((t) => evtLower.includes(t));
 }
 
 function EventCard({ event, userLocation }: { event: PipelineEvent; userLocation: string }) {
@@ -211,133 +405,234 @@ function EventCard({ event, userLocation }: { event: PipelineEvent; userLocation
   const farAway = !event.virtual && isFarAway(event.location, userLocation);
 
   return (
-    <Card className="min-w-0 overflow-hidden border border-border shadow-sm">
-      <CardContent className="flex flex-col gap-0 p-0 pb-5">
+    <div style={{ ...cardStyle, overflow: "hidden" }}>
+      {/* Hero banner */}
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          minHeight: 128,
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          borderRadius: "20px 20px 0 0",
+          padding: "40px 16px 16px",
+          overflow: "hidden",
+          background: gradient,
+        }}
+      >
+        {event.image_url && (
+          <>
+            <img
+              src={event.image_url}
+              alt=""
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                height: "100%",
+                width: "100%",
+                objectFit: "cover",
+              }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+            <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
+          </>
+        )}
 
-        {/* Hero banner — real image when available, gradient fallback always */}
-        <div
-          className="relative flex min-h-[128px] flex-col justify-end rounded-t-xl px-4 pb-4 pt-10 overflow-hidden"
-          style={{ background: gradient }}
-        >
-          {event.image_url && (
-            <>
-              <img
-                src={event.image_url}
-                alt=""
-                aria-hidden
-                className="absolute inset-0 h-full w-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-              />
-              <div className="absolute inset-0 bg-black/45" />
-            </>
-          )}
-
-          {/* Source pill — top-right */}
-          <div className="absolute top-3 right-3 z-10">
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/30 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-              {sourceMeta ? `${sourceMeta.emoji} ${sourceMeta.label}` : event.source_name}
-            </span>
-          </div>
-
-          {/* Virtual / Far away badge — top-left */}
-          {(event.virtual || farAway) && (
-            <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-              {event.virtual && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/30 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                  <GlobeAltIcon className="h-3 w-3" /> Online
-                </span>
-              )}
-              {farAway && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/30 px-2.5 py-1 text-xs font-medium text-amber-200 backdrop-blur-sm">
-                  📍 Far away
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Title */}
-          <p className="relative z-10 text-lg font-bold leading-snug text-white drop-shadow line-clamp-2">
-            {title}
-          </p>
-
-          {/* Date + location row */}
-          {(date || location) && (
-            <div className="relative z-10 mt-1.5 flex flex-wrap items-center gap-3 text-xs text-white/80">
-              {date && (
-                <span className="inline-flex items-center gap-1">
-                  <CalendarIcon className="h-3 w-3 shrink-0" />
-                  {date}
-                </span>
-              )}
-              {location && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPinIcon className="h-3 w-3 shrink-0" />
-                  {location}
-                </span>
-              )}
-              {event.price_label && (
-                <span className="inline-flex items-center gap-1 font-medium">
-                  {event.price_label}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Body */}
-        <div className="flex flex-col gap-4 px-4 pt-4">
-          {/* Scraped-from attribution */}
-          <p className="text-[11px] text-muted-foreground">
-            Scraped from{" "}
-            <span className="font-medium">
-              {sourceMeta ? sourceMeta.label : event.source_name}
-            </span>{" "}
-            · {sourceDomain(event.source_url)}
-          </p>
-
-          {/* Description */}
-          {description && (
-            <p className="text-sm text-text-secondary line-clamp-3">{description}</p>
-          )}
-
-          {/* "Recommended for you" chip */}
-          <span className="self-start inline-block rounded-md border border-border bg-chip-bg px-2 py-0.5 text-xs text-muted-foreground">
-            Recommended for you
+        {/* Source pill — top-right */}
+        <div style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}>
+          <span style={sourceBadgeStyle}>
+            {sourceMeta ? `${sourceMeta.emoji} ${sourceMeta.label}` : event.source_name}
           </span>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href={event.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="touch-target inline-flex min-h-[44px] min-w-0 items-center gap-1 shrink-0 -translate-y-0.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:underline underline-offset-2 transition-colors"
-            >
-              Details
-              <ChevronRightIcon className="h-4 w-4 shrink-0" />
-            </Link>
-            <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
-            <Button
-              variant="outline"
-              size="icon-sm"
-              className="touch-target shrink-0 min-h-[44px] min-w-[44px]"
-              aria-label="Bookmark"
-            >
-              <BookmarkIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className="touch-target min-h-[44px] min-w-0 flex-1 bg-primary text-primary-foreground hover:bg-primary-hover"
-            >
-              Add to plan
-            </Button>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Virtual / Far away badge — top-left */}
+        {(event.virtual || farAway) && (
+          <div style={{ position: "absolute", top: 12, left: 12, zIndex: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+            {event.virtual && (
+              <span style={sourceBadgeStyle}>
+                <GlobeAltIcon style={{ height: 12, width: 12 }} /> Online
+              </span>
+            )}
+            {farAway && (
+              <span
+                style={{
+                  ...sourceBadgeStyle,
+                  border: "1px solid rgba(251,191,36,0.40)",
+                  background: "rgba(245,158,11,0.30)",
+                  color: "#fde68a",
+                }}
+              >
+                📍 Far away
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Title */}
+        <p
+          style={{
+            position: "relative",
+            zIndex: 10,
+            fontSize: 18,
+            fontWeight: 900,
+            fontStyle: "italic",
+            lineHeight: 1.25,
+            color: "#fff",
+            fontFamily: FONT_HEADING,
+            textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {title}
+        </p>
+
+        {/* Date + location row */}
+        {(date || location) && (
+          <div
+            style={{
+              position: "relative",
+              zIndex: 10,
+              marginTop: 6,
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 12,
+              fontSize: 12,
+              color: "rgba(255,255,255,0.80)",
+              fontFamily: FONT_BODY,
+            }}
+          >
+            {date && (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <CalendarIcon style={{ height: 12, width: 12, flexShrink: 0 }} />
+                {date}
+              </span>
+            )}
+            {location && (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <MapPinIcon style={{ height: 12, width: 12, flexShrink: 0 }} />
+                {location}
+              </span>
+            )}
+            {event.price_label && (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 500 }}>
+                {event.price_label}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Body */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "16px 16px 20px" }}>
+        {/* Scraped-from attribution */}
+        <p style={{ fontSize: 11, color: TEXT_LO, fontFamily: FONT_MONO }}>
+          Scraped from{" "}
+          <span style={{ fontWeight: 500 }}>
+            {sourceMeta ? sourceMeta.label : event.source_name}
+          </span>{" "}
+          · {sourceDomain(event.source_url)}
+        </p>
+
+        {/* Description */}
+        {description && (
+          <p
+            style={{
+              fontSize: 14,
+              color: TEXT_MID,
+              fontFamily: FONT_BODY,
+              lineHeight: 1.55,
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {description}
+          </p>
+        )}
+
+        {/* "Recommended for you" chip */}
+        <span
+          style={{
+            alignSelf: "flex-start",
+            display: "inline-block",
+            borderRadius: 8,
+            border: "1px solid " + GLASS_BORDER,
+            background: GLASS,
+            padding: "2px 8px",
+            fontSize: 12,
+            color: TEXT_LO,
+            fontFamily: FONT_MONO,
+          }}
+        >
+          Recommended for you
+        </span>
+
+        {/* CTAs */}
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+          <Link
+            href={event.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              minHeight: 44,
+              minWidth: 0,
+              alignItems: "center",
+              gap: 4,
+              flexShrink: 0,
+              fontSize: 14,
+              fontWeight: 500,
+              color: TEXT_MID,
+              textDecoration: "none",
+              fontFamily: FONT_BODY,
+            }}
+          >
+            Details
+            <ChevronRightIcon style={{ height: 16, width: 16, flexShrink: 0 }} />
+          </Link>
+          <span style={{ height: 16, width: 1, flexShrink: 0, background: GLASS_BORDER }} aria-hidden />
+          <button
+            style={{
+              ...ghostStyle,
+              flex: "none",
+              minHeight: 44,
+              minWidth: 44,
+              width: 44,
+              padding: 0,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            aria-label="Bookmark"
+          >
+            <BookmarkIcon style={{ height: 16, width: 16 }} />
+          </button>
+          <button
+            style={{
+              ...ctaStyle,
+              flex: 1,
+              minHeight: 44,
+              padding: "12px 0",
+              fontSize: 14,
+            }}
+          >
+            Add to plan
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
+
+/* ── Main page component ─────────────────────────────────────────────────── */
 
 export default function EventsPage() {
   const ambitionType = usePlanStore((s) => s.ambitionType);
@@ -382,21 +677,25 @@ export default function EventsPage() {
   const now = Date.now();
   const events: PipelineEvent[] = (pipelinePlan?.recommended_events ?? [])
     .filter((e) => {
-      // Only drop events with a provably past date; null dates pass through
       if (e.start_date) {
         const d = new Date(e.start_date).getTime();
         if (!isNaN(d) && d < now) return false;
       }
-      // Drop keyword-soup descriptions: too many commas relative to content length
       if (e.description) {
         const commas = (e.description.match(/,/g) ?? []).length;
         const words = e.description.trim().split(/\s+/).length;
         if (commas > 5 && commas / words > 0.25) return false;
       }
-      // Drop events with junk location data (very short segments between commas suggest tag lists)
       if (e.location) {
         const parts = e.location.split(",").map((p) => p.trim());
-        const junk = parts.some((p) => p.split(/\s+/).length === 1 && p.length < 8 && /^[A-Z]/.test(p) && !/^\d/.test(p) && parts.length > 2);
+        const junk = parts.some(
+          (p) =>
+            p.split(/\s+/).length === 1 &&
+            p.length < 8 &&
+            /^[A-Z]/.test(p) &&
+            !/^\d/.test(p) &&
+            parts.length > 2,
+        );
         if (junk) return false;
       }
       return true;
@@ -405,137 +704,152 @@ export default function EventsPage() {
   const event = events[currentIndex] ?? null;
   const matchCount = events.length;
 
-  // ── SSR guard — prevents hydration mismatch from store reading localStorage ─
+  const headingStyle: React.CSSProperties = {
+    fontFamily: FONT_HEADING,
+    fontWeight: 900,
+    fontStyle: "italic",
+    fontSize: 28,
+    color: TEXT_HI,
+    lineHeight: 1.15,
+  };
+
+  const subtextStyle: React.CSSProperties = {
+    marginTop: 8,
+    fontFamily: FONT_BODY,
+    fontSize: 15,
+    color: TEXT_MID,
+    fontWeight: 400,
+  };
+
+  // ── SSR guard ──────────────────────────────────────────────────────────────
   if (!mounted) {
     return (
-      <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-        <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
-          <header>
-            <h1 className="type-h1 text-text-primary">Best match for you</h1>
-          </header>
-          <SkeletonCard />
-        </div>
-      </div>
+      <PageShell>
+        <header>
+          <h1 style={headingStyle}>Best match for you</h1>
+        </header>
+        <SkeletonCard />
+      </PageShell>
     );
   }
 
   // ── Loading ────────────────────────────────────────────────────────────────
   if (pipelineStatus === "loading") {
     return (
-      <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-        <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
-          <header>
-            <h1 className="type-h1 text-text-primary">Best match for you</h1>
-            <p className="mt-2 type-body font-normal text-microcopy-soft">
-              Finding events matched to your ambition…
+      <PageShell>
+        <header>
+          <h1 style={headingStyle}>Best match for you</h1>
+          <p style={subtextStyle}>Finding events matched to your ambition…</p>
+        </header>
+        <SkeletonCard />
+        <div
+          style={{
+            ...cardStyle,
+            display: "flex",
+            minWidth: 0,
+            alignItems: "flex-start",
+            gap: 12,
+            padding: 16,
+          }}
+        >
+          <EventsOrb />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.5, color: TEXT_HI, fontFamily: FONT_BODY }}>
+              Searching Eventbrite, Meetup, Ticketmaster and more…
             </p>
-          </header>
-          <SkeletonCard />
-          <div className="flex min-w-0 items-start gap-3 rounded-xl border border-border bg-card p-4">
-            <EventsOrb />
-            <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-semibold leading-relaxed text-text-primary">
-                Searching Eventbrite, Meetup, Ticketmaster and more…
-              </p>
-              <p className="mt-1 text-xs text-microcopy-soft">This takes about 30–60 seconds.</p>
-            </div>
+            <p style={{ marginTop: 4, fontSize: 12, color: TEXT_LO, fontFamily: FONT_MONO }}>
+              This takes about 30–60 seconds.
+            </p>
           </div>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
-  // ── No ambition / unsupported type ────────────────────────────────────────
+  // ── No ambition / unsupported type ─────────────────────────────────────────
   if (!ambitionType || !AMBITION_GOAL_MAP[ambitionType]) {
     return (
-      <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-        <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
-          <header>
-            <h1 className="type-h1 text-text-primary">Best match for you</h1>
-          </header>
-          <Card className="min-w-0 border border-border shadow-sm">
-            <CardContent className="p-6 text-center space-y-4">
-              <p className="text-[15px] text-text-secondary">
-                {ambitionType
-                  ? "Event search for your ambition type is coming soon."
-                  : "Complete the quiz so we can find events matched to your goal."}
-              </p>
-              <Link href="/events/search">
-                <Button variant="outline" className="min-h-[44px]">
-                  Find events (set goal, location & more)
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+      <PageShell>
+        <header>
+          <h1 style={headingStyle}>Best match for you</h1>
+        </header>
+        <div style={{ ...cardStyle, padding: 24, textAlign: "center" }}>
+          <p style={{ fontSize: 15, color: TEXT_MID, fontFamily: FONT_BODY }}>
+            {ambitionType
+              ? "Event search for your ambition type is coming soon."
+              : "Complete the quiz so we can find events matched to your goal."}
+          </p>
+          <Link href="/events/search" style={{ textDecoration: "none", display: "block", marginTop: 16 }}>
+            <button style={{ ...ghostStyle, width: "100%", minHeight: 44 }}>
+              Find events (set goal, location & more)
+            </button>
+          </Link>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
-  // ── Idle — show location input ─────────────────────────────────────────────
+  // ── Idle — location input ──────────────────────────────────────────────────
   if (pipelineStatus === "idle") {
     return (
-      <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-        <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
-          <header>
-            <h1 className="type-h1 text-text-primary">Find events near you</h1>
-            <p className="mt-2 type-body font-normal text-microcopy-soft">
-              Enter your city so we can find relevant events.
-            </p>
-          </header>
-          <Card className="min-w-0 border border-border shadow-sm">
-            <CardContent className="p-6 space-y-4">
-              <input
-                type="text"
-                value={locationInput}
-                onChange={(e) => setLocationInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && fetchEvents()}
-                placeholder="e.g. Vilnius, Lithuania"
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-              />
-              <Button
-                className="w-full min-h-[44px] bg-primary text-primary-foreground hover:bg-primary-hover"
-                onClick={fetchEvents}
-                disabled={!locationInput.trim()}
-              >
-                Find Events
-              </Button>
-            </CardContent>
-          </Card>
+      <PageShell>
+        <header>
+          <h1 style={headingStyle}>Find events near you</h1>
+          <p style={subtextStyle}>Enter your city so we can find relevant events.</p>
+        </header>
+        <div style={{ ...cardStyle, padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+          <input
+            type="text"
+            value={locationInput}
+            onChange={(e) => setLocationInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && fetchEvents()}
+            placeholder="e.g. Vilnius, Lithuania"
+            style={inputStyle}
+          />
+          <button style={{ ...ctaStyle, opacity: !locationInput.trim() ? 0.4 : 1 }} onClick={fetchEvents} disabled={!locationInput.trim()}>
+            Find Events
+          </button>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   // ── Error ──────────────────────────────────────────────────────────────────
   if (pipelineStatus === "error") {
     return (
-      <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-        <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
-          <header>
-            <h1 className="type-h1 text-text-primary">Best match for you</h1>
-          </header>
-          <Card className="min-w-0 border border-border shadow-sm">
-            <CardContent className="p-6 text-center">
-              <p className="text-[15px] text-text-secondary">
-                Couldn&apos;t load events right now.
-              </p>
-              {pipelineError && (
-                <p className="mt-2 text-xs font-mono text-destructive bg-muted px-3 py-2 rounded-lg break-all">
-                  {pipelineError}
-                </p>
-              )}
-              <Button className="mt-4" onClick={() => setPipelineStatus("idle")}>
-                Retry
-              </Button>
-            </CardContent>
-          </Card>
+      <PageShell>
+        <header>
+          <h1 style={headingStyle}>Best match for you</h1>
+        </header>
+        <div style={{ ...cardStyle, padding: 24, textAlign: "center" }}>
+          <p style={{ fontSize: 15, color: TEXT_MID, fontFamily: FONT_BODY }}>
+            Couldn&apos;t load events right now.
+          </p>
+          {pipelineError && (
+            <p
+              style={{
+                marginTop: 8,
+                fontSize: 12,
+                fontFamily: FONT_MONO,
+                color: "#f87171",
+                background: "rgba(255,255,255,0.04)",
+                padding: "8px 12px",
+                borderRadius: 10,
+                wordBreak: "break-all",
+              }}
+            >
+              {pipelineError}
+            </p>
+          )}
+          <button style={{ ...ctaStyle, marginTop: 16 }} onClick={() => setPipelineStatus("idle")}>
+            Retry
+          </button>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
-  // ── No events returned → fall back to idle so user can search again ────────
+  // ── No events → fall back to idle ──────────────────────────────────────────
   if (pipelineStatus === "ready" && events.length === 0) {
     setPipelineStatus("idle");
     return null;
@@ -543,93 +857,122 @@ export default function EventsPage() {
 
   // ── Events carousel ────────────────────────────────────────────────────────
   return (
-    <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-      <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
-        <header>
-          <h1 className="type-h1 text-text-primary">Best match for you</h1>
-          <p className="mt-2 type-body font-normal text-microcopy-soft">
-            Curated events to advance your path.
-          </p>
-          <Link href="/events/search" className="mt-2 inline-block text-sm font-medium text-primary hover:underline underline-offset-2">
-            Find events (goal, location, timeframe…)
-          </Link>
-        </header>
-
-        {event && <EventCard event={event} userLocation={location} />}
-
-        {/* Carousel dots */}
-        <div className="flex justify-center gap-1.5" aria-hidden>
-          {events.slice(0, 5).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                i === currentIndex ? "bg-text-secondary" : "bg-border"
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Next / skip */}
-        {events.length > 1 && currentIndex < events.length - 1 && (
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              className="flex-1 min-h-[44px]"
-              onClick={() => setCurrentIndex((i) => Math.min(i + 1, events.length - 1))}
-            >
-              Skip
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1 min-h-[44px]"
-              onClick={() => setCurrentIndex((i) => Math.min(i + 1, events.length - 1))}
-            >
-              Next event
-            </Button>
-          </div>
-        )}
-
-        {/* Footer summary */}
-        <div className="flex min-w-0 items-start gap-3 rounded-xl border border-border bg-card p-4">
-          <EventsOrb />
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] font-semibold leading-relaxed text-text-primary">
-              Future Me found <strong>{matchCount} events</strong> matched to your ambition.
-            </p>
-            <p className="mt-1 text-[15px] leading-relaxed text-text-primary">
-              We&apos;ll block time in your calendar when you accept.
-            </p>
-            <p className="mt-1 text-xs text-microcopy-soft">
-              {currentIndex + 1} of {matchCount} · Tap dots to jump
-            </p>
-          </div>
-        </div>
-
-        <Button
-          variant="ghost"
-          className="w-full min-h-[44px] text-text-secondary"
-          onClick={() => setPipelineStatus("idle")}
+    <PageShell>
+      <header>
+        <h1 style={headingStyle}>Best match for you</h1>
+        <p style={subtextStyle}>Curated events to advance your path.</p>
+        <Link
+          href="/events/search"
+          style={{
+            display: "inline-block",
+            marginTop: 8,
+            fontSize: 14,
+            fontWeight: 500,
+            color: LIME,
+            textDecoration: "none",
+            fontFamily: FONT_BODY,
+          }}
         >
-          Find new events
-        </Button>
+          Find events (goal, location, timeframe…)
+        </Link>
+      </header>
 
-        {/* ── Roadmap link ────────────────────────────────────────────────── */}
-        {pipelinePlan?.phases && pipelinePlan.phases.length > 0 && (
-          <Link
-            href="/plan"
-            className="flex items-center justify-between rounded-xl border border-border bg-card p-4 hover:bg-muted/50 transition-colors"
-          >
-            <div>
-              <p className="text-[15px] font-semibold text-text-primary">Your roadmap</p>
-              <p className="text-xs text-microcopy-soft mt-0.5">
-                {pipelinePlan.phases.length} phases · {pipelinePlan.horizon_weeks} weeks
-              </p>
-            </div>
-            <ArrowRightIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
-          </Link>
-        )}
+      {event && <EventCard event={event} userLocation={location} />}
+
+      {/* Carousel dots */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 6 }} aria-hidden>
+        {events.slice(0, 5).map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentIndex(i)}
+            style={{
+              height: 6,
+              width: 6,
+              borderRadius: "50%",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              background: i === currentIndex ? TEXT_MID : GLASS_BORDER,
+              transition: "background 0.2s",
+            }}
+          />
+        ))}
       </div>
-    </div>
+
+      {/* Next / skip */}
+      {events.length > 1 && currentIndex < events.length - 1 && (
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            style={ghostStyle}
+            onClick={() => setCurrentIndex((i) => Math.min(i + 1, events.length - 1))}
+          >
+            Skip
+          </button>
+          <button
+            style={{ ...ghostStyle, color: TEXT_HI, fontWeight: 500 }}
+            onClick={() => setCurrentIndex((i) => Math.min(i + 1, events.length - 1))}
+          >
+            Next event
+          </button>
+        </div>
+      )}
+
+      {/* Footer summary */}
+      <div
+        style={{
+          ...cardStyle,
+          display: "flex",
+          minWidth: 0,
+          alignItems: "flex-start",
+          gap: 12,
+          padding: 16,
+        }}
+      >
+        <EventsOrb />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <p style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.5, color: TEXT_HI, fontFamily: FONT_BODY }}>
+            Behavio found <strong>{matchCount} events</strong> matched to your ambition.
+          </p>
+          <p style={{ marginTop: 4, fontSize: 15, lineHeight: 1.5, color: TEXT_HI, fontFamily: FONT_BODY }}>
+            We&apos;ll block time in your calendar when you accept.
+          </p>
+          <p style={{ marginTop: 4, fontSize: 12, color: TEXT_LO, fontFamily: FONT_MONO }}>
+            {currentIndex + 1} of {matchCount} · Tap dots to jump
+          </p>
+        </div>
+      </div>
+
+      <button
+        style={{ ...ghostStyle, width: "100%", minHeight: 44, flex: "none" }}
+        onClick={() => setPipelineStatus("idle")}
+      >
+        Find new events
+      </button>
+
+      {/* Roadmap link */}
+      {pipelinePlan?.phases && pipelinePlan.phases.length > 0 && (
+        <Link
+          href="/plan"
+          style={{
+            ...cardStyle,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: 16,
+            textDecoration: "none",
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 15, fontWeight: 600, color: TEXT_HI, fontFamily: FONT_BODY }}>
+              Your roadmap
+            </p>
+            <p style={{ fontSize: 12, color: TEXT_LO, marginTop: 2, fontFamily: FONT_MONO }}>
+              {pipelinePlan.phases.length} phases · {pipelinePlan.horizon_weeks} weeks
+            </p>
+          </div>
+          <ArrowRightIcon style={{ height: 20, width: 20, flexShrink: 0, color: TEXT_MID }} />
+        </Link>
+      )}
+    </PageShell>
   );
 }

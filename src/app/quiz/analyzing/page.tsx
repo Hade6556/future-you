@@ -40,6 +40,15 @@ export default function AnalyzingPage() {
   const quizCurrentState = usePlanStore((s) => s.quizCurrentState);
   const quizVision = usePlanStore((s) => s.quizVision);
   const quizGender = usePlanStore((s) => s.quizGender);
+  const quizAgeGroup = usePlanStore((s) => s.quizAgeGroup);
+  const quizDream = usePlanStore((s) => s.quizDream);
+  const quizPastAttempts = usePlanStore((s) => s.quizPastAttempts);
+  const dogArchetype = usePlanStore((s) => s.dogArchetype);
+  const multiSelectAnswers = usePlanStore((s) => s.multiSelectAnswers);
+  const moodRating = usePlanStore((s) => s.moodRating);
+  const sleepQuality = usePlanStore((s) => s.sleepQuality);
+  const energyLevel = usePlanStore((s) => s.energyLevel);
+  const stressLevel = usePlanStore((s) => s.stressLevel);
   const planFired = useRef(false);
   const [step, setStep] = useState(0);
 
@@ -61,7 +70,34 @@ export default function AnalyzingPage() {
     if (planFired.current) return;
     planFired.current = true;
     const goal = AMBITION_GOAL_MAP[ambitionType ?? "wellness"] ?? "wellness";
+
+    // Derive the domain-specific goals key (e.g., "q_goals_career" for Career & Ambition)
+    const domainKeyMap: Record<string, string> = {
+      career: "q_goals_career",
+      entrepreneur: "q_goals_career",
+      finance: "q_goals_money",
+      relationships: "q_goals_relationships",
+      weight_loss: "q_goals_health",
+      athlete: "q_goals_health",
+      wellness: "q_goals_health",
+      mindfulness: "q_goals_mindset",
+      confidence: "q_goals_mindset",
+      student: "q_goals_education",
+      productivity: "q_goals_productivity",
+    };
+    const goalsKey = domainKeyMap[ambitionType ?? ""] ?? "";
+    const specificGoals = goalsKey ? (multiSelectAnswers[goalsKey] ?? []) : [];
+
+    // Read dream narrative from sessionStorage (set by intake page)
+    let dreamNarrative = quizDream ?? null;
+    try {
+      if (!dreamNarrative && typeof window !== "undefined") {
+        dreamNarrative = sessionStorage.getItem("behavio-pending-narrative");
+      }
+    } catch { /* SSR guard */ }
+
     const userContext = {
+      // Existing fields
       timeline: quizTimeline ?? undefined,
       commitment: quizCommitment ?? undefined,
       schedule: quizSchedule ?? undefined,
@@ -70,6 +106,26 @@ export default function AnalyzingPage() {
       currentState: quizCurrentState ?? undefined,
       vision: quizVision ?? undefined,
       gender: quizGender ?? undefined,
+      // Quiz signals
+      ageGroup: quizAgeGroup ?? undefined,
+      specificGoals: specificGoals.length > 0 ? specificGoals : undefined,
+      motivations: multiSelectAnswers["q_motivations"]?.length ? multiSelectAnswers["q_motivations"] : undefined,
+      badHabits: multiSelectAnswers["q_bad_habits"]?.length ? multiSelectAnswers["q_bad_habits"] : undefined,
+      selfTrust: multiSelectAnswers["q_self_trust"]?.[0] ?? undefined,
+      problems: multiSelectAnswers["q_problems"]?.length ? multiSelectAnswers["q_problems"] : undefined,
+      pastAttempts: quizPastAttempts ?? undefined,
+      // Intake signals
+      dreamNarrative: dreamNarrative ?? undefined,
+      // Identity signals
+      archetype: dogArchetype ?? undefined,
+      ambitionDomain: ambitionType ?? undefined,
+      // Wellbeing signals
+      moodRating: moodRating ?? undefined,
+      sleepQuality: sleepQuality ?? undefined,
+      energyLevel: energyLevel ?? undefined,
+      stressLevel: stressLevel != null ? String(stressLevel) : undefined,
+      // Domain-specific deep dive answers
+      domainAnswers: Object.keys(multiSelectAnswers).length > 0 ? multiSelectAnswers : undefined,
     };
     setPipelineStatus("loading");
     fetch("/api/plan", {
@@ -166,7 +222,7 @@ export default function AnalyzingPage() {
         </div>
 
         <p className="font-accent text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-          Powered by Future Me AI
+          Powered by Behavio AI
         </p>
       </div>
     </div>

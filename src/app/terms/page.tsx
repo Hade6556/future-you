@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Terms of Service – Future You" };
+export const metadata = { title: "Terms of Service – Behavio" };
 
 export default function TermsPage() {
   return (
@@ -16,15 +16,15 @@ export default function TermsPage() {
           <section>
             <h2 className="mb-2 text-lg font-semibold">1. Acceptance</h2>
             <p className="text-muted-foreground">
-              By using Future You, you agree to these terms. If you don't agree, don't use the
+              By using Behavio, you agree to these terms. If you don't agree, don't use the
               service.
             </p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold">2. What Future You is</h2>
+            <h2 className="mb-2 text-lg font-semibold">2. What Behavio is</h2>
             <p className="text-muted-foreground">
-              Future You is an AI-powered personal coaching and habit-tracking application. It
+              Behavio is an AI-powered personal coaching and habit-tracking application. It
               generates personalised 90-day plans and daily coaching messages. It is not a
               substitute for professional medical, mental health, or financial advice.
             </p>
@@ -67,7 +67,7 @@ export default function TermsPage() {
           <section>
             <h2 className="mb-2 text-lg font-semibold">7. Limitation of liability</h2>
             <p className="text-muted-foreground">
-              Future You is provided "as is". To the maximum extent permitted by law, we are not
+              Behavio is provided "as is". To the maximum extent permitted by law, we are not
               liable for any indirect, incidental, or consequential damages arising from use of the
               service.
             </p>
@@ -85,8 +85,8 @@ export default function TermsPage() {
             <h2 className="mb-2 text-lg font-semibold">9. Contact</h2>
             <p className="text-muted-foreground">
               Questions?{" "}
-              <a href="mailto:hello@futureyou.app" className="underline hover:text-foreground">
-                hello@futureyou.app
+              <a href="mailto:hello@trybehavio.com" className="underline hover:text-foreground">
+                hello@trybehavio.com
               </a>
             </p>
           </section>

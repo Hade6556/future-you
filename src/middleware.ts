@@ -1,6 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Routes that require an authenticated user. */
+const PROTECTED_PATHS = ["/account", "/structure", "/tasks", "/journal"];
+
+/** Routes that are always public (no auth check). */
+const PUBLIC_PATHS = ["/", "/signup", "/quiz", "/intake", "/generating", "/plan", "/about", "/brand", "/privacy", "/terms", "/forgot-password", "/auth"];
+
+function isProtected(pathname: string): boolean {
+  return PROTECTED_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -28,7 +38,14 @@ export async function middleware(request: NextRequest) {
   });
 
   // Refresh session — do not remove this
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Redirect unauthenticated users away from protected routes
+  if (!user && isProtected(request.nextUrl.pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/signup";
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }

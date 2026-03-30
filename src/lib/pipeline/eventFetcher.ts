@@ -50,7 +50,7 @@ export async function fetchEvents(
     const currentYear = new Date().getFullYear();
     const query = `upcoming ${baseQuery} ${location} ${currentYear} ${siteFilter}`.trim();
     try {
-      const response = await app.search(query, { limit: SEARCH_LIMIT });
+      const response: any = await app.search(query, { limit: SEARCH_LIMIT });
       const results = Array.isArray(response)
         ? response
         : (response?.web ?? response?.data ?? response?.results ?? []);
@@ -88,7 +88,7 @@ export async function fetchEventsForSources(
     const siteFilter = SOURCE_SITES[sourceName] ?? "";
     const query = `${fallbackBase} ${location} ${currentYear} ${siteFilter}`.trim();
     try {
-      const response = await app.search(query, { limit: SEARCH_LIMIT });
+      const response: any = await app.search(query, { limit: SEARCH_LIMIT });
       const results = Array.isArray(response)
         ? response
         : (response?.web ?? response?.data ?? response?.results ?? []);

@@ -58,7 +58,7 @@ export function AppTour({ onDismiss }: AppTourProps) {
       {/* Bottom sheet */}
       <motion.div
         key="tour-sheet"
-        className="fixed bottom-0 left-0 right-0 z-[60] mx-auto max-w-sm rounded-t-3xl px-6 pb-10 pt-6 shadow-2xl"
+        className="fixed bottom-0 left-0 right-0 z-[60] mx-auto max-w-sm rounded-t-3xl px-6 pb-28 pt-6 shadow-2xl"
         style={{
           background: "rgba(15,32,64,0.97)",
           backdropFilter: "blur(24px)",

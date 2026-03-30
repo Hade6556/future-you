@@ -85,12 +85,12 @@ export async function upsertCalendarEvent(
   input: CalendarEventInput
 ): Promise<string> {
   const calendar = google.calendar({ version: "v3", auth });
-  const privateKey = `futureYou_${input.planId}_${input.eventKey}`;
+  const privateKey = `behavio_${input.planId}_${input.eventKey}`;
 
   // Check for existing event with this key
   const existing = await calendar.events.list({
     calendarId,
-    privateExtendedProperty: [`futureYouKey=${privateKey}`],
+    privateExtendedProperty: [`behavioKey=${privateKey}`],
     maxResults: 1,
     showDeleted: false,
   });
@@ -104,8 +104,8 @@ export async function upsertCalendarEvent(
     end: { date: input.endDate },
     extendedProperties: {
       private: {
-        futureYouPlanId: input.planId,
-        futureYouKey: privateKey,
+        behavioPlanId: input.planId,
+        behavioKey: privateKey,
       },
     },
   };

@@ -13,7 +13,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; FutureYouBot/1.0)" },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; BehavioBot/1.0)" },
     });
     if (!res.ok) return null;
     const html = await res.text();

@@ -1,4 +1,4 @@
-# Future Me – North Star – Midnight palette
+# Behavio – North Star – Midnight palette
 
 Design variables for the North Star – Midnight aesthetic. All tokens are defined as CSS custom properties in `src/app/globals.css` and exposed to Tailwind via `@theme inline`.
 

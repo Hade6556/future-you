@@ -3,7 +3,7 @@ import { parseGoal } from "./goalParser";
 import { fetchEvents, fetchEventsForSources } from "./eventFetcher";
 import { normalizeEvents } from "./normalizer";
 import { enrichEventImages } from "./imageEnricher";
-import { buildPlan } from "./planBuilder";
+import { buildPersonalizedPlan } from "./planBuilder";
 import { getCuratedExperts } from "./experts";
 
 export async function runPipeline(
@@ -16,7 +16,7 @@ export async function runPipeline(
 
   if (!location) {
     // No location — skip event fetching, return plan immediately
-    return buildPlan(goal, goalKey, goalConfig, [], experts, userContext);
+    return buildPersonalizedPlan(goal, goalKey, goalConfig, [], experts, userContext);
   }
 
   const rawSources = await fetchEvents(goalConfig, location);
@@ -41,5 +41,5 @@ export async function runPipeline(
   }
 
   await enrichEventImages(events);
-  return buildPlan(goal, goalKey, goalConfig, events, experts, userContext);
+  return buildPersonalizedPlan(goal, goalKey, goalConfig, events, experts, userContext);
 }

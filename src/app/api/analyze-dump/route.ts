@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
+import { requireAuth } from "@/lib/auth";
 
 interface AnalyzeRequest {
   transcript: string;
@@ -39,6 +40,9 @@ const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
 
 export async function POST(req: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   const limited = rateLimitResponse(req);
   if (limited) return limited;
   const { transcript } = (await req.json()) as AnalyzeRequest;

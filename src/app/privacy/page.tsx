@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Privacy Policy – Future You" };
+export const metadata = { title: "Privacy Policy – Behavio" };
 
 export default function PrivacyPage() {
   return (
@@ -68,8 +68,8 @@ export default function PrivacyPage() {
             <h2 className="mb-2 text-lg font-semibold">7. Contact</h2>
             <p className="text-muted-foreground">
               Questions? Email us at{" "}
-              <a href="mailto:hello@futureyou.app" className="underline hover:text-foreground">
-                hello@futureyou.app
+              <a href="mailto:hello@trybehavio.com" className="underline hover:text-foreground">
+                hello@trybehavio.com
               </a>
             </p>
           </section>

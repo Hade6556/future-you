@@ -1,6 +1,6 @@
 # Distribution playbook
 
-One place for how we grow Future Me: SEO, Reddit, content format, and philosophy. Based on lessons from bootstrapped app founders (e.g. Kyle Fowler, Cardstock/Scanon).
+One place for how we grow Behavio: SEO, Reddit, content format, and philosophy. Based on lessons from bootstrapped app founders (e.g. Kyle Fowler, Cardstock/Scanon).
 
 ---
 
@@ -28,10 +28,10 @@ Use for **validation** (before or after launch) and **one strong launch post**. 
 One **repeatable format** so we can iterate on a single structure instead of reinventing every video.
 
 - **Hook (3–5 sec):** Relatable struggle or question (e.g. "I kept restarting every Monday").
-- **Demo:** Open Future Me; show daily brief or streak.
-- **Reveal:** Streak, plan, or "Future Me is proud of you" moment.
+- **Demo:** Open Behavio; show daily brief or streak.
+- **Reveal:** Streak, plan, or "Behavio is proud of you" moment.
 - **Goal:** Viewers ask "what's the app?" so the name appears in comments and drives attribution.
-- **In-app branding:** We added a small "Future Me" label at the top of the brief and home screens so when someone screen-records, the app name is visible (same idea as putting the app name in the product UI for UGC).
+- **In-app branding:** We added a small "Behavio" label at the top of the brief and home screens so when someone screen-records, the app name is visible (same idea as putting the app name in the product UI for UGC).
 
 ---
 

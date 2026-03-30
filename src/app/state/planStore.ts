@@ -1,8 +1,29 @@
 import { create } from "zustand";
 import type { AmbitionDomain, ArchetypeId } from "../types/plan";
-import type { CheckinStatus, GoalPlan, PipelineStatus, PipelineStep } from "../types/pipeline";
+import type { CheckinStatus, GoalPlan, PipelineStatus, PipelineStep, GeneratedTask, RecurringTask, EnergyLevel, TimeAvailable, ChallengeLevel } from "../types/pipeline";
+import type { DailyScoreEntry } from "../utils/scoreEngine";
+import { recordScoringAction, computeFutureScore, backfillMissedDays } from "../utils/scoreEngine";
 
-const PIPELINE_SESSION_KEY = "future-you-pipeline";
+const PIPELINE_SESSION_KEY = "behavio-pipeline";
+const OLD_PIPELINE_SESSION_KEY = "future-you-pipeline";
+
+const STORAGE_KEY = "behavio-plan-state";
+const OLD_STORAGE_KEY = "future-you-plan-state";
+
+function migrateStorageKey(oldKey: string, newKey: string) {
+  if (typeof window === "undefined") return;
+  try {
+    if (!localStorage.getItem(newKey) && localStorage.getItem(oldKey)) {
+      localStorage.setItem(newKey, localStorage.getItem(oldKey)!);
+      localStorage.removeItem(oldKey);
+    }
+  } catch { /* ignore */ }
+}
+
+if (typeof window !== "undefined") {
+  migrateStorageKey(OLD_PIPELINE_SESSION_KEY, PIPELINE_SESSION_KEY);
+  migrateStorageKey(OLD_STORAGE_KEY, STORAGE_KEY);
+}
 
 function getStoredPipelinePlan(): GoalPlan | null {
   if (typeof window === "undefined") return null;
@@ -22,8 +43,6 @@ function storePipelinePlan(plan: GoalPlan) {
     // ignore quota errors
   }
 }
-
-const STORAGE_KEY = "future-you-plan-state";
 
 export type DailyStatus = "align" | "act" | "reflect" | "complete";
 
@@ -54,6 +73,7 @@ export type MentalHealthFields = {
   quizLifePhase: string | null;
   quizAccountability: string | null;
   quizSuccessDefinition: string | null;
+  multiSelectAnswers: Record<string, string[]>;
 };
 
 type Persisted = {
@@ -113,6 +133,38 @@ type Persisted = {
   phoenixPriorStreak: number;
   /** ISO date the streak expired; used for 48-hour auto-clear of phoenix state. */
   streakExpiredAt: string | null;
+  /** Historical daily score data. Key = ISO date string. */
+  dailyScores: Record<string, DailyScoreEntry>;
+  /** ISO dates on which user submitted a journal entry. */
+  journalDates: Record<string, boolean>;
+
+  // ─── Daily tasks system ─────────────────────────────────────────────────
+  /** Morning energy check-in for today. */
+  morningEnergy: EnergyLevel | null;
+  /** Morning time available check-in for today. */
+  morningTimeAvailable: TimeAvailable | null;
+  /** Morning focus area check-in for today. */
+  morningFocus: string | null;
+  /** Morning challenge level check-in for today. */
+  morningChallengeLevel: ChallengeLevel | null;
+  /** ISO date of last morning check-in (reset daily). */
+  morningCheckinDate: string | null;
+  /** Today's generated tasks. */
+  todayTasks: GeneratedTask[];
+  /** ISO date when todayTasks were generated. */
+  todayTasksDate: string | null;
+  /** User-defined recurring tasks. */
+  recurringTasks: RecurringTask[];
+  /** Day message from AI task generation. */
+  todayDayMessage: string | null;
+  /** Adaptation note from AI (e.g., "Lighter day"). */
+  todayAdaptationNote: string | null;
+  /** ISO date when the plan was last refreshed by the weekly cron. */
+  planLastRefreshedAt: string | null;
+  /** Summary of what changed in the last plan refresh. */
+  planRefreshSummary: string | null;
+  /** Whether the user has dismissed the plan refresh notification. */
+  planRefreshSeen: boolean;
   /** Mental health / wellness assessment from onboarding quiz */
 } & MentalHealthFields;
 
@@ -175,11 +227,32 @@ function getDefaultPersisted(): Persisted {
     quizLifePhase: null,
     quizAccountability: null,
     quizSuccessDefinition: null,
+    multiSelectAnswers: {},
+    dailyScores: {},
+    journalDates: {},
+    morningEnergy: null,
+    morningTimeAvailable: null,
+    morningFocus: null,
+    morningChallengeLevel: null,
+    morningCheckinDate: null,
+    todayTasks: [],
+    todayTasksDate: null,
+    recurringTasks: [],
+    todayDayMessage: null,
+    todayAdaptationNote: null,
+    planLastRefreshedAt: null,
+    planRefreshSummary: null,
+    planRefreshSeen: false,
   };
 }
 
+/** Format a Date as YYYY-MM-DD in the user's local timezone (NOT UTC). */
+function localDateISO(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localDateISO(new Date());
 }
 
 /** Returns the Monday–Sunday bounds for the current calendar week as ISO date strings. */
@@ -193,8 +266,8 @@ function getCurrentWeekBounds(): { monday: string; sunday: string } {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
   return {
-    monday: monday.toISOString().slice(0, 10),
-    sunday: sunday.toISOString().slice(0, 10),
+    monday: localDateISO(monday),
+    sunday: localDateISO(sunday),
   };
 }
 
@@ -211,14 +284,14 @@ export function getCurrentWeekDates(): string[] {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(base);
     d.setDate(base.getDate() + i);
-    return d.toISOString().slice(0, 10);
+    return localDateISO(d);
   });
 }
 
 function yesterdayISO(): string {
   const d = new Date();
   d.setDate(d.getDate() - 1);
-  return d.toISOString().slice(0, 10);
+  return localDateISO(d);
 }
 
 /** Apply streak reset and daily todayStatus reset on load; pure, no side effects. */
@@ -256,6 +329,13 @@ function applyStreakResetOnLoad(p: Persisted): Persisted {
   // Reset todayStatus if it was set on a different day
   if (p.todayStatusDate && p.todayStatusDate !== today) {
     result = { ...result, todayStatus: "pending", todayStatusDate: null };
+  }
+  // Backfill missed days in dailyScores with flat zero candles
+  if (result.dailyScores && p.lastCompletedDate) {
+    result = {
+      ...result,
+      dailyScores: backfillMissedDays(result.dailyScores ?? {}, p.lastCompletedDate, today),
+    };
   }
   return result;
 }
@@ -324,6 +404,16 @@ type PlanState = {
   dailyRoutine: string | null;
   stressLevel: number | null;
   expressionText: string | null;
+  quizPrimaryGoal: string | null;
+  quizPastAttempts: string | null;
+  quizCurrentState: string | null;
+  quizVision: string | null;
+  quizAgeGroup: string | null;
+  quizDream: string | null;
+  quizSecondaryGoal: string | null;
+  quizLifePhase: string | null;
+  quizAccountability: string | null;
+  quizSuccessDefinition: string | null;
 
   bestStreak: number;
   streakShields: number;
@@ -361,7 +451,7 @@ type PlanState = {
   setPlanStartDate: (date: string) => void;
   setTodayStatus: (status: CheckinStatus) => void;
 
-  // Pipeline (Future You workflow) state — not persisted to localStorage
+  // Pipeline (Behavio workflow) state — not persisted to localStorage
   pipelinePlan: GoalPlan | null;
   pipelineStatus: PipelineStatus;
   setPipelinePlan: (plan: GoalPlan) => void;
@@ -379,11 +469,56 @@ type PlanState = {
   lastGiftType: string | null;
   setGiftRevealed: (giftType: string) => void;
 
+  // Multi-select quiz answers (keyed by screen id)
+  multiSelectAnswers: Record<string, string[]>;
+  setMultiSelectAnswer: (screenId: string, labels: string[]) => void;
+
   // Phoenix comeback mechanic
   phoenixDay: boolean;
   phoenixPriorStreak: number;
   streakExpiredAt: string | null;
   exitPhoenixMode: () => void;
+
+  // Gap closure scoring
+  dailyScores: Record<string, DailyScoreEntry>;
+  journalDates: Record<string, boolean>;
+  recalculateAndPersistScore: () => void;
+  recordJournalEntry: () => void;
+
+  // Daily tasks system
+  morningEnergy: EnergyLevel | null;
+  morningTimeAvailable: TimeAvailable | null;
+  morningFocus: string | null;
+  morningChallengeLevel: ChallengeLevel | null;
+  morningCheckinDate: string | null;
+  todayTasks: GeneratedTask[];
+  todayTasksDate: string | null;
+  recurringTasks: RecurringTask[];
+  todayDayMessage: string | null;
+  todayAdaptationNote: string | null;
+  setMorningCheckin: (energy: EnergyLevel, time: TimeAvailable, focus: string | null, challengeLevel: ChallengeLevel) => void;
+  setTodayTasks: (tasks: GeneratedTask[], dayMessage: string, adaptationNote: string | null) => void;
+  toggleDailyTask: (taskId: string) => void;
+  deferDailyTask: (taskId: string) => void;
+  addCustomDailyTask: (label: string, estimatedMinutes: number) => void;
+  swapDailyTask: (taskId: string, replacement: GeneratedTask) => void;
+  addRecurringTask: (task: RecurringTask) => void;
+  removeRecurringTask: (taskId: string) => void;
+
+  // Daily visit (opening the app maintains streak)
+  recordDailyVisit: () => void;
+
+  // Plan refresh (living plan)
+  planLastRefreshedAt: string | null;
+  planRefreshSummary: string | null;
+  planRefreshSeen: boolean;
+  setPlanRefreshed: (summary: string) => void;
+  dismissPlanRefresh: () => void;
+
+  // Server sync
+  synced: boolean;
+  syncToServer: () => Promise<void>;
+  hydrateFromServer: () => Promise<void>;
 };
 
 export const usePlanStore = create<PlanState>((set, get) => {
@@ -443,6 +578,16 @@ export const usePlanStore = create<PlanState>((set, get) => {
     dailyRoutine: persisted.dailyRoutine ?? null,
     stressLevel: persisted.stressLevel ?? null,
     expressionText: persisted.expressionText ?? null,
+    quizPrimaryGoal: persisted.quizPrimaryGoal ?? null,
+    quizPastAttempts: persisted.quizPastAttempts ?? null,
+    quizCurrentState: persisted.quizCurrentState ?? null,
+    quizVision: persisted.quizVision ?? null,
+    quizAgeGroup: persisted.quizAgeGroup ?? null,
+    quizDream: persisted.quizDream ?? null,
+    quizSecondaryGoal: persisted.quizSecondaryGoal ?? null,
+    quizLifePhase: persisted.quizLifePhase ?? null,
+    quizAccountability: persisted.quizAccountability ?? null,
+    quizSuccessDefinition: persisted.quizSuccessDefinition ?? null,
 
     // Weekly tracking & gift
     weeklyCompletions: persisted.weeklyCompletions ?? {},
@@ -450,10 +595,29 @@ export const usePlanStore = create<PlanState>((set, get) => {
     lastGiftDate: persisted.lastGiftDate ?? null,
     lastGiftType: persisted.lastGiftType ?? null,
 
+    // Multi-select quiz answers
+    multiSelectAnswers: persisted.multiSelectAnswers ?? {},
+
     // Phoenix comeback
     phoenixDay: persisted.phoenixDay ?? false,
     phoenixPriorStreak: persisted.phoenixPriorStreak ?? 0,
     streakExpiredAt: persisted.streakExpiredAt ?? null,
+
+    // Daily tasks system
+    morningEnergy: persisted.morningCheckinDate === todayISO() ? (persisted.morningEnergy ?? null) : null,
+    morningTimeAvailable: persisted.morningCheckinDate === todayISO() ? (persisted.morningTimeAvailable ?? null) : null,
+    morningFocus: persisted.morningCheckinDate === todayISO() ? (persisted.morningFocus ?? null) : null,
+    morningChallengeLevel: persisted.morningCheckinDate === todayISO() ? (persisted.morningChallengeLevel ?? null) : null,
+    morningCheckinDate: persisted.morningCheckinDate ?? null,
+    todayTasks: persisted.todayTasksDate === todayISO() ? (persisted.todayTasks ?? []) : [],
+    todayTasksDate: persisted.todayTasksDate ?? null,
+    recurringTasks: persisted.recurringTasks ?? [],
+    todayDayMessage: persisted.todayTasksDate === todayISO() ? (persisted.todayDayMessage ?? null) : null,
+    todayAdaptationNote: persisted.todayTasksDate === todayISO() ? (persisted.todayAdaptationNote ?? null) : null,
+
+    // Gap closure scoring
+    dailyScores: persisted.dailyScores ?? {},
+    journalDates: persisted.journalDates ?? {},
 
     setIdentityComplete: (v) => set({ identityComplete: v }),
 
@@ -467,8 +631,11 @@ export const usePlanStore = create<PlanState>((set, get) => {
     setDailyStatus: (s) => set({ dailyStatus: s }),
 
     incrementStreak: () => {
-      const next = get().streak + 1;
       const today = todayISO();
+      // Idempotent: only increment once per day
+      if (get().lastCompletedDate === today) return;
+
+      const next = get().streak + 1;
       const newBest = Math.max(get().bestStreak, next);
       const SHIELD_MILESTONES = [7, 14, 30];
       const newShields = SHIELD_MILESTONES.includes(next)
@@ -476,6 +643,13 @@ export const usePlanStore = create<PlanState>((set, get) => {
         : get().streakShields;
       setPersisted({ streak: next, lastCompletedDate: today, bestStreak: newBest, streakShields: newShields });
       set({ streak: next, lastCompletedDate: today, bestStreak: newBest, streakShields: newShields });
+      // Persist to server immediately
+      void get().syncToServer();
+    },
+
+    recordDailyVisit: () => {
+      // Opening the app on a new day maintains the streak
+      get().incrementStreak();
     },
 
     useStreakShield: () => {
@@ -616,7 +790,7 @@ export const usePlanStore = create<PlanState>((set, get) => {
       const today = todayISO();
       setPersisted({ todayStatus: status, todayStatusDate: today });
       set({ todayStatus: status, todayStatusDate: today });
-      // Track weekly completion when user marks "done"
+      // Track weekly completion and increment streak when user marks "done"
       if (status === "done") {
         const current = get().weeklyCompletions;
         const updated = { ...current, [today]: true };
@@ -624,6 +798,11 @@ export const usePlanStore = create<PlanState>((set, get) => {
         const newBest = Math.max(get().weeklyBest, count);
         setPersisted({ weeklyCompletions: updated, weeklyBest: newBest });
         set({ weeklyCompletions: updated, weeklyBest: newBest });
+
+        // Increment streak if not already incremented today
+        if (get().lastCompletedDate !== today) {
+          get().incrementStreak();
+        }
       }
     },
 
@@ -633,9 +812,155 @@ export const usePlanStore = create<PlanState>((set, get) => {
       set({ lastGiftDate: today, lastGiftType: giftType });
     },
 
+    setMultiSelectAnswer: (screenId, labels) => {
+      const current = get().multiSelectAnswers;
+      const next = { ...current, [screenId]: labels };
+      setPersisted({ multiSelectAnswers: next });
+      set({ multiSelectAnswers: next });
+    },
+
     exitPhoenixMode: () => {
       setPersisted({ phoenixDay: false, phoenixPriorStreak: 0, streakExpiredAt: null });
       set({ phoenixDay: false, phoenixPriorStreak: 0, streakExpiredAt: null });
+    },
+
+    recalculateAndPersistScore: () => {
+      const state = get();
+      const today = todayISO();
+      const taskHistory = state.taskHistory;
+
+      // Count today's tasks (keys like "2026-03-26:1")
+      const todayPrefix = today + ":";
+      let tasksDone = 0;
+      let taskCount = 0;
+      for (const key of Object.keys(taskHistory)) {
+        if (key.startsWith(todayPrefix)) {
+          taskCount++;
+          if (taskHistory[key]) tasksDone++;
+        }
+      }
+
+      // Count must-do tasks from today's generated tasks
+      const activeTasks = (state.todayTasks ?? []).filter((t) => !t.deferred);
+      const mustDoTasks = activeTasks.filter((t) => t.priority === "must-do");
+      const mustDoCount = mustDoTasks.length;
+      const mustDoDone = mustDoTasks.filter((t) => t.completed).length;
+
+      const journaledToday = !!(state.journalDates ?? {})[today];
+      const { entry, scores } = recordScoringAction(
+        state.dailyScores ?? {},
+        today,
+        state.todayStatus,
+        tasksDone,
+        taskCount,
+        journaledToday,
+        state.streak,
+        mustDoDone,
+        mustDoCount,
+      );
+      void entry;
+      const futureScore = computeFutureScore(scores);
+
+      setPersisted({ dailyScores: scores, futureScore });
+      set({ dailyScores: scores, futureScore });
+    },
+
+    // ─── Daily tasks actions ────────────────────────────────────────────────
+
+    setMorningCheckin: (energy, time, focus, challengeLevel) => {
+      const today = todayISO();
+      setPersisted({ morningEnergy: energy, morningTimeAvailable: time, morningFocus: focus, morningChallengeLevel: challengeLevel, morningCheckinDate: today });
+      set({ morningEnergy: energy, morningTimeAvailable: time, morningFocus: focus, morningChallengeLevel: challengeLevel, morningCheckinDate: today });
+    },
+
+    setTodayTasks: (tasks, dayMessage, adaptationNote) => {
+      const today = todayISO();
+      setPersisted({ todayTasks: tasks, todayTasksDate: today, todayDayMessage: dayMessage, todayAdaptationNote: adaptationNote });
+      set({ todayTasks: tasks, todayTasksDate: today, todayDayMessage: dayMessage, todayAdaptationNote: adaptationNote });
+      // Also sync task count into the old taskHistory for scoring compatibility
+      for (const t of tasks) {
+        const key = `${today}:${t.id}`;
+        const existing = get().taskHistory[key];
+        if (existing === undefined) {
+          get().setTaskCompletion(key, t.completed);
+        }
+      }
+    },
+
+    toggleDailyTask: (taskId) => {
+      const today = todayISO();
+      const tasks = get().todayTasks.map((t) =>
+        t.id === taskId ? { ...t, completed: !t.completed } : t,
+      );
+      setPersisted({ todayTasks: tasks });
+      set({ todayTasks: tasks });
+      // Sync to taskHistory for scoring
+      const task = tasks.find((t) => t.id === taskId);
+      if (task) {
+        get().setTaskCompletion(`${today}:${taskId}`, task.completed);
+      }
+      setTimeout(() => get().recalculateAndPersistScore(), 0);
+    },
+
+    deferDailyTask: (taskId) => {
+      const tasks = get().todayTasks.map((t) =>
+        t.id === taskId ? { ...t, deferred: true, completed: false } : t,
+      );
+      setPersisted({ todayTasks: tasks });
+      set({ todayTasks: tasks });
+      setTimeout(() => get().recalculateAndPersistScore(), 0);
+    },
+
+    addCustomDailyTask: (label, estimatedMinutes) => {
+      const today = todayISO();
+      const newTask: GeneratedTask = {
+        id: `custom-${Date.now()}`,
+        label,
+        description: "",
+        category: "custom",
+        estimatedMinutes,
+        priority: "should-do",
+        planStepRef: null,
+        source: "user",
+        completed: false,
+        deferred: false,
+      };
+      const tasks = [...get().todayTasks, newTask];
+      setPersisted({ todayTasks: tasks });
+      set({ todayTasks: tasks });
+      get().setTaskCompletion(`${today}:${newTask.id}`, false);
+      setTimeout(() => get().recalculateAndPersistScore(), 0);
+    },
+
+    swapDailyTask: (taskId, replacement) => {
+      const today = todayISO();
+      const tasks = get().todayTasks.map((t) =>
+        t.id === taskId ? { ...replacement, id: taskId } : t,
+      );
+      setPersisted({ todayTasks: tasks });
+      set({ todayTasks: tasks });
+      get().setTaskCompletion(`${today}:${taskId}`, false);
+    },
+
+    addRecurringTask: (task) => {
+      const tasks = [...get().recurringTasks, task];
+      setPersisted({ recurringTasks: tasks });
+      set({ recurringTasks: tasks });
+    },
+
+    removeRecurringTask: (taskId) => {
+      const tasks = get().recurringTasks.filter((t) => t.id !== taskId);
+      setPersisted({ recurringTasks: tasks });
+      set({ recurringTasks: tasks });
+    },
+
+    recordJournalEntry: () => {
+      const today = todayISO();
+      const updated = { ...(get().journalDates ?? {}), [today]: true };
+      setPersisted({ journalDates: updated });
+      set({ journalDates: updated });
+      // Recalculate score with journal bonus
+      get().recalculateAndPersistScore();
     },
 
     googleCalendarConnected: persisted.googleCalendarConnected ?? false,
@@ -648,6 +973,89 @@ export const usePlanStore = create<PlanState>((set, get) => {
     setMentalHealthData: (data) => {
       setPersisted(data);
       set(data);
+    },
+
+    // Plan refresh (living plan)
+    planLastRefreshedAt: persisted.planLastRefreshedAt ?? null,
+    planRefreshSummary: persisted.planRefreshSummary ?? null,
+    planRefreshSeen: persisted.planRefreshSeen ?? false,
+
+    setPlanRefreshed: (summary: string) => {
+      const now = new Date().toISOString();
+      setPersisted({ planLastRefreshedAt: now, planRefreshSummary: summary, planRefreshSeen: false });
+      set({ planLastRefreshedAt: now, planRefreshSummary: summary, planRefreshSeen: false });
+    },
+
+    dismissPlanRefresh: () => {
+      setPersisted({ planRefreshSeen: true });
+      set({ planRefreshSeen: true });
+    },
+
+    // Server sync
+    synced: false,
+
+    syncToServer: async () => {
+      try {
+        const state = get();
+        const res = await fetch("/api/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            streak: state.streak,
+            bestStreak: state.bestStreak,
+            streakShields: state.streakShields,
+            futureScore: state.futureScore,
+            lastCompletedDate: state.lastCompletedDate,
+            userName: state.userName,
+            archetype: state.dogArchetype,
+            ambitionType: state.ambitionType,
+            onboardingComplete: state.onboardingComplete,
+            quizData: {
+              quizGender: state.quizGender,
+              quizTimeline: state.quizTimeline,
+              quizCommitment: state.quizCommitment,
+              quizSchedule: state.quizSchedule,
+              quizObstacles: state.quizObstacles,
+              multiSelectAnswers: state.multiSelectAnswers,
+              moodRating: state.moodRating,
+              sleepQuality: state.sleepQuality,
+              stressLevel: state.stressLevel,
+              energyLevel: state.energyLevel,
+              quizPrimaryGoal: (state as unknown as MentalHealthFields).quizPrimaryGoal,
+              quizCurrentState: (state as unknown as MentalHealthFields).quizCurrentState,
+              quizVision: (state as unknown as MentalHealthFields).quizVision,
+              quizAgeGroup: (state as unknown as MentalHealthFields).quizAgeGroup,
+            },
+            planId: state.planId,
+            planStartDate: state.planStartDate,
+            goal: null,
+            intakeResponse: null,
+            pipelineOutput: null,
+          }),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        // Apply authoritative server state
+        const patch: Partial<Persisted> = {
+          streak: data.streak,
+          bestStreak: data.bestStreak,
+          streakShields: data.streakShields,
+          futureScore: data.futureScore,
+          lastCompletedDate: data.lastCompletedDate,
+          isPremium: data.isPremium,
+          trialStartedAt: data.trialStartedAt,
+        };
+        setPersisted(patch);
+        set({ ...patch, synced: true });
+      } catch {
+        // Sync failed silently — localStorage stays as fallback
+      }
+    },
+
+    hydrateFromServer: async () => {
+      // Only sync if we haven't already
+      if (get().synced) return;
+      await get().syncToServer();
     },
 
     setPipelinePlan: (plan) => {
@@ -720,6 +1128,19 @@ export const usePlanStore = create<PlanState>((set, get) => {
         phoenixDay: false,
         phoenixPriorStreak: 0,
         streakExpiredAt: null,
+        multiSelectAnswers: {},
+        dailyScores: {},
+        journalDates: {},
+        morningEnergy: null,
+        morningTimeAvailable: null,
+        morningFocus: null,
+        morningChallengeLevel: null,
+        morningCheckinDate: null,
+        todayTasks: [],
+        todayTasksDate: null,
+        recurringTasks: [],
+        todayDayMessage: null,
+        todayAdaptationNote: null,
       });
       if (typeof window !== "undefined") {
         localStorage.removeItem(PIPELINE_SESSION_KEY);

@@ -1,5 +1,5 @@
 {
-  "name": "future-you-app",
+  "name": "behavio-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "@base-ui/react": "^1.2.0",
     "@heroicons/react": "^2.2.0",
     "@mendable/firecrawl-js": "^4.15.4",
+    "@react-pdf/renderer": "^4.3.2",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.1",
     "class-variance-authority": "^0.7.1",

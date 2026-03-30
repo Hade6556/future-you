@@ -28,8 +28,8 @@ export function Sheet({ children, onClose }: SheetProps) {
     <motion.div
       data-testid="sheet"
       role="dialog"
-      aria-label="Future Me coaching"
-      className="fixed left-5 right-5 z-50 w-auto max-w-[420px] overflow-hidden rounded-xl border border-border bg-card p-6 shadow-[0_2px_8px_rgba(0,0,0,0.2)] md:left-1/2 md:right-auto md:w-full md:max-w-[520px] md:-translate-x-1/2 md:px-8 md:py-6 lg:max-w-[640px] lg:px-10"
+      aria-label="Behavio coaching"
+      className="app-fixed-phone-inset z-50 overflow-hidden rounded-xl border border-border bg-card p-6 shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
       style={{
         top: "clamp(12%, 18vh, 22%)",
       }}

@@ -1,12 +1,12 @@
 # SEO and discovery (ASO for web)
 
-For Future Me, **SEO is our App Store Optimization**: title and description are the main levers for organic discovery. This doc explains how we choose phrases and how to re-run research.
+For Behavio, **SEO is our App Store Optimization**: title and description are the main levers for organic discovery. This doc explains how we choose phrases and how to re-run research.
 
 ---
 
 ## Role of title and description
 
-- **Title** (and, when we have one, app store subtitle): Primary signal. Use high-intent, searchable phrases. Keep the brand name "Future Me" for recognition; add 1–2 clear benefit/keyword phrases.
+- **Title** (and, when we have one, app store subtitle): Primary signal. Use high-intent, searchable phrases. Keep the brand name "Behavio" for recognition; add 1–2 clear benefit/keyword phrases.
 - **Description**: One or two sentences that reinforce the title and add audience/use-case keywords. Used in search snippets and shares (OG/twitter).
 
 Same idea as Kyle Fowler’s ASO: 1–2 weeks of keyword research, then put the best phrases in title/subtitle; the payoff can last years with minimal ongoing work.
@@ -19,7 +19,7 @@ Same idea as Kyle Fowler’s ASO: 1–2 weeks of keyword research, then put the 
 - **Audience:** "entrepreneur, athlete, weight loss, creative, student, wellness" (ambition types we support).
 - **Action:** "discover your coaching style in 90 seconds", "build a daily habit streak" (outcomes we deliver).
 
-Current title: **Future Me – Daily Habit Coach & 90-Day Plan | Find Your Coaching Style**
+Current title: **Behavio – Daily Habit Coach & 90-Day Plan | Find Your Coaching Style**
 
 Current description: Your AI life coach for any ambition. Discover your coaching style in 90 seconds, get a personalized 90-day plan, and build a daily habit streak. Entrepreneur, athlete, weight loss, creative, student, wellness.
 

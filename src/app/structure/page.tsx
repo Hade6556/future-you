@@ -1,41 +1,40 @@
 "use client";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognitionInstance = any;
+
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { MicrophoneIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
 import type { AmbitionCategory } from "../state/planStore";
+import AmbitionMapOrbs from "../components/AmbitionMapOrbs";
+import CoachResponseCard from "../components/CoachResponseCard";
 
-const ORB_PALETTE = [
-  { gradient: "from-red-300 to-destructive",        glow: "var(--orb-glow-destructive)", dot: "bg-destructive" },
-  { gradient: "from-green-200 to-accent",            glow: "var(--orb-glow-success)",     dot: "bg-accent" },
-  { gradient: "from-accent-secondary/50 to-primary", glow: "var(--orb-glow-primary)",     dot: "bg-primary" },
-  { gradient: "from-amber-200 to-amber-500",         glow: "rgba(245,158,11,0.4)",         dot: "bg-amber-500" },
-  { gradient: "from-sky-200 to-sky-500",             glow: "rgba(14,165,233,0.4)",         dot: "bg-sky-500" },
-  { gradient: "from-pink-200 to-pink-500",           glow: "rgba(236,72,153,0.4)",         dot: "bg-pink-500" },
-  { gradient: "from-violet-200 to-violet-500",       glow: "rgba(139,92,246,0.4)",         dot: "bg-violet-500" },
-  { gradient: "from-orange-200 to-orange-500",       glow: "rgba(249,115,22,0.4)",         dot: "bg-orange-500" },
-];
+const LIME = "#C8FF00";
+const NAVY = "#060912";
+const TEXT_HI = "rgba(235,242,255,0.95)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
+const GLASS = "rgba(255,255,255,0.07)";
+const GLASS_BORDER = "rgba(255,255,255,0.14)";
 
-function diameterForPct(pct: number, maxPct: number) {
-  return Math.round((pct / Math.max(maxPct, 1)) * 90);
-}
-
-function getOrbPosition(i: number, total: number) {
-  const angle = (i / total) * 2 * Math.PI - Math.PI / 2;
-  return {
-    left: `${50 + 32 * Math.cos(angle)}%`,
-    top: `${50 + 28 * Math.sin(angle)}%`,
-  };
-}
+const FONT_HEADING: React.CSSProperties = {
+  fontFamily: "var(--font-barlow-condensed), sans-serif",
+  fontWeight: 900,
+  fontStyle: "italic",
+};
+const FONT_BODY: React.CSSProperties = {
+  fontFamily: "var(--font-apercu), sans-serif",
+};
+const FONT_MONO: React.CSSProperties = {
+  fontFamily: "var(--font-jetbrains-mono), monospace",
+};
 
 type RecordingState = "idle" | "recording" | "processing" | "done";
 
 export default function StructurePage() {
-
-  // Recording state machine
   const [recordingState, setRecordingState] = useState<RecordingState>("idle");
   const [recordingError, setRecordingError] = useState<string | null>(null);
   const [lang, setLang] = useState<"en-US" | "lt-LT">("en-US");
@@ -44,7 +43,7 @@ export default function StructurePage() {
   const [coachMessage, setCoachMessage] = useState<string | null>(null);
   const [coachActionItem, setCoachActionItem] = useState<string | null>(null);
   const [mapUpdated, setMapUpdated] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const accumulatedRef = useRef("");
   const manualStopRef = useRef(false);
 
@@ -55,7 +54,6 @@ export default function StructurePage() {
     );
   }, []);
 
-  // Zustand selectors
   const setLastReflection = usePlanStore((s) => s.setLastReflection);
   const dogArchetype = usePlanStore((s) => s.dogArchetype);
   const ambitionType = usePlanStore((s) => s.ambitionType);
@@ -74,7 +72,7 @@ export default function StructurePage() {
     manualStopRef.current = false;
     setRecordingError(null);
 
-    const recognition = new SR() as SpeechRecognition;
+    const recognition = new SR() as SpeechRecognitionInstance;
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = lang;
@@ -82,7 +80,7 @@ export default function StructurePage() {
 
     recognition.onstart = () => setRecordingState("recording");
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const t = event.results[i][0].transcript;
@@ -100,7 +98,6 @@ export default function StructurePage() {
       setInterimTranscript("");
       recognitionRef.current = null;
       if (manualStopRef.current) {
-        // User tapped stop — all onresult events have now fired, safe to read
         manualStopRef.current = false;
         const transcript = accumulatedRef.current.trim();
         accumulatedRef.current = "";
@@ -114,7 +111,7 @@ export default function StructurePage() {
       }
     };
 
-    recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (e: any) => {
       if (e.error === "aborted") return;
       if (e.error === "no-speech") {
         setRecordingError("No speech detected. Tap Retry to try again.");
@@ -133,9 +130,6 @@ export default function StructurePage() {
   function stopListening() {
     manualStopRef.current = true;
     recognitionRef.current?.stop();
-    // Don't read accumulatedRef here — the browser fires one more onresult
-    // to finalize pending interim speech after stop(). We read it in onend
-    // which is guaranteed to fire after all onresult events.
   }
 
   async function processTranscript(rawTranscript: string) {
@@ -143,7 +137,6 @@ export default function StructurePage() {
     setFinalTranscript(rawTranscript);
     setRecordingError(null);
 
-    // Step 1: Rewrite (sequential — both parallel calls need the cleaned text)
     let cleaned = rawTranscript;
     try {
       const res = await fetch("/api/rewrite", {
@@ -159,7 +152,6 @@ export default function StructurePage() {
     setFinalTranscript(cleaned);
     setLastReflection(cleaned);
 
-    // Step 2: analyze + coach in parallel
     const [analyzeResult, coachResult] = await Promise.allSettled([
       fetch("/api/analyze-dump", {
         method: "POST",
@@ -177,7 +169,6 @@ export default function StructurePage() {
       }).then((r) => r.json() as Promise<{ message: string; actionItem?: string | null; sentiment?: string }>),
     ]);
 
-    // Apply categories if analyze succeeded
     console.log("[analyze-dump] status:", analyzeResult.status, "categories:", analyzeResult.status === "fulfilled" ? analyzeResult.value.categories : analyzeResult);
     if (analyzeResult.status === "fulfilled" && analyzeResult.value.categories?.length) {
       setAmbitionCategories(
@@ -193,7 +184,6 @@ export default function StructurePage() {
       setMapUpdated(false);
     }
 
-    // Extract coach result
     let coachMsg = "Reflection saved. Coach is unavailable right now.";
     let coachAction: string | null = null;
     let sentiment: "positive" | "neutral" | "negative" = "neutral";
@@ -203,7 +193,6 @@ export default function StructurePage() {
       sentiment = (coachResult.value.sentiment as typeof sentiment) ?? "neutral";
     }
 
-    // Step 3: Save locally
     try {
       await fetch("/api/brain-dumps", {
         method: "POST",
@@ -212,7 +201,6 @@ export default function StructurePage() {
       });
     } catch { /* non-blocking */ }
 
-    // Step 4: Increment streak
     incrementStreak();
 
     setCoachMessage(coachMsg);
@@ -230,101 +218,94 @@ export default function StructurePage() {
     setMapUpdated(false);
   }
 
+  const cardStyle: React.CSSProperties = {
+    background: GLASS,
+    border: "1px solid " + GLASS_BORDER,
+    borderRadius: 20,
+    backdropFilter: "blur(16px)",
+    WebkitBackdropFilter: "blur(16px)",
+  };
+
   return (
-    <div className="content-padding relative flex min-h-dvh flex-col bg-background pb-36 pt-[max(3.5rem,env(safe-area-inset-top,3.5rem))]">
-      <div className="section-gap mx-auto flex w-full max-w-md flex-col min-w-0">
+    <div style={{ minHeight: "100dvh", background: NAVY, position: "relative", overflow: "hidden" }}>
+      {/* Background mesh */}
+      <div aria-hidden style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        background: "radial-gradient(ellipse 80% 55% at 50% -5%, rgba(50,90,220,0.38) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 90% 90%, rgba(15,40,110,0.40) 0%, transparent 55%), linear-gradient(170deg, #0d1a3a 0%, #060912 55%)",
+        pointerEvents: "none",
+      }} />
+      {/* Grid overlay */}
+      <div aria-hidden style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+        backgroundSize: "48px 48px", pointerEvents: "none",
+      }} />
+
+      <div style={{
+        position: "relative", zIndex: 1,
+        display: "flex", flexDirection: "column", gap: 20,
+        width: "100%", maxWidth: 448, margin: "0 auto", minWidth: 0,
+        padding: "max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2.75rem)) 24px 160px",
+      }}>
         {/* Header */}
         <header>
-          <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-tight text-foreground">
+          <h1 style={{
+            ...FONT_HEADING,
+            fontSize: 46, lineHeight: 0.92, letterSpacing: "-0.03em",
+            color: TEXT_HI, margin: 0,
+          }}>
             Your ambition map
           </h1>
-          <p className="mt-2 text-[15px] font-normal leading-relaxed text-muted-foreground">
+          <p style={{
+            ...FONT_BODY,
+            fontSize: 15, lineHeight: 1.6, color: TEXT_MID,
+            marginTop: 8, marginBottom: 0,
+          }}>
             We adjust focus every week based on your inputs.
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Updated today</p>
+          <p style={{
+            ...FONT_MONO,
+            fontSize: 12, color: TEXT_LO,
+            marginTop: 4, marginBottom: 0,
+          }}>
+            Updated today
+          </p>
         </header>
 
-        {/* Hero card */}
-        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card px-6 py-8" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
-          <div className="relative mx-auto flex aspect-square max-h-[280px] w-full max-w-full items-center justify-center">
-            <div
-              className="absolute inset-0 opacity-40"
-              style={{
-                backgroundImage: `
-                  linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-                  linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)
-                `,
-                backgroundSize: "20px 20px",
-              }}
-              aria-hidden
-            />
-            {ambitionCategories.length > 0 ? (() => {
-              const maxPct = Math.max(...ambitionCategories.map((c) => c.pct));
-              return ambitionCategories.map((cat, i) => {
-                const d = diameterForPct(cat.pct, maxPct);
-                const pos = getOrbPosition(i, ambitionCategories.length);
-                const palette = ORB_PALETTE[i % ORB_PALETTE.length];
-                const delta = cat.pct - cat.prevPct;
-                const deltaLabel = delta > 0 ? `+${delta}%` : delta < 0 ? `${delta}%` : "—";
-                return (
-                  <div
-                    key={cat.label}
-                    className="absolute flex flex-col items-center justify-center"
-                    style={{ width: d, height: d, transform: "translate(-50%, -50%)", ...pos }}
-                  >
-                    <div
-                      className={`relative h-full w-full rounded-full bg-gradient-to-br ${palette.gradient} shadow-lg`}
-                      style={{ boxShadow: `0 0 40px ${palette.glow}` }}
-                    />
-                    <span className="mt-1.5 text-center text-xs font-medium text-text-primary drop-shadow-sm">
-                      {cat.shortLabel} {cat.pct}%
-                    </span>
-                    <span className="mt-0.5 text-[10px] font-medium text-accent-cool">
-                      {deltaLabel} vs last
-                    </span>
-                  </div>
-                );
-              });
-            })() : (
-              <p className="text-xs text-text-secondary text-center px-4">
-                Record a brain dump to populate your map
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Legend */}
-        {ambitionCategories.length > 0 && (
-          <div className="block-gap flex flex-col">
-            {ambitionCategories.map((cat, i) => (
-              <div key={cat.label} className="flex items-baseline gap-4">
-                <div className={`h-5 w-5 shrink-0 rounded-full ${ORB_PALETTE[i % ORB_PALETTE.length].dot}`} />
-                <span className="text-[15px] text-text-primary">
-                  {cat.label} <strong className="font-semibold">{cat.pct}%</strong>
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
+        {/* Ambition map orbs + legend */}
+        <AmbitionMapOrbs categories={ambitionCategories} />
 
         {/* Voice reflection section */}
-        <div className="block-gap flex flex-col items-center gap-4">
+        <div style={{
+          ...cardStyle,
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
+          padding: "20px 16px", marginBottom: 24,
+          boxShadow: "0 8px 28px rgba(0,0,0,0.35)",
+        }}>
           {speechSupported ? (
             <>
-              {/* Language toggle — always visible */}
-              <div className="flex rounded-full border border-border bg-card p-0.5 text-xs font-medium">
+              {/* Language toggle */}
+              <div style={{
+                display: "flex", borderRadius: 999,
+                background: GLASS, border: "1px solid " + GLASS_BORDER,
+                padding: 2, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+              }}>
                 {(["en-US", "lt-LT"] as const).map((l) => (
                   <button
                     key={l}
                     type="button"
                     onClick={() => setLang(l)}
                     disabled={recordingState === "processing"}
-                    className={`rounded-full px-3 py-1 transition-colors disabled:opacity-40 ${
-                      lang === l
-                        ? "bg-primary text-primary-foreground"
-                        : "text-text-secondary hover:text-text-primary"
-                    }`}
+                    style={{
+                      ...FONT_BODY,
+                      border: "none", cursor: "pointer",
+                      borderRadius: 999, padding: "4px 12px",
+                      fontSize: 12, fontWeight: 500,
+                      background: lang === l ? LIME : "transparent",
+                      color: lang === l ? NAVY : TEXT_MID,
+                      opacity: recordingState === "processing" ? 0.4 : 1,
+                      transition: "background 0.15s, color 0.15s",
+                    }}
                   >
                     {l === "en-US" ? "EN" : "LT"}
                   </button>
@@ -332,7 +313,7 @@ export default function StructurePage() {
               </div>
 
               {/* Mic button */}
-              <div className="flex flex-col items-center gap-2">
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
                 <button
                   type="button"
                   disabled={recordingState === "processing"}
@@ -340,16 +321,22 @@ export default function StructurePage() {
                     if (recordingState === "recording") stopListening();
                     else if (recordingState !== "processing") startListening();
                   }}
-                  className={`flex h-[88px] w-[88px] min-w-[88px] items-center justify-center rounded-full shadow-lg transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-                    recordingState === "recording"
-                      ? "animate-mic-pulse"
-                      : recordingState === "processing"
-                      ? "bg-muted"
-                      : "hover:scale-105 active:scale-95"
-                  }`}
+                  className={recordingState === "recording" ? "animate-mic-pulse" : undefined}
                   style={{
-                    background: recordingState === "recording" ? "var(--destructive)" : recordingState === "processing" ? undefined : "var(--accent-primary)",
-                    boxShadow: recordingState === "recording" ? "0 0 0 4px rgba(232,98,42,0.25)" : "0 4px 16px rgba(232,98,42,0.35)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    width: 78, height: 78, minWidth: 78, borderRadius: "50%",
+                    border: "none", cursor: recordingState === "processing" ? "not-allowed" : "pointer",
+                    opacity: recordingState === "processing" ? 0.5 : 1,
+                    background: recordingState === "recording"
+                      ? "#FF4444"
+                      : recordingState === "processing"
+                      ? "rgba(255,255,255,0.12)"
+                      : LIME,
+                    boxShadow: recordingState === "recording"
+                      ? "0 0 0 4px rgba(255,68,68,0.25)"
+                      : `0 4px 24px rgba(200,255,0,0.35)`,
+                    color: recordingState === "recording" ? "#fff" : NAVY,
+                    transition: "transform 0.15s, background 0.15s",
                   }}
                   aria-label={
                     recordingState === "recording" ? "Stop recording" :
@@ -358,15 +345,18 @@ export default function StructurePage() {
                   }
                 >
                   {recordingState === "processing" ? (
-                    <svg className="h-8 w-8 animate-spin text-white" fill="none" viewBox="0 0 24 24" aria-hidden>
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    <svg style={{ width: 32, height: 32, animation: "spin 1s linear infinite", color: "#fff" }} fill="none" viewBox="0 0 24 24" aria-hidden>
+                      <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                     </svg>
                   ) : (
-                    <MicrophoneIcon className="h-10 w-10 text-white" aria-hidden />
+                    <MicrophoneIcon style={{ width: 32, height: 32 }} aria-hidden />
                   )}
                 </button>
-                <span className="text-sm font-medium text-text-primary">
+                <span style={{
+                  ...FONT_HEADING,
+                  fontSize: 14, fontWeight: 700, color: TEXT_HI,
+                }}>
                   {recordingState === "recording" ? "Tap to stop" :
                    recordingState === "processing" ? "Saving reflection…" :
                    recordingState === "done" ? "Reflection saved" :
@@ -374,15 +364,25 @@ export default function StructurePage() {
                 </span>
               </div>
 
-              {/* Prompt chips — only when idle */}
+              {/* Prompt chips */}
               {recordingState === "idle" && (
-                <div className="flex flex-wrap justify-center gap-2" aria-label="Quick reflection prompts">
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }} aria-label="Quick reflection prompts">
                   {["What went well?", "What's blocking me?", "Rebalance focus"].map((chip) => (
                     <button
                       key={chip}
                       type="button"
                       onClick={() => startListening()}
-                      className="touch-target rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:border-primary/40 hover:bg-secondary/50 active:scale-[0.97]"
+                      style={{
+                        ...FONT_BODY,
+                        background: GLASS,
+                        border: "1px solid " + GLASS_BORDER,
+                        color: TEXT_MID,
+                        borderRadius: 999,
+                        padding: "6px 12px",
+                        fontSize: 12, fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "background 0.15s, border-color 0.15s",
+                      }}
                     >
                       {chip}
                     </button>
@@ -398,16 +398,30 @@ export default function StructurePage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
                     transition={{ duration: 0.2 }}
-                    className="flex w-full items-center justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3"
+                    style={{
+                      display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between", gap: 12,
+                      borderRadius: 12, padding: "12px 16px",
+                      border: "1px solid rgba(255,68,68,0.4)",
+                      background: "rgba(255,68,68,0.1)",
+                    }}
                   >
-                    <p className="flex-1 text-[13px] font-medium text-destructive">{recordingError}</p>
+                    <p style={{ ...FONT_BODY, flex: 1, fontSize: 13, fontWeight: 500, color: "#FF6B6B", margin: 0 }}>
+                      {recordingError}
+                    </p>
                     <button
                       type="button"
                       onClick={() => {
                         setRecordingError(null);
                         setRecordingState("idle");
                       }}
-                      className="touch-target shrink-0 rounded-full border border-destructive/40 px-3 py-1 text-xs font-semibold text-destructive"
+                      style={{
+                        ...FONT_BODY,
+                        flexShrink: 0, borderRadius: 999,
+                        border: "1px solid rgba(255,68,68,0.4)",
+                        background: "transparent",
+                        padding: "4px 12px", fontSize: 12, fontWeight: 600,
+                        color: "#FF6B6B", cursor: "pointer",
+                      }}
                     >
                       Retry
                     </button>
@@ -421,44 +435,36 @@ export default function StructurePage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25 }}
-                  className="flex w-full flex-col gap-3"
+                  style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}
                 >
                   {(interimTranscript || finalTranscript) && (
-                    <div className="rounded-xl border border-border bg-card px-4 py-3">
-                      <p className="mb-1 text-[13px] font-medium text-text-secondary">Your reflection</p>
-                      <p className="text-[15px] leading-relaxed text-text-primary">
+                    <div style={{
+                      borderRadius: 12, padding: "12px 16px",
+                      background: GLASS, border: "1px solid " + GLASS_BORDER,
+                    }}>
+                      <p style={{ ...FONT_BODY, fontSize: 13, fontWeight: 500, color: TEXT_MID, margin: "0 0 4px" }}>
+                        Your reflection
+                      </p>
+                      <p style={{ ...FONT_BODY, fontSize: 15, lineHeight: 1.6, color: TEXT_HI, margin: 0 }}>
                         {finalTranscript || interimTranscript}
                         {recordingState === "recording" && !finalTranscript && (
-                          <span className="animate-pulse ml-0.5 inline-block h-[1em] w-px bg-primary align-text-bottom" />
+                          <span style={{
+                            display: "inline-block", width: 1, height: "1em",
+                            background: LIME, marginLeft: 2,
+                            verticalAlign: "text-bottom",
+                            animation: "pulse 1s ease-in-out infinite",
+                          }} />
                         )}
                       </p>
                     </div>
                   )}
 
                   {recordingState === "done" && coachMessage && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1, duration: 0.25 }}
-                      className="flex items-start gap-3 rounded-xl border border-border bg-card px-4 py-3"
-                    >
-                      <div className="relative h-[40px] w-[32px] shrink-0">
-                        <Image src="/orb-thinking.png" alt="" fill className="object-contain object-bottom" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="mb-1 text-[13px] font-medium text-text-secondary">Future Me</p>
-                        <p className="text-[14px] leading-relaxed text-text-primary">{coachMessage}</p>
-                        {coachActionItem && (
-                          <p className="mt-2 border-t border-border pt-2 text-[12px] text-accent-cool">
-                            → {coachActionItem}
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
+                    <CoachResponseCard message={coachMessage} actionItem={coachActionItem} />
                   )}
 
                   {recordingState === "done" && (
-                    <p className="text-center text-xs text-muted-foreground">
+                    <p style={{ ...FONT_BODY, textAlign: "center", fontSize: 12, color: TEXT_LO, margin: 0 }}>
                       {mapUpdated
                         ? "↑ Ambition map updated"
                         : "Map couldn't be updated — try a longer reflection"}
@@ -469,7 +475,13 @@ export default function StructurePage() {
                     <button
                       type="button"
                       onClick={resetRecording}
-                      className="touch-target self-center py-2 text-sm font-medium text-text-secondary underline underline-offset-2"
+                      style={{
+                        ...FONT_BODY,
+                        alignSelf: "center", padding: "8px 0",
+                        background: "transparent", border: "none", cursor: "pointer",
+                        fontSize: 14, fontWeight: 500, color: TEXT_MID,
+                        textDecoration: "underline", textUnderlineOffset: 2,
+                      }}
                     >
                       Record again
                     </button>
@@ -479,38 +491,51 @@ export default function StructurePage() {
             </>
           ) : (
             /* Fallback for browsers without Web Speech API */
-            <div className="flex w-full flex-col gap-3">
-              <p className="text-center text-xs text-muted-foreground">
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
+              <p style={{ ...FONT_BODY, textAlign: "center", fontSize: 12, color: TEXT_LO, margin: 0 }}>
                 Voice recording isn&apos;t supported in this browser. Type your reflection below.
               </p>
               <textarea
                 placeholder="What's on your mind?"
-                className="w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-[15px] text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                 rows={3}
                 value={finalTranscript}
                 onChange={(e) => setFinalTranscript(e.target.value)}
+                style={{
+                  ...FONT_BODY,
+                  width: "100%", resize: "none", borderRadius: 12,
+                  background: GLASS, border: "1px solid " + GLASS_BORDER,
+                  padding: "12px 16px", fontSize: 15, color: TEXT_HI,
+                  outline: "none", boxSizing: "border-box",
+                }}
               />
               {recordingState === "done" && coachMessage && (
-                <div className="flex items-start gap-3 rounded-xl border border-border bg-card px-4 py-3">
-                  <div className="relative h-[40px] w-[32px] shrink-0">
-                    <Image src="/orb-thinking.png" alt="" fill className="object-contain object-bottom" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="mb-1 text-[13px] font-medium text-text-secondary">Future Me</p>
-                    <p className="text-[14px] leading-relaxed text-text-primary">{coachMessage}</p>
-                  </div>
-                </div>
+                <CoachResponseCard message={coachMessage} />
               )}
               <button
                 type="button"
                 disabled={!finalTranscript.trim() || recordingState === "processing"}
                 onClick={() => void processTranscript(finalTranscript.trim())}
-                className="touch-target rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40"
+                style={{
+                  ...FONT_BODY,
+                  borderRadius: 999, border: "none", cursor: "pointer",
+                  background: LIME, color: NAVY,
+                  padding: "12px 24px", fontSize: 14, fontWeight: 600,
+                  opacity: (!finalTranscript.trim() || recordingState === "processing") ? 0.4 : 1,
+                }}
               >
                 {recordingState === "processing" ? "Saving…" : recordingState === "done" ? "Saved ✓" : "Submit reflection"}
               </button>
               {recordingState === "done" && (
-                <button type="button" onClick={resetRecording} className="self-center text-xs font-medium text-text-secondary underline underline-offset-2">
+                <button
+                  type="button"
+                  onClick={resetRecording}
+                  style={{
+                    ...FONT_BODY,
+                    alignSelf: "center", background: "transparent", border: "none", cursor: "pointer",
+                    fontSize: 12, fontWeight: 500, color: TEXT_MID,
+                    textDecoration: "underline", textUnderlineOffset: 2,
+                  }}
+                >
                   Write another
                 </button>
               )}
@@ -521,10 +546,15 @@ export default function StructurePage() {
         {/* Link to journal */}
         <Link
           href="/journal"
-          className="self-center text-xs font-medium text-text-secondary underline underline-offset-2"
+          style={{
+            ...FONT_BODY,
+            alignSelf: "center", fontSize: 12, fontWeight: 500, color: TEXT_MID,
+            textDecoration: "underline", textUnderlineOffset: 2,
+          }}
         >
           View brain dumps →
         </Link>
+        <div aria-hidden style={{ height: 80 }} />
       </div>
     </div>
   );

@@ -91,7 +91,7 @@ export function NorthStarPanel() {
               aria-label="Close assistant"
             />
             {/* Demoted orb: compact progress accent in header */}
-            <div className="pointer-events-none fixed inset-x-0 top-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))] z-50 flex flex-col items-center px-5">
+            <div className="app-fixed-phone pointer-events-none top-[max(2.5rem,calc(env(safe-area-inset-top)+1rem))] z-50 flex flex-col items-center px-5">
               <div className="pointer-events-auto">
                 <CommandRosette isOpen onClick={close} scale={0.75} />
               </div>
