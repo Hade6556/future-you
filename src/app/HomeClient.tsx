@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { usePlanStore, todayISO } from "./state/planStore";
-import { PaywallSheet } from "./components/paywall/PaywallSheet";
+
 import { AppTour } from "./components/AppTour";
 import { computeDayInfo } from "./utils/dayEngine";
 import { HookScreen } from "./components/home/HookScreen";
@@ -15,7 +15,6 @@ import { PlanUpdatedCard } from "./components/home/PlanUpdatedCard";
 import { StreakMomentumCard } from "./components/home/StreakMomentumCard";
 import { MilestoneCard } from "./components/home/MilestoneCard";
 
-const SESSION_PAYWALL_KEY = "behavio-paywall-last-date";
 
 function formatHeaderDate(): string {
   return new Date().toLocaleDateString("en-US", {
@@ -54,7 +53,6 @@ export default function HomeClient() {
   const toggleDailyTask      = usePlanStore((s) => s.toggleDailyTask);
   const journalDates         = usePlanStore((s) => s.journalDates);
 
-  const [sessionPaywallOpen, setSessionPaywallOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const dayInfo = useMemo(
@@ -77,24 +75,6 @@ export default function HomeClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizComplete, onboardingComplete]);
 
-  // Show paywall sheet for non-premium users once per session/day
-  useEffect(() => {
-    if (isPremium || !onboardingComplete) return;
-    try {
-      const last = sessionStorage.getItem(SESSION_PAYWALL_KEY);
-      const today = new Date().toISOString().slice(0, 10);
-      if (last === today) return;
-    } catch { /* ignore */ }
-    const timer = setTimeout(() => setSessionPaywallOpen(true), 1200);
-    return () => clearTimeout(timer);
-  }, [isPremium, onboardingComplete]);
-
-  const handleSessionPaywallClose = () => {
-    setSessionPaywallOpen(false);
-    try {
-      sessionStorage.setItem(SESSION_PAYWALL_KEY, new Date().toISOString().slice(0, 10));
-    } catch { /* ignore */ }
-  };
 
   if (!quizComplete) return <HookScreen />;
   if (!onboardingComplete) return null;
@@ -718,11 +698,6 @@ export default function HomeClient() {
         <AppTour onDismiss={setAppTourSeen} />
       )}
 
-      <PaywallSheet
-        open={sessionPaywallOpen}
-        onClose={handleSessionPaywallClose}
-        variant="session"
-      />
     </div>
   );
 }
