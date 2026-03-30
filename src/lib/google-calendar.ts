@@ -28,6 +28,7 @@ export type StoredTokens = {
   expiry_date: number | null;
   token_type: string;
   scope: string;
+  id_token?: string | null;
 };
 
 export function buildAuthenticatedClient(tokens: StoredTokens) {

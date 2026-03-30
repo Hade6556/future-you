@@ -920,6 +920,7 @@ export const usePlanStore = create<PlanState>((set, get) => {
         category: "custom",
         estimatedMinutes,
         priority: "should-do",
+        intensity: "routine",
         planStepRef: null,
         source: "user",
         completed: false,
