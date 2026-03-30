@@ -38,7 +38,7 @@ export function MissionCard() {
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Ccircle cx='10' cy='10' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3Ccircle cx='28' cy='10' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3Ccircle cx='19' cy='24' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3C/svg%3E")`,
           backgroundRepeat: "repeat",
           backgroundSize: "38px 38px",
-          boxShadow: "0 16px 32px rgba(75,52,37,0.10)",
+          boxShadow: "0 16px 32px rgba(0,0,0,0.25)",
         }}
       >
         {/* Icon — smiley (done) or target (pending) */}

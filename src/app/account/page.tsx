@@ -12,7 +12,7 @@ const TEXT_MID = "rgba(120,155,195,0.75)";
 const TEXT_LO = "rgba(120,155,195,0.40)";
 const GLASS = "rgba(255,255,255,0.07)";
 const GLASS_BORDER = "rgba(255,255,255,0.14)";
-const DANGER = "#FF4444";
+const DANGER = "#FF5555";
 
 const heading: CSSProperties = {
   fontFamily: "var(--font-barlow-condensed), sans-serif",

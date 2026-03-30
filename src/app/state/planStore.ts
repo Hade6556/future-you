@@ -1054,8 +1054,6 @@ export const usePlanStore = create<PlanState>((set, get) => {
     },
 
     hydrateFromServer: async () => {
-      // Only sync if we haven't already
-      if (get().synced) return;
       await get().syncToServer();
     },
 

@@ -6,7 +6,7 @@ export default function DarkLoader() {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6"
-      style={{ background: "#1F160F" }}
+      style={{ background: "#0A1628" }}
     >
       <OrbAvatar emotion="thinking" size={80} />
       <div className="flex gap-2">
@@ -14,7 +14,7 @@ export default function DarkLoader() {
           <span
             key={i}
             className="h-2.5 w-2.5 rounded-full animate-pulse"
-            style={{ background: "#EEEAF6", animationDelay: `${i * 200}ms` }}
+            style={{ background: "#C8FF00", animationDelay: `${i * 200}ms` }}
           />
         ))}
       </div>

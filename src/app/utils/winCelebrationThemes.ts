@@ -47,7 +47,7 @@ const FILL_ORDER: DomainKey[] = [
 
 export const WIN_CELEBRATION_BASELINE = {
   label: "Without program",
-  color: "#FF4444",
+  color: "#FF5555",
   emoji: "",
   points: [0.25, 0.27, 0.24, 0.22, 0.2] as const,
 };

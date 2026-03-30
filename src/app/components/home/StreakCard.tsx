@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
 
 const MILESTONES = [5, 7, 14, 30];
-const CONFETTI_COLORS = ["#7B6BA8", "#FFCE5C", "#9BB068", "#A28FFF", "#BDA193", "#ffffff"];
+const CONFETTI_COLORS = ["#C8FF00", "#2DD4C0", "#4CAF7D", "#A28FFF", "#F5A623", "#ffffff"];
 
 function getStreakCopy(streak: number): string {
   if (streak >= 30) return "legendary 🏆";
@@ -70,7 +70,7 @@ export function StreakCard() {
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Ccircle cx='19' cy='8' r='5' fill='rgba(255,255,255,0.13)'/%3E%3Ccircle cx='8' cy='19' r='5' fill='rgba(255,255,255,0.13)'/%3E%3Ccircle cx='19' cy='30' r='5' fill='rgba(255,255,255,0.13)'/%3E%3Ccircle cx='30' cy='19' r='5' fill='rgba(255,255,255,0.13)'/%3E%3C/svg%3E")`,
           backgroundRepeat: "repeat",
           backgroundSize: "38px 38px",
-          boxShadow: "0 16px 32px rgba(75,52,37,0.10)",
+          boxShadow: "0 16px 32px rgba(0,0,0,0.25)",
           overflow: "visible",
         }}
       >
@@ -97,14 +97,12 @@ export function StreakCard() {
           ))}
         </AnimatePresence>
 
-        {/* Icon */}
+        {/* Fire icon */}
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
-            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-            stroke="white"
-            strokeWidth="1.8"
-            strokeLinejoin="round"
-            fill="none"
+            d="M12 23c-4.5 0-7-3.2-7-6.8 0-3.3 2.3-5.8 4.2-7.8.4-.4 1.1-.1 1 .5-.3 1.5.1 3 1.2 3.8.1-.05.2-.15.15-.25-.5-2.8.8-5.8 2.5-7.8.3-.4.9-.3 1 .2.5 2.3 2 3.8 3.2 5.2 1.3 1.5 2.7 3.2 2.7 6.2C21 19.8 16.5 23 12 23z"
+            fill="white"
+            opacity="0.9"
           />
         </svg>
 

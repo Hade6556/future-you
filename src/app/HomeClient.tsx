@@ -68,15 +68,14 @@ export default function HomeClient() {
     }
   }, [quizComplete, onboardingComplete, router]);
 
-  // Sync state with server on mount (hydrates premium, streak, etc.)
-  // Then record the daily visit to maintain/increment streak
+  // Record daily visit first (uses local state), then sync with server
   useEffect(() => {
     if (quizComplete && onboardingComplete) {
-      hydrateFromServer().then(() => {
-        recordDailyVisit();
-      });
+      recordDailyVisit();     // increment streak from local state immediately
+      hydrateFromServer();    // sync with server in background
     }
-  }, [quizComplete, onboardingComplete, hydrateFromServer, recordDailyVisit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizComplete, onboardingComplete]);
 
   // Show paywall sheet for non-premium users once per session/day
   useEffect(() => {
@@ -240,35 +239,76 @@ export default function HomeClient() {
                   <defs>
                     <radialGradient id="fireGlow" cx="50%" cy="60%" r="50%">
                       <stop offset="0%" stopColor="#C8FF00" stopOpacity="0.6">
-                        <animate attributeName="stopOpacity" values="0.6;0.35;0.6" dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="stopOpacity" values="0.6;0.3;0.55;0.35;0.6" dur="2.5s" repeatCount="indefinite" />
+                      </stop>
+                      <stop offset="60%" stopColor="#D4FF33" stopOpacity="0.15">
+                        <animate attributeName="stopOpacity" values="0.15;0.25;0.1;0.2;0.15" dur="3s" repeatCount="indefinite" />
                       </stop>
                       <stop offset="100%" stopColor="#C8FF00" stopOpacity="0" />
                     </radialGradient>
                   </defs>
+                  {/* Outer glow — breathes in size */}
                   <ellipse cx="3.41" cy="3.6" rx="2.6" ry="3.4" fill="url(#fireGlow)" opacity="0.5">
-                    <animate attributeName="ry" values="3.4;3.8;3.4" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="ry" values="3.4;3.9;3.5;3.8;3.4" dur="2.5s" repeatCount="indefinite" />
+                    <animate attributeName="rx" values="2.6;2.9;2.5;2.8;2.6" dur="3s" repeatCount="indefinite" />
                   </ellipse>
+                  {/* Rising embers */}
+                  <circle cx="2.8" cy="2.5" r="0.18" fill="#C8FF00" opacity="0">
+                    <animate attributeName="cy" values="4;1;-0.5" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0;0.7;0" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values="2.8;2.5;2.3" dur="2s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="4.2" cy="3" r="0.14" fill="#E5FF66" opacity="0">
+                    <animate attributeName="cy" values="4.5;1.5;0" dur="2.4s" begin="0.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0;0.6;0" dur="2.4s" begin="0.8s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values="4.2;4.5;4.3" dur="2.4s" begin="0.8s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="3.4" cy="2" r="0.12" fill="#ffffff" opacity="0">
+                    <animate attributeName="cy" values="3.5;0.5;-1" dur="2.8s" begin="1.4s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0;0.5;0" dur="2.8s" begin="1.4s" repeatCount="indefinite" />
+                  </circle>
+                  {/* Main flame — breathe + sway */}
                   <g style={{ transformOrigin: "50% 100%" }}>
                     <animateTransform
                       attributeName="transform"
                       type="scale"
-                      values="1 0.96;1 1.04;1 0.96"
-                      dur="1.5s"
+                      values="1 0.96;1 1.05;1 0.97;1 1.03;1 0.96"
+                      dur="1.8s"
                       repeatCount="indefinite"
                     />
                     <g>
                       <animateTransform
                         attributeName="transform"
                         type="rotate"
-                        values="-1.5 3.41 8.53;1.5 3.41 8.53;-1.5 3.41 8.53"
-                        dur="3s"
+                        values="-1.5 3.41 8.53;2 3.41 8.53;-1 3.41 8.53;1.5 3.41 8.53;-1.5 3.41 8.53"
+                        dur="3.5s"
                         repeatCount="indefinite"
                       />
+                      {/* Outer flame */}
                       <path
                         fill="#C8FF00"
                         fillRule="nonzero"
                         d="M2.19418 3.43256c0.171654,-0.0729606 0.981992,-0.473524 0.849098,-2.51938 -0.00625984,-0.0520354 0.0595827,-0.0814291 0.0937795,-0.0407244 0.496264,0.657122 1.2477,1.61003 1.06698,2.50698 0.274827,-0.224244 0.391874,-0.799941 0.401764,-1.13351 -0.00287795,-0.0534961 0.0672795,-0.0776929 0.0975276,-0.0326496 0.53424,0.818642 0.91748,1.84963 0.38198,2.76904 -0.209594,0.359862 -0.530689,0.630732 -0.896654,0.797512 -0.36561,0.166614 -0.776244,0.229492 -1.16533,0.173524 -0.665236,-0.0956929 -1.26754,-0.536543 -1.47732,-1.39707 -0.0760354,-0.31189 -0.0864173,-0.670236 -0.00993701,-1.06974 0.0692165,-0.361551 0.20976,-0.757339 0.437453,-1.18343 0.0241772,-0.057378 0.112059,-0.0325827 0.101748,0.0294961 -0.0543543,0.270772 -0.0887835,0.911571 0.118909,1.09996z"
                       />
+                      {/* Inner flame — brighter, slightly smaller, offset timing */}
+                      <g style={{ transformOrigin: "50% 100%" }}>
+                        <animateTransform
+                          attributeName="transform"
+                          type="scale"
+                          values="0.55 0.5;0.55 0.6;0.55 0.48;0.55 0.55;0.55 0.5"
+                          dur="1.4s"
+                          repeatCount="indefinite"
+                        />
+                        <path
+                          fill="#E5FF66"
+                          fillRule="nonzero"
+                          opacity="0.85"
+                          transform="translate(1.53, 3.2)"
+                          d="M2.19418 3.43256c0.171654,-0.0729606 0.981992,-0.473524 0.849098,-2.51938 -0.00625984,-0.0520354 0.0595827,-0.0814291 0.0937795,-0.0407244 0.496264,0.657122 1.2477,1.61003 1.06698,2.50698 0.274827,-0.224244 0.391874,-0.799941 0.401764,-1.13351 -0.00287795,-0.0534961 0.0672795,-0.0776929 0.0975276,-0.0326496 0.53424,0.818642 0.91748,1.84963 0.38198,2.76904 -0.209594,0.359862 -0.530689,0.630732 -0.896654,0.797512 -0.36561,0.166614 -0.776244,0.229492 -1.16533,0.173524 -0.665236,-0.0956929 -1.26754,-0.536543 -1.47732,-1.39707 -0.0760354,-0.31189 -0.0864173,-0.670236 -0.00993701,-1.06974 0.0692165,-0.361551 0.20976,-0.757339 0.437453,-1.18343 0.0241772,-0.057378 0.112059,-0.0325827 0.101748,0.0294961 -0.0543543,0.270772 -0.0887835,0.911571 0.118909,1.09996z"
+                        >
+                          <animate attributeName="opacity" values="0.85;0.6;0.9;0.65;0.85" dur="1.2s" repeatCount="indefinite" />
+                        </path>
+                      </g>
                     </g>
                   </g>
                 </svg>

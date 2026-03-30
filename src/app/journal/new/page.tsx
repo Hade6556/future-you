@@ -16,11 +16,11 @@ type Sentiment = "positive" | "neutral" | "negative";
 type PageState = "form" | "processing" | "done";
 
 const MOODS: { label: Mood; color: string; sentiment: Sentiment }[] = [
-  { label: "Calm",      color: "#9BB068", sentiment: "neutral"  },
+  { label: "Calm",      color: "#4CAF7D", sentiment: "neutral"  },
   { label: "Anxious",   color: "#A28FFF", sentiment: "negative" },
-  { label: "Energized", color: "#7B6BA8", sentiment: "positive" },
-  { label: "Sad",       color: "#BDA193", sentiment: "negative" },
-  { label: "Focused",   color: "#FFCE5C", sentiment: "positive" },
+  { label: "Energized", color: "#C8FF00", sentiment: "positive" },
+  { label: "Sad",       color: "rgba(120,155,195,0.55)", sentiment: "negative" },
+  { label: "Focused",   color: "#F5A623", sentiment: "positive" },
 ];
 
 const LIME = "#C8FF00";

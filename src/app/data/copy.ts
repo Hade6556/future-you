@@ -163,7 +163,6 @@ export const BRAND = {
   },
   paywall: {
     step1: {
-      headline: "Your plan is ready.",
       subtext: "Behavio built this. Now it needs you.",
       cta: "See what\u2019s included",
     },

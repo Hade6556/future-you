@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 
 const TEXT_HI = "rgba(235,242,255,0.95)";
@@ -25,15 +24,12 @@ export default function CoachResponseCard({ message, actionItem }: CoachResponse
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1, duration: 0.25 }}
       style={{
-        display: "flex", alignItems: "flex-start", gap: 12,
+        display: "flex", flexDirection: "column", alignItems: "stretch",
         borderRadius: 12, padding: "12px 16px",
         background: GLASS, border: "1px solid " + GLASS_BORDER,
       }}
     >
-      <div style={{ position: "relative", height: 40, width: 32, flexShrink: 0 }}>
-        <Image src="/orb-thinking.png" alt="" fill style={{ objectFit: "contain", objectPosition: "bottom" }} />
-      </div>
-      <div style={{ minWidth: 0, flex: 1 }}>
+      <div style={{ minWidth: 0 }}>
         <p style={{ ...FONT_BODY, fontSize: 13, fontWeight: 500, color: TEXT_MID, margin: "0 0 4px" }}>
           Behavio
         </p>

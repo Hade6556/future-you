@@ -36,7 +36,7 @@ export function PlanCard() {
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='34'%3E%3Ccircle cx='19' cy='4' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3Ccircle cx='6' cy='11' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3Ccircle cx='32' cy='11' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3Ccircle cx='6' cy='23' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3Ccircle cx='32' cy='23' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3Ccircle cx='19' cy='30' r='4.5' fill='rgba(255,255,255,0.11)'/%3E%3C/svg%3E")`,
           backgroundRepeat: "repeat",
           backgroundSize: "38px 34px",
-          boxShadow: "0 16px 32px rgba(75,52,37,0.10)",
+          boxShadow: "0 16px 32px rgba(0,0,0,0.25)",
         }}
       >
         {/* Header row */}

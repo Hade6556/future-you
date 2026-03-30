@@ -15,7 +15,7 @@ type Props = {
 const LIME = "#C8FF00";
 const NAVY = "#060912";
 const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.80)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
 const TEXT_LO = "rgba(120,155,195,0.50)";
 const GLASS = "rgba(15,32,64,0.92)";
 const GLASS_BORDER = "rgba(255,255,255,0.10)";
@@ -231,10 +231,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                 >
                   <ProgressRing size={64} />
 
-                  <h2 style={{ ...heading, fontSize: 28, lineHeight: 1.15, marginTop: 20 }}>
-                    {BRAND.paywall.step1.headline}
-                  </h2>
-                  <p style={{ ...bodyText, fontSize: 15, lineHeight: 1.6, marginTop: 12 }}>
+                  <p style={{ ...bodyText, fontSize: 15, lineHeight: 1.6, marginTop: 20 }}>
                     {BRAND.paywall.step1.subtext}
                   </p>
                   <p style={{ ...eyebrow, marginTop: 16 }}>

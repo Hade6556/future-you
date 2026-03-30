@@ -328,7 +328,7 @@ export default function StructurePage() {
                     border: "none", cursor: recordingState === "processing" ? "not-allowed" : "pointer",
                     opacity: recordingState === "processing" ? 0.5 : 1,
                     background: recordingState === "recording"
-                      ? "#FF4444"
+                      ? "#FF5555"
                       : recordingState === "processing"
                       ? "rgba(255,255,255,0.12)"
                       : LIME,

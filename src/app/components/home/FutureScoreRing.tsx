@@ -21,9 +21,9 @@ function getScoreMessage(score: number): string {
 }
 
 function getArcColor(score: number): string {
-  if (score >= 70) return "#9BB068"; // Serenity Green
-  if (score >= 40) return "#7B6BA8"; // Mindful Violet
-  return "#A28FFF";                  // Gentle Lavender
+  if (score >= 70) return "#4CAF7D"; // Positive green
+  if (score >= 40) return "#F5A623"; // Amber
+  return "#2DD4C0";                  // Teal
 }
 
 export function FutureScoreRing() {

@@ -9,7 +9,7 @@ import { BRAND } from "../data/copy";
 const LIME = "#C8FF00";
 const NAVY = "#060912";
 const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.80)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
 const TEXT_LO = "rgba(120,155,195,0.50)";
 const GLASS_BORDER = "rgba(255,255,255,0.10)";
 

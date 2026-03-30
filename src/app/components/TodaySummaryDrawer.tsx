@@ -11,10 +11,10 @@ interface Props {
 }
 
 const STATUS_CONFIG = {
-  done:    { label: "Done",    bg: "#9BB068", text: "#ffffff" },
-  partial: { label: "Partial", bg: "#FFCE5C", text: "#4B3425" },
-  skipped: { label: "Skipped", bg: "#D5C2B9", text: "#4B3425" },
-  pending: { label: "Pending", bg: "#EEEAF6", text: "#7B6BA8" },
+  done:    { label: "Done",    bg: "#4CAF7D", text: "#ffffff" },
+  partial: { label: "Partial", bg: "#F5A623", text: "#060912" },
+  skipped: { label: "Skipped", bg: "rgba(120,155,195,0.25)", text: "rgba(235,242,255,0.92)" },
+  pending: { label: "Pending", bg: "rgba(255,255,255,0.07)", text: "rgba(120,155,195,0.75)" },
 };
 
 export function TodaySummaryDrawer({ open, onClose }: Props) {
@@ -38,7 +38,7 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
           {/* Backdrop */}
           <motion.div
             className="fixed inset-0 z-[60]"
-            style={{ background: "rgba(31,22,15,0.3)" }}
+            style={{ background: "rgba(6,9,18,0.5)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -48,7 +48,7 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
           {/* Sheet */}
           <motion.div
             className="fixed bottom-0 left-0 right-0 z-[70] mx-auto max-w-[375px] rounded-t-3xl px-6 pb-10 pt-5"
-            style={{ background: "#F7F4F2" }}
+            style={{ background: "#0F2040" }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -56,7 +56,7 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
           >
             {/* Drag handle */}
             <div className="mb-5 flex justify-center">
-              <div className="h-1 w-10 rounded-full" style={{ background: "#D5C2B9" }} />
+              <div className="h-1 w-10 rounded-full" style={{ background: "rgba(255,255,255,0.14)" }} />
             </div>
 
             <p
@@ -68,19 +68,19 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
 
             <div className="flex flex-col gap-4">
               {/* Streak */}
-              <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: "#FFFFFF" }}>
+              <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Streak</p>
-                  <p className="text-[28px] font-extrabold leading-none" style={{ color: "#4B3425" }}>
+                  <p className="text-[28px] font-extrabold leading-none" style={{ color: "rgba(235,242,255,0.92)" }}>
                     {streak}
-                    <span className="ml-1 text-[13px] font-semibold" style={{ color: "#926247" }}>days</span>
+                    <span className="ml-1 text-[13px] font-semibold" style={{ color: "rgba(120,155,195,0.75)" }}>days</span>
                   </p>
                 </div>
                 <span className="text-3xl" aria-hidden>🔥</span>
               </div>
 
               {/* Today's status */}
-              <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: "#FFFFFF" }}>
+              <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
                 <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Today's task</p>
                 <span
                   className="rounded-full px-3 py-1 text-[12px] font-bold"
@@ -92,18 +92,18 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
 
               {/* Day progress */}
               {dayInfo && (
-                <div className="rounded-2xl p-4" style={{ background: "#FFFFFF" }}>
+                <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Plan progress</p>
-                    <p className="text-[13px] font-bold" style={{ color: "#4B3425" }}>
+                    <p className="text-[13px] font-bold" style={{ color: "rgba(235,242,255,0.92)" }}>
                       Day {dayInfo.currentDay}
-                      <span className="font-normal" style={{ color: "#926247" }}> / {dayInfo.totalDays}</span>
+                      <span className="font-normal" style={{ color: "rgba(120,155,195,0.75)" }}> / {dayInfo.totalDays}</span>
                     </p>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: "#E8DDD9" }}>
+                  <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.14)" }}>
                     <motion.div
                       className="h-full rounded-full"
-                      style={{ background: "#9BB068" }}
+                      style={{ background: "#4CAF7D" }}
                       initial={{ width: 0 }}
                       animate={{ width: `${progressPct}%` }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
