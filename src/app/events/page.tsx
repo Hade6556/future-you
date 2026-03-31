@@ -654,7 +654,7 @@ export default function EventsPage() {
     setLocation(locationInput);
     setPipelineStatus("loading");
     setPipelineError(null);
-    const goal = ambitionType ? AMBITION_GOAL_MAP[ambitionType] : undefined;
+    const goal = (ambitionType && AMBITION_GOAL_MAP[ambitionType]) || "wellness";
     try {
       const res = await fetch("/api/plan", {
         method: "POST",
@@ -761,29 +761,6 @@ export default function EventsPage() {
               This takes about 30–60 seconds.
             </p>
           </div>
-        </div>
-      </PageShell>
-    );
-  }
-
-  // ── No ambition / unsupported type ─────────────────────────────────────────
-  if (!ambitionType || !AMBITION_GOAL_MAP[ambitionType]) {
-    return (
-      <PageShell>
-        <header>
-          <h1 style={headingStyle}>Best match for you</h1>
-        </header>
-        <div style={{ ...cardStyle, padding: 24, textAlign: "center" }}>
-          <p style={{ fontSize: 15, color: TEXT_MID, fontFamily: FONT_BODY }}>
-            {ambitionType
-              ? "Event search for your ambition type is coming soon."
-              : "Complete the quiz so we can find events matched to your goal."}
-          </p>
-          <Link href="/events/search" style={{ textDecoration: "none", display: "block", marginTop: 16 }}>
-            <button style={{ ...ghostStyle, width: "100%", minHeight: 44 }}>
-              Find events (set goal, location & more)
-            </button>
-          </Link>
         </div>
       </PageShell>
     );
