@@ -849,10 +849,28 @@ export default function EventsPage() {
     );
   }
 
-  // ── No events → fall back to idle ──────────────────────────────────────────
+  // ── No events found ────────────────────────────────────────────────────────
   if (pipelineStatus === "ready" && events.length === 0) {
-    setPipelineStatus("idle");
-    return null;
+    return (
+      <PageShell>
+        <header>
+          <h1 style={headingStyle}>No events found</h1>
+        </header>
+        <div style={{ ...cardStyle, padding: 24, textAlign: "center" }}>
+          <p style={{ fontSize: 15, color: TEXT_MID, fontFamily: FONT_BODY }}>
+            We couldn&apos;t find upcoming events near <strong>{location}</strong> for your goal. Try a different city or broaden your search.
+          </p>
+          <button style={{ ...ctaStyle, marginTop: 16 }} onClick={() => setPipelineStatus("idle")}>
+            Try another location
+          </button>
+          <Link href="/events/search" style={{ textDecoration: "none", display: "block", marginTop: 12 }}>
+            <button style={{ ...ghostStyle, width: "100%" }}>
+              Advanced search
+            </button>
+          </Link>
+        </div>
+      </PageShell>
+    );
   }
 
   // ── Events carousel ────────────────────────────────────────────────────────

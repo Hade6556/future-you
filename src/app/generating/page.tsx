@@ -165,7 +165,10 @@ export default function GeneratingPage() {
         },
       }),
     }).then((res) => {
-      if (!res.ok) return null;
+      if (!res.ok) {
+        console.error(`[generating] /api/plan returned ${res.status}`);
+        return null;
+      }
       return res.json() as Promise<GoalPlan>;
     });
 

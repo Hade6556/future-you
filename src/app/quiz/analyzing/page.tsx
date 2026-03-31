@@ -133,7 +133,10 @@ export default function AnalyzingPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ goal, userContext }),
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`Pipeline returned ${r.status}`);
+        return r.json();
+      })
       .then((plan) => {
         if (plan && !plan.error) {
           setPipelinePlan(plan);
@@ -141,7 +144,10 @@ export default function AnalyzingPage() {
           setPipelineStatus("error");
         }
       })
-      .catch(() => setPipelineStatus("error"));
+      .catch((err) => {
+        console.error("[quiz/analyzing] Plan generation failed:", err);
+        setPipelineStatus("error");
+      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
