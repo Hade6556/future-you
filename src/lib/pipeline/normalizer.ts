@@ -138,16 +138,15 @@ function scoreRelevance(text: string, keywords: string[]): number {
   return keywords.reduce((score, kw) => lower.includes(kw.toLowerCase()) ? score + 1 : score, 0);
 }
 
-export function normalizeEvents(
+function buildCandidates(
   sources: RawSource[],
   goalCategory: string,
-  location: string,
-  keywords: string[] = []
-): PipelineEvent[] {
+  keywords: string[],
+  strict: boolean,
+): { candidates: PipelineEvent[]; stats: Record<string, number> } {
   const seen = new Set<string>();
   const candidates: PipelineEvent[] = [];
-
-  let stats = { total: 0, junkUrl: 0, noTitle: 0, staleTitle: 0, nonEvent: 0, staleDate: 0, noKeyword: 0, deduped: 0, kept: 0 };
+  const stats: Record<string, number> = { total: 0, junkUrl: 0, noTitle: 0, staleTitle: 0, nonEvent: 0, staleDate: 0, noKeyword: 0, deduped: 0, kept: 0 };
 
   for (const { sourceName, results } of sources) {
     for (const item of results) {
@@ -158,7 +157,7 @@ export function normalizeEvents(
       const title = (item.title ?? "").trim();
       if (!title) { stats.noTitle++; continue; }
       if (hasStaleTitleYear(title)) { stats.staleTitle++; continue; }
-      if (isNonEventTitle(title)) { stats.nonEvent++; continue; }
+      if (strict && isNonEventTitle(title)) { stats.nonEvent++; continue; }
 
       const fullText = [title, item.description ?? "", item.markdown ?? ""].join(" ");
       const date = extractDate(fullText);
@@ -166,14 +165,12 @@ export function normalizeEvents(
 
       if (isStale(date)) { stats.staleDate++; continue; }
 
-      // Drop events with no keyword overlap (skip if text too short to evaluate)
-      if (keywords.length > 0 && fullText.length > 200) {
+      // Keyword relevance — only in strict mode with long text
+      if (strict && keywords.length > 0 && fullText.length > 200) {
         if (scoreRelevance(fullText, keywords) < MIN_RELEVANCE_SCORE) { stats.noKeyword++; continue; }
       }
 
-      // Use extracted location from text; fall back to user's location
       const eventLocation = extractLocation(fullText);
-
       const eventId = makeEventId(title, date, eventLocation ?? "");
       if (seen.has(eventId)) { stats.deduped++; continue; }
       seen.add(eventId);
@@ -194,8 +191,25 @@ export function normalizeEvents(
       });
     }
   }
+  return { candidates, stats };
+}
 
-  console.log(`[normalizer] ${JSON.stringify(stats)}`);
+export function normalizeEvents(
+  sources: RawSource[],
+  goalCategory: string,
+  location: string,
+  keywords: string[] = []
+): PipelineEvent[] {
+  // Try strict filtering first
+  let { candidates, stats } = buildCandidates(sources, goalCategory, keywords, true);
+  console.log(`[normalizer] strict: ${JSON.stringify(stats)}`);
+
+  // If strict filtering killed everything, retry with relaxed filters
+  if (candidates.length === 0 && stats.total > 0) {
+    const relaxed = buildCandidates(sources, goalCategory, keywords, false);
+    candidates = relaxed.candidates;
+    console.log(`[normalizer] relaxed: ${JSON.stringify(relaxed.stats)}`);
+  }
 
   // Round-robin across sources to ensure diversity
   const bySource = new Map<string, PipelineEvent[]>();
