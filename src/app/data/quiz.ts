@@ -253,10 +253,10 @@ export const QUIZ_SCREENS: QuizScreen[] = [
   {
     id: "insight_expert",
     type: "insight-card",
-    stat: "PhD",
-    headline: "level research backs every plan we build.",
-    body: "By addressing your emotional motivation we can eradicate procrastination & supercharge your performance.",
-    ctaLabel: "Continue",
+    stat: "6 min",
+    headline: "Most users finish their first action before this screen fades.",
+    body: "**Motivation fades. Systems last.** We break your goal into one tiny action with a clear trigger — so you move even on your worst day.",
+    ctaLabel: "Build my system →",
     autoAdvance: false,
   },
 
@@ -500,7 +500,7 @@ export const QUIZ_SCREENS: QuizScreen[] = [
   {
     id: "insight_save_time",
     type: "timeline-card",
-    ctaLabel: "Continue",
+    ctaLabel: "Lock in my plan",
     autoAdvance: false,
   },
 

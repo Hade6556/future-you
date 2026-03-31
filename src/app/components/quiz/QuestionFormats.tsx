@@ -625,23 +625,102 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 0,
+        width: "100%",
+        textAlign: "center",
+      }}
     >
-      {/* Lime-tinted insight card */}
-      <div
+      {/* ── Hero stat block — screams at you ── */}
+      {stat && (
+        <div style={{ marginBottom: 6, textAlign: "center" }}>
+          <motion.div
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 18 }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 900,
+                fontStyle: "italic",
+                fontSize: 96,
+                lineHeight: 0.9,
+                letterSpacing: "-0.03em",
+                color: LIME,
+                textShadow: "0 0 60px rgba(200,255,0,0.35), 0 0 120px rgba(200,255,0,0.15)",
+                display: "block",
+                textAlign: "center",
+              }}
+            >
+              {stat}
+            </span>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Headline — right in their face */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25, duration: 0.35 }}
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}
+      >
+        <p
+          style={{
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontStyle: "italic",
+            fontSize: 24,
+            lineHeight: 1.15,
+            letterSpacing: "-0.01em",
+            color: TEXT_HI,
+            margin: "0 0 6px",
+          }}
+        >
+          Your first action.
+          <br />
+          Done before you doubt it.
+        </p>
+        {headline && (
+          <p
+            style={{
+              fontFamily: "var(--font-apercu), sans-serif",
+              fontWeight: 400,
+              fontSize: 13,
+              color: TEXT_LO,
+              margin: 0,
+              maxWidth: 320,
+            }}
+          >
+            {headline}
+          </p>
+        )}
+      </motion.div>
+
+      {/* Glass card — mechanism */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.35 }}
         style={{
           position: "relative",
-          background: "rgba(200,255,0,0.05)",
+          background: GLASS,
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
-          border: "1px solid rgba(200,255,0,0.18)",
+          border: `1px solid ${GLASS_BORDER}`,
           borderRadius: 20,
-          padding: "24px 22px",
+          padding: "22px 20px",
+          marginTop: 24,
+          width: "100%",
+          maxWidth: 360,
           overflow: "hidden",
         }}
       >
-        {/* Top lime highlight */}
         <div
           aria-hidden
           style={{
@@ -650,224 +729,168 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
             left: 0,
             right: 0,
             height: 1,
-            background: "linear-gradient(90deg, transparent, rgba(200,255,0,0.30), transparent)",
+            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.20), transparent)",
           }}
         />
 
-        {/* Eyebrow */}
+        {/* 3-step visual: Goal → Tiny actions → Momentum */}
         <div
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
-            fontWeight: 700,
-            fontSize: 10,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            color: "rgba(200,255,0,0.60)",
-            marginBottom: 10,
             display: "flex",
             alignItems: "center",
-            gap: 7,
+            justifyContent: "center",
+            gap: 0,
+            marginBottom: 16,
           }}
         >
-          <span style={{ display: "block", width: 16, height: 1, background: "rgba(200,255,0,0.40)" }} />
-          What the data shows
+          {[
+            { icon: "🎯", label: "Your goal" },
+            { icon: "→", label: "" },
+            { icon: "⚡", label: "Tiny actions" },
+            { icon: "→", label: "" },
+            { icon: "🔥", label: "Momentum" },
+          ].map((step, i) =>
+            step.icon === "→" ? (
+              <span
+                key={i}
+                style={{
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontSize: 18,
+                  color: TEXT_LO,
+                  margin: "0 4px",
+                }}
+              >
+                →
+              </span>
+            ) : (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 4,
+                  minWidth: 70,
+                }}
+              >
+                <span style={{ fontSize: 24 }}>{step.icon}</span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-jetbrains-mono), monospace",
+                    fontSize: 8,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: TEXT_LO,
+                  }}
+                >
+                  {step.label}
+                </span>
+              </div>
+            ),
+          )}
         </div>
 
-        <p
-          style={{
-            fontFamily: "var(--font-body), Georgia, serif",
-            fontWeight: 400,
-            fontSize: 15,
-            lineHeight: 1.65,
-            color: "rgba(235,242,255,0.82)",
-            margin: "0 0 16px",
-          }}
-          dangerouslySetInnerHTML={{
-            __html: body
-              ? body.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight:500;color:rgba(235,242,255,0.92)">$1</strong>')
-              : headline,
-          }}
-        />
+        {body && (
+          <p
+            style={{
+              fontFamily: "var(--font-apercu), sans-serif",
+              fontWeight: 400,
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: TEXT_MID,
+              margin: 0,
+              textAlign: "center",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: body.replace(
+                /\*\*(.*?)\*\*/g,
+                `<strong style="font-weight:600;color:${TEXT_HI}">$1</strong>`,
+              ),
+            }}
+          />
+        )}
 
-        {/* Logo cluster + "Backed by science" — shown ABOVE the PhD stat when badges exist */}
+        {/* Research logos — small trust strip */}
         {badges && badges.length > 0 && (
           <div
             style={{
               marginTop: 16,
-              paddingTop: 18,
-              borderTop: "1px solid rgba(255,255,255,0.07)",
+              paddingTop: 14,
+              borderTop: "1px solid rgba(255,255,255,0.06)",
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
               gap: 12,
             }}
           >
-            <div style={{ position: "relative", width: 160, height: 80 }}>
-              {badges[1] && (
-                <img
-                  src={badges[1].logo}
-                  alt={badges[1].name}
-                  style={{
-                    position: "absolute",
-                    width: 52,
-                    height: 52,
-                    objectFit: "contain",
-                    left: 0,
-                    top: 8,
-                    zIndex: 1,
-                  }}
-                />
-              )}
-              {badges[2] && (
-                <img
-                  src={badges[2].logo}
-                  alt={badges[2].name}
-                  style={{
-                    position: "absolute",
-                    width: 52,
-                    height: 52,
-                    objectFit: "contain",
-                    right: 0,
-                    top: 8,
-                    zIndex: 1,
-                  }}
-                />
-              )}
-              {badges[0] && (
-                <img
-                  src={badges[0].logo}
-                  alt={badges[0].name}
-                  style={{
-                    position: "absolute",
-                    width: 72,
-                    height: 72,
-                    objectFit: "contain",
-                    left: "50%",
-                    top: 0,
-                    transform: "translateX(-50%)",
-                    zIndex: 3,
-                    filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.50))",
-                  }}
-                />
-              )}
-            </div>
-
-            <span
-              style={{
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 800,
-                fontStyle: "italic",
-                fontSize: 22,
-                letterSpacing: "-0.02em",
-                color: TEXT_HI,
-                textAlign: "center",
-              }}
-            >
-              Backed by science.
-            </span>
-
-            <span
-              style={{
-                fontFamily: "var(--font-jetbrains-mono), monospace",
-                fontSize: 9,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase" as const,
-                color: TEXT_LO,
-                textAlign: "center",
-              }}
-            >
-              {badges.map((b) => b.name).join(" · ")}
-            </span>
+            {badges.map((b) => (
+              <img
+                key={b.name}
+                src={b.logo}
+                alt={b.name}
+                style={{
+                  width: 26,
+                  height: 26,
+                  objectFit: "contain",
+                  opacity: 0.45,
+                }}
+              />
+            ))}
           </div>
         )}
 
-        {/* PhD stat — shown below logos when badges exist, or standalone */}
-        {stat && (
-          <div
-            style={{
-              marginTop: 16,
-              paddingTop: 16,
-              borderTop: badges && badges.length > 0 ? "none" : "1px solid rgba(255,255,255,0.07)",
-              display: "flex",
-              alignItems: "baseline",
-              gap: 6,
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 700,
-                fontSize: 34,
-                color: LIME,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              {stat}
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-body), Georgia, serif",
-                fontWeight: 400,
-                fontSize: 13,
-                color: TEXT_MID,
-              }}
-            >
-              {headline}
-            </span>
-          </div>
-        )}
-
+        {/* Avatar social proof — when no badges */}
         {avatars && avatars.length > 0 && !badges && (
           <div
             style={{
-              marginTop: 16,
-              paddingTop: 14,
-              borderTop: "1px solid rgba(255,255,255,0.07)",
+              marginTop: 14,
+              paddingTop: 12,
+              borderTop: "1px solid rgba(255,255,255,0.06)",
               display: "flex",
               alignItems: "center",
-              gap: 12,
+              justifyContent: "center",
+              gap: 10,
             }}
           >
             <div style={{ display: "flex", flexShrink: 0 }}>
-              {avatars.map((src, i) => (
+              {avatars.slice(0, 5).map((src, i) => (
                 <img
                   key={i}
                   src={src}
                   alt=""
                   style={{
-                    width: 28,
-                    height: 28,
+                    width: 24,
+                    height: 24,
                     borderRadius: "50%",
                     objectFit: "cover",
                     border: "2px solid #0f1a2e",
-                    marginLeft: i === 0 ? 0 : -8,
+                    marginLeft: i === 0 ? 0 : -6,
                     position: "relative",
-                    zIndex: avatars.length - i,
+                    zIndex: 5 - i,
                   }}
                 />
               ))}
             </div>
             <span
               style={{
-                fontFamily: "var(--font-body), Georgia, serif",
-                fontWeight: 400,
-                fontSize: 11,
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 9,
+                letterSpacing: "0.06em",
                 color: TEXT_LO,
-                lineHeight: 1.35,
               }}
             >
-              Join thousands transforming their lives
+              1,200+ plans started today
             </span>
           </div>
         )}
-
-        {/* Old duplicate badges block removed — now rendered above the stat */}
-      </div>
+      </motion.div>
 
       <button
         onClick={onContinue}
         style={{
+          marginTop: 24,
           width: "100%",
+          maxWidth: 360,
           background: LIME,
           color: "#060912",
           fontFamily: "var(--font-barlow-condensed), sans-serif",
@@ -1053,38 +1076,63 @@ export function CommitmentScale({ subtext, onSelect }: CommitmentScaleProps) {
 }
 
 /* ══════════════════════════════════════════════════════
-   LIVE COUNTER CARD — animated user count + pulsing dot
+   LIVE COUNTER CARD — realistic social proof + micro-testimonials
 ══════════════════════════════════════════════════════ */
+
+const MICRO_TESTIMONIALS = [
+  { name: "Anna", text: "Did 8 minutes instead of skipping." },
+  { name: "Jay", text: "Day 3 streak after months of stops/starts." },
+  { name: "Mia", text: "Finally stopped overthinking and just started." },
+  { name: "Sam", text: "First time I actually followed through." },
+  { name: "Lina", text: "Tiny win today, biggest shift in weeks." },
+];
 
 export function LiveCounterCard({
   avatars,
-  ctaLabel = "I'm ready",
+  ctaLabel = "Start my first 2-minute win",
   onContinue,
 }: {
   avatars: string[];
   ctaLabel?: string;
   onContinue: () => void;
 }) {
-  const TARGET = 595588;
-  const [count, setCount] = useState(0);
+  const userName = usePlanStore((s) => s.userName);
+  const firstName = userName ? userName.split(" ")[0] : null;
+
+  const BASE_RECENT = 1248;
+  const [recentCount, setRecentCount] = useState(0);
+  const [testimonialIdx, setTestimonialIdx] = useState(0);
 
   useEffect(() => {
-    const start = TARGET - 588;
-    const duration = 1800;
+    const duration = 1400;
     const startTime = performance.now();
     let animId: number;
-
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(start + (TARGET - start) * eased));
+      setRecentCount(Math.round(BASE_RECENT * eased));
       if (progress < 1) animId = requestAnimationFrame(tick);
     };
-
     animId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animId);
   }, []);
+
+  useEffect(() => {
+    const drift = setInterval(() => {
+      setRecentCount((c) => c + Math.floor(Math.random() * 3) + 1);
+    }, 4000);
+    return () => clearInterval(drift);
+  }, []);
+
+  useEffect(() => {
+    const rotate = setInterval(() => {
+      setTestimonialIdx((i) => (i + 1) % MICRO_TESTIMONIALS.length);
+    }, 3500);
+    return () => clearInterval(rotate);
+  }, []);
+
+  const current = MICRO_TESTIMONIALS[testimonialIdx];
 
   return (
     <motion.div
@@ -1104,49 +1152,25 @@ export function LiveCounterCard({
           background: GLASS,
           border: `1px solid ${GLASS_BORDER}`,
           borderRadius: 20,
-          padding: "36px 28px 32px",
+          padding: "32px 24px 28px",
           width: "100%",
           maxWidth: 360,
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Scattered avatar cloud background */}
+        {/* Top highlight */}
         <div
+          aria-hidden
           style={{
             position: "absolute",
-            inset: 0,
-            opacity: 0.08,
-            pointerEvents: "none",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 1,
+            background: "linear-gradient(90deg, transparent, rgba(200,255,0,0.25), transparent)",
           }}
-        >
-          {avatars.slice(0, 6).map((src, i) => {
-            const positions = [
-              { top: "8%", left: "12%" },
-              { top: "15%", right: "10%" },
-              { top: "55%", left: "6%" },
-              { top: "60%", right: "14%" },
-              { top: "35%", left: "80%" },
-              { top: "78%", left: "45%" },
-            ];
-            return (
-              <img
-                key={i}
-                src={src}
-                alt=""
-                style={{
-                  position: "absolute",
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  filter: "blur(1px)",
-                  ...positions[i],
-                }}
-              />
-            );
-          })}
-        </div>
+        />
 
         {/* LIVE badge */}
         <div
@@ -1155,7 +1179,7 @@ export function LiveCounterCard({
             alignItems: "center",
             justifyContent: "center",
             gap: 6,
-            marginBottom: 20,
+            marginBottom: 18,
             position: "relative",
             zIndex: 1,
           }}
@@ -1185,7 +1209,7 @@ export function LiveCounterCard({
           </span>
         </div>
 
-        {/* Counter */}
+        {/* Counter — recent plans */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -1196,46 +1220,34 @@ export function LiveCounterCard({
             style={{
               fontFamily: "var(--font-barlow-condensed), sans-serif",
               fontWeight: 800,
-              fontSize: 64,
+              fontSize: 56,
               lineHeight: 1,
               letterSpacing: "-0.02em",
               color: LIME,
-              marginBottom: 8,
+              marginBottom: 6,
             }}
           >
-            {count.toLocaleString()}
+            {recentCount.toLocaleString()}
           </div>
           <div
             style={{
               fontFamily: "var(--font-apercu), sans-serif",
               fontWeight: 500,
-              fontSize: 16,
+              fontSize: 15,
               color: TEXT_HI,
               lineHeight: 1.45,
-              marginBottom: 6,
             }}
           >
-            people are building better lives
-          </div>
-          <div
-            style={{
-              fontFamily: "var(--font-apercu), sans-serif",
-              fontWeight: 600,
-              fontSize: 14,
-              color: LIME,
-              letterSpacing: "0.02em",
-            }}
-          >
-            right now.
+            plans started in the last 24h
           </div>
         </motion.div>
 
-        {/* Stacked avatars row */}
+        {/* Stacked avatars */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            marginTop: 24,
+            marginTop: 20,
             position: "relative",
             zIndex: 1,
           }}
@@ -1246,8 +1258,8 @@ export function LiveCounterCard({
               src={src}
               alt=""
               style={{
-                width: 34,
-                height: 34,
+                width: 32,
+                height: 32,
                 borderRadius: "50%",
                 objectFit: "cover",
                 border: "2px solid #0f1a2e",
@@ -1259,43 +1271,140 @@ export function LiveCounterCard({
           ))}
         </div>
 
-        <p
+        {/* Rotating micro-testimonial */}
+        <div
           style={{
-            fontFamily: "var(--font-apercu), sans-serif",
-            fontWeight: 400,
-            fontSize: 13,
-            color: TEXT_MID,
-            lineHeight: 1.5,
             marginTop: 18,
+            minHeight: 42,
             position: "relative",
             zIndex: 1,
           }}
         >
-          Our AI-powered plans are built from real behavioral science — not generic advice.
-        </p>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={testimonialIdx}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontStyle: "italic",
+                  fontWeight: 400,
+                  fontSize: 13,
+                  color: TEXT_HI,
+                  lineHeight: 1.5,
+                }}
+              >
+                &ldquo;{current.text}&rdquo;
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-jetbrains-mono), monospace",
+                  fontSize: 9,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: TEXT_LO,
+                }}
+              >
+                — {current.name}
+              </span>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Outcome line */}
+        <div
+          style={{
+            marginTop: 16,
+            paddingTop: 14,
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "var(--font-apercu), sans-serif",
+              fontWeight: 400,
+              fontSize: 12,
+              color: TEXT_MID,
+              lineHeight: 1.5,
+              margin: 0,
+            }}
+          >
+            Most people complete their first action in under{" "}
+            <span style={{ color: LIME, fontWeight: 600 }}>6 minutes</span>.
+          </p>
+        </div>
       </div>
+
+      {/* Personalized motivation line */}
+      <p
+        style={{
+          fontFamily: "var(--font-apercu), sans-serif",
+          fontWeight: 500,
+          fontSize: 14,
+          color: TEXT_HI,
+          marginTop: 20,
+          marginBottom: 4,
+        }}
+      >
+        {firstName
+          ? `Let\u2019s build your first win, ${firstName}.`
+          : "Your first tiny win starts now."}
+      </p>
 
       <button
         onClick={onContinue}
         style={{
-          marginTop: 24,
+          marginTop: 12,
           width: "100%",
           maxWidth: 360,
-          padding: "18px 0",
+          padding: "20px 32px",
           background: LIME,
           color: NAVY,
           border: "none",
-          borderRadius: 14,
+          borderRadius: 100,
           fontFamily: "var(--font-barlow-condensed), sans-serif",
           fontWeight: 700,
           fontSize: 17,
           letterSpacing: "0.10em",
           textTransform: "uppercase",
           cursor: "pointer",
+          boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
         }}
       >
         {ctaLabel}
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+          <path d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
       </button>
+
+      <p
+        style={{
+          fontFamily: "var(--font-jetbrains-mono), monospace",
+          fontSize: 10,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: TEXT_LO,
+          margin: "8px 0 0",
+        }}
+      >
+        2 min · private · free
+      </p>
     </motion.div>
   );
 }
@@ -1333,8 +1442,37 @@ function MiniSparkline({ points, color, dashed }: { points: number[]; color: str
   );
 }
 
+const FAIL_STORY = [
+  { icon: "😩", line: '"I\'ll start Monday"', sub: "…Monday never comes" },
+  { icon: "📱", line: "Scrolled for 2 hours", sub: "instead of doing the thing" },
+  { icon: "🔄", line: "Reset the counter again", sub: "Day 1 — for the 47th time" },
+  { icon: "💀", line: "Gave up", sub: "\"Maybe I'm just not that person\"" },
+];
+const WIN_STORY = [
+  { icon: "⚡", line: "Got a 2-min action", sub: "Specific. No thinking required." },
+  { icon: "✅", line: "Done before coffee", sub: "Felt easy. Did it again next day." },
+  { icon: "🔥", line: "14-day streak", sub: "Didn't even try — the system worked." },
+  { icon: "🏆", line: "Goal hit in 6 weeks", sub: "\"Why didn't I do this sooner?\"" },
+];
+
+function XIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M3 3l8 8M11 3l-8 8" stroke="#FF6B6B" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M2.5 7L5.5 10L11.5 4" stroke={LIME} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function ComparisonCard({
-  ctaLabel = "That makes sense",
+  ctaLabel = "I want the system",
   onContinue,
 }: {
   ctaLabel?: string;
@@ -1342,183 +1480,309 @@ export function ComparisonCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         gap: 0,
+        width: "100%",
         textAlign: "center",
       }}
     >
-      {/* Header stat */}
-      <div style={{ marginBottom: 24 }}>
+      {/* ── Headline ── */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        style={{
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontWeight: 700,
+          fontStyle: "italic",
+          fontSize: 22,
+          lineHeight: 1.2,
+          color: TEXT_HI,
+          margin: "0 0 20px",
+        }}
+      >
+        This is what &quot;trying harder&quot; looks like.
+      </motion.p>
+
+      {/* ── FAIL STORY ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.4 }}
+        style={{
+          width: "100%",
+          maxWidth: 360,
+          background: "rgba(255,70,70,0.04)",
+          border: "1px solid rgba(255,70,70,0.15)",
+          borderRadius: 20,
+          padding: "18px 16px 14px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "radial-gradient(ellipse at top, rgba(255,70,70,0.06) 0%, transparent 60%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontSize: 10,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "#FF6B6B",
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+          }}
+        >
+          <span style={{ fontSize: 13 }}>😔</span> Without a system
+        </div>
+
+        {FAIL_STORY.map((item, i) => (
+          <motion.div
+            key={item.line}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 + i * 0.4, duration: 0.25 }}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 9,
+              padding: "8px 0",
+              borderTop: i > 0 ? "1px solid rgba(255,255,255,0.04)" : "none",
+            }}
+          >
+            <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{item.icon}</span>
+            <div style={{ textAlign: "left" }}>
+              <div
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  color: "rgba(255,120,120,0.9)",
+                  lineHeight: 1.3,
+                }}
+              >
+                {item.line}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 400,
+                  fontSize: 11,
+                  color: TEXT_LO,
+                  lineHeight: 1.3,
+                  marginTop: 1,
+                }}
+              >
+                {item.sub}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+        <MiniSparkline points={[0.6, 0.55, 0.45, 0.3, 0.12]} color="#FF6B6B" dashed />
+      </motion.div>
+
+      {/* ── Pivot divider ── */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 2.0, duration: 0.3 }}
+        style={{
+          margin: "16px 0",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 4,
+        }}
+      >
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: "50%",
+            background: "rgba(200,255,0,0.12)",
+            border: "1px solid rgba(200,255,0,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 16,
+          }}
+        >
+          ↓
+        </div>
         <span
           style={{
             fontFamily: "var(--font-barlow-condensed), sans-serif",
-            fontWeight: 800,
-            fontSize: 52,
-            color: "#FF6B6B",
-            letterSpacing: "-0.02em",
+            fontWeight: 700,
+            fontStyle: "italic",
+            fontSize: 14,
+            letterSpacing: "0.04em",
+            color: LIME,
           }}
         >
-          92%
+          Now watch this.
         </span>
-        <div
-          style={{
-            fontFamily: "var(--font-apercu), sans-serif",
-            fontWeight: 500,
-            fontSize: 15,
-            color: TEXT_HI,
-            marginTop: 4,
-          }}
-        >
-          of people fail with information alone.
-        </div>
-      </div>
+      </motion.div>
 
-      {/* Side-by-side comparison */}
-      <div
+      {/* ── WIN STORY ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.2, duration: 0.4 }}
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 12,
           width: "100%",
           maxWidth: 360,
+          background: "rgba(200,255,0,0.04)",
+          border: "1px solid rgba(200,255,0,0.20)",
+          borderRadius: 20,
+          padding: "18px 16px 14px",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Left — failure */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "radial-gradient(ellipse at top, rgba(200,255,0,0.06) 0%, transparent 60%)",
+            pointerEvents: "none",
+          }}
+        />
         <div
           style={{
-            background: "rgba(255,107,107,0.06)",
-            border: "1px solid rgba(255,107,107,0.15)",
-            borderRadius: 16,
-            padding: "20px 14px 16px",
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontSize: 10,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: LIME,
+            marginBottom: 12,
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
-            gap: 10,
+            justifyContent: "center",
+            gap: 6,
           }}
         >
-          <div
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 700,
-              fontSize: 13,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "#FF6B6B",
-              marginBottom: 4,
-            }}
-          >
-            Books & Courses
-          </div>
-          <div style={{ display: "flex", gap: 8, fontSize: 22, opacity: 0.7 }}>
-            <span>📚</span>
-            <span>🎓</span>
-            <span>▶️</span>
-          </div>
-          <MiniSparkline points={[0.5, 0.55, 0.48, 0.42, 0.3]} color="#FF6B6B" dashed />
-          <div
-            style={{
-              fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 10,
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              color: "#FF6B6B",
-              opacity: 0.8,
-            }}
-          >
-            92% QUIT
-          </div>
+          <span style={{ fontSize: 13 }}>⚡</span> With Behavio
         </div>
 
-        {/* Right — success */}
-        <div
-          style={{
-            background: "rgba(200,255,0,0.06)",
-            border: `1px solid rgba(200,255,0,0.18)`,
-            borderRadius: 16,
-            padding: "20px 14px 16px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <div
+        {WIN_STORY.map((item, i) => (
+          <motion.div
+            key={item.line}
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 2.4 + i * 0.35, duration: 0.25 }}
             style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 700,
-              fontSize: 13,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: LIME,
-              marginBottom: 4,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 9,
+              padding: "8px 0",
+              borderTop: i > 0 ? "1px solid rgba(255,255,255,0.04)" : "none",
             }}
           >
-            Behavio
-          </div>
-          <div style={{ display: "flex", gap: 8, fontSize: 22 }}>
-            <span>✅</span>
-            <span>🔥</span>
-            <span>🎮</span>
-          </div>
-          <MiniSparkline points={[0.2, 0.35, 0.5, 0.72, 0.92]} color={LIME} />
-          <div
-            style={{
-              fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 10,
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              color: LIME,
-            }}
-          >
-            STICK WITH IT
-          </div>
-        </div>
-      </div>
+            <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{item.icon}</span>
+            <div style={{ textAlign: "left" }}>
+              <div
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  color: TEXT_HI,
+                  lineHeight: 1.3,
+                }}
+              >
+                {item.line}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 400,
+                  fontSize: 11,
+                  color: TEXT_MID,
+                  lineHeight: 1.3,
+                  marginTop: 1,
+                }}
+              >
+                {item.sub}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+        <MiniSparkline points={[0.15, 0.3, 0.5, 0.75, 0.95]} color={LIME} />
+      </motion.div>
 
-      <p
+      {/* Bridge */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 3.8 }}
         style={{
           fontFamily: "var(--font-apercu), sans-serif",
           fontWeight: 400,
-          fontSize: 13,
+          fontSize: 14,
           color: TEXT_MID,
           lineHeight: 1.5,
-          marginTop: 20,
-          maxWidth: 320,
+          marginTop: 18,
+          maxWidth: 300,
         }}
       >
-        Consistent action beats information. We use{" "}
-        <span style={{ color: LIME, fontWeight: 600 }}>gamification</span> &{" "}
-        <span style={{ color: LIME, fontWeight: 600 }}>behavioral science</span>{" "}
-        to make you take action.
-      </p>
+        Same person. Same goal.{" "}
+        <span style={{ color: LIME, fontWeight: 700 }}>Different system.</span>
+      </motion.p>
 
-      <button
-        onClick={onContinue}
-        style={{
-          marginTop: 24,
-          width: "100%",
-          maxWidth: 360,
-          padding: "18px 0",
-          background: LIME,
-          color: NAVY,
-          border: "none",
-          borderRadius: 14,
-          fontFamily: "var(--font-barlow-condensed), sans-serif",
-          fontWeight: 700,
-          fontSize: 17,
-          letterSpacing: "0.10em",
-          textTransform: "uppercase",
-          cursor: "pointer",
-        }}
+      {/* CTA — only fully visible after win story completes */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 4.0, duration: 0.35 }}
+        style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: 20 }}
       >
-        {ctaLabel}
-      </button>
+        <button
+          onClick={onContinue}
+          style={{
+            width: "100%",
+            maxWidth: 360,
+            padding: "20px 32px",
+            background: LIME,
+            color: NAVY,
+            border: "none",
+            borderRadius: 100,
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontSize: 17,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+          }}
+        >
+          {ctaLabel}
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+            <path d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </motion.div>
     </motion.div>
   );
 }
@@ -1528,207 +1792,318 @@ export function ComparisonCard({
 ══════════════════════════════════════════════════════ */
 
 export function TimelineCard({
-  ctaLabel = "Continue",
+  ctaLabel = "Lock in my plan",
   onContinue,
 }: {
   ctaLabel?: string;
   onContinue: () => void;
 }) {
-  const ROW = {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-    padding: "16px 18px",
-    borderRadius: 14,
-    width: "100%",
-  } as const;
+  const TIMELINE = [
+    { week: "NOW", own: "Thinking about starting", behavio: "First action done", icon: "🚀" },
+    { week: "WEEK 1", own: "Watching YouTube videos", behavio: "7-day streak", icon: "🔥" },
+    { week: "WEEK 2", own: "Bought a course, didn't open it", behavio: "Routine feels automatic", icon: "⚡" },
+    { week: "MONTH 1", own: "Back to old habits", behavio: "Friends notice the change", icon: "💬" },
+    { week: "MONTH 3", own: "\"I'll try again next year\"", behavio: "Goal reached", icon: "🏆" },
+  ];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         gap: 0,
+        width: "100%",
         textAlign: "center",
       }}
     >
-      {/* Big 10x stat */}
-      <div style={{ marginBottom: 8 }}>
+      {/* Hero stat */}
+      <motion.div
+        initial={{ scale: 0.6, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 18 }}
+        style={{ marginBottom: 4 }}
+      >
         <span
           style={{
             fontFamily: "var(--font-barlow-condensed), sans-serif",
-            fontWeight: 800,
+            fontWeight: 900,
             fontStyle: "italic",
-            fontSize: 72,
-            lineHeight: 1,
+            fontSize: 84,
+            lineHeight: 0.9,
             color: LIME,
-            letterSpacing: "-0.02em",
+            textShadow: "0 0 60px rgba(200,255,0,0.30), 0 0 120px rgba(200,255,0,0.12)",
+            display: "block",
+            textAlign: "center",
           }}
         >
           10×
         </span>
-      </div>
-      <p
-        style={{
-          fontFamily: "var(--font-apercu), sans-serif",
-          fontWeight: 500,
-          fontSize: 16,
-          color: TEXT_HI,
-          marginBottom: 28,
-          maxWidth: 300,
-        }}
-      >
-        more efficient than figuring it out alone.
-      </p>
+      </motion.div>
 
-      {/* Two stacked rows */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 24 }}
+      >
+        <p
+          style={{
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontStyle: "italic",
+            fontSize: 22,
+            lineHeight: 1.15,
+            color: TEXT_HI,
+            margin: "0 0 4px",
+          }}
+        >
+          faster than figuring it out alone.
+        </p>
+        <p
+          style={{
+            fontFamily: "var(--font-apercu), sans-serif",
+            fontWeight: 400,
+            fontSize: 13,
+            color: TEXT_LO,
+            margin: 0,
+          }}
+        >
+          Here&apos;s how the next 3 months play out:
+        </p>
+      </motion.div>
+
+      {/* Timeline — two separate columns side by side */}
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
           gap: 10,
           width: "100%",
-          maxWidth: 360,
+          maxWidth: 380,
         }}
       >
-        {/* Row 1 — Without (red/faded) */}
-        <div
+        {/* ── LEFT: On your own — red/dead ── */}
+        <motion.div
+          initial={{ opacity: 0, x: -14 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
           style={{
-            ...ROW,
-            background: "rgba(255,107,107,0.06)",
-            border: "1px solid rgba(255,107,107,0.12)",
+            background: "rgba(255,70,70,0.05)",
+            border: "1px solid rgba(255,70,70,0.15)",
+            borderRadius: 18,
+            padding: "14px 12px 16px",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
           <div
+            aria-hidden
             style={{
-              width: 42,
-              height: 42,
-              borderRadius: 12,
-              background: "rgba(255,107,107,0.10)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              fontSize: 20,
+              position: "absolute",
+              inset: 0,
+              background: "radial-gradient(ellipse at top, rgba(255,70,70,0.06) 0%, transparent 60%)",
+              pointerEvents: "none",
+            }}
+          />
+          <div
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 10,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#FF6B6B",
+              marginBottom: 14,
+              textAlign: "center",
             }}
           >
-            ⏳
+            😔 On your own
           </div>
-          <div style={{ textAlign: "left" }}>
-            <div
+          {TIMELINE.map((row, i) => (
+            <motion.div
+              key={row.week}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 + i * 0.3, duration: 0.2 }}
               style={{
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontWeight: 600,
-                fontSize: 14,
-                color: "#FF6B6B",
+                padding: "8px 0",
+                borderTop: i > 0 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                textAlign: "center",
               }}
             >
-              On your own
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontWeight: 400,
-                fontSize: 12,
-                color: TEXT_LO,
-                marginTop: 2,
-              }}
-            >
-              Months of trial, error & guessing
-            </div>
-          </div>
-        </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 700,
+                  fontSize: 8,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,107,107,0.45)",
+                  marginBottom: 3,
+                }}
+              >
+                {row.week}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontSize: 11,
+                  fontWeight: i === TIMELINE.length - 1 ? 500 : 400,
+                  color: i === TIMELINE.length - 1 ? "rgba(255,107,107,0.75)" : TEXT_LO,
+                  fontStyle: i === TIMELINE.length - 1 ? "italic" : "normal",
+                  lineHeight: 1.35,
+                }}
+              >
+                {row.own}
+              </div>
+            </motion.div>
+          ))}
+          <MiniSparkline points={[0.55, 0.5, 0.4, 0.25, 0.1]} color="#FF6B6B" dashed />
+        </motion.div>
 
-        {/* Row 2 — With Behavio (lime) */}
-        <div
+        {/* ── RIGHT: With Behavio — lime/alive ── */}
+        <motion.div
+          initial={{ opacity: 0, x: 14 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
           style={{
-            ...ROW,
-            background: "rgba(200,255,0,0.06)",
-            border: "1px solid rgba(200,255,0,0.16)",
+            background: "rgba(200,255,0,0.05)",
+            border: "1px solid rgba(200,255,0,0.20)",
+            borderRadius: 18,
+            padding: "14px 12px 16px",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
           <div
+            aria-hidden
             style={{
-              width: 42,
-              height: 42,
-              borderRadius: 12,
-              background: "rgba(200,255,0,0.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              fontSize: 20,
+              position: "absolute",
+              inset: 0,
+              background: "radial-gradient(ellipse at top, rgba(200,255,0,0.06) 0%, transparent 60%)",
+              pointerEvents: "none",
+            }}
+          />
+          <div
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 10,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: LIME,
+              marginBottom: 14,
+              textAlign: "center",
             }}
           >
-            🎯
+            ⚡ With Behavio
           </div>
-          <div style={{ textAlign: "left" }}>
-            <div
+          {TIMELINE.map((row, i) => (
+            <motion.div
+              key={row.week}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65 + i * 0.3, duration: 0.2 }}
               style={{
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontWeight: 600,
-                fontSize: 14,
-                color: LIME,
+                padding: "8px 0",
+                borderTop: i > 0 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                textAlign: "center",
               }}
             >
-              With Behavio
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontWeight: 400,
-                fontSize: 12,
-                color: TEXT_LO,
-                marginTop: 2,
-              }}
-            >
-              15 min/day — guided, focused, effective
-            </div>
-          </div>
-        </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 700,
+                  fontSize: 8,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "rgba(200,255,0,0.50)",
+                  marginBottom: 3,
+                }}
+              >
+                {row.week}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontSize: 11,
+                  fontWeight: i === TIMELINE.length - 1 ? 700 : 500,
+                  color: i === TIMELINE.length - 1 ? LIME : TEXT_HI,
+                  lineHeight: 1.35,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 3,
+                }}
+              >
+                <span style={{ fontSize: 13 }}>{row.icon}</span>
+                {row.behavio}
+              </div>
+            </motion.div>
+          ))}
+          <MiniSparkline points={[0.12, 0.3, 0.52, 0.78, 0.95]} color={LIME} />
+        </motion.div>
       </div>
 
-      <p
+      {/* Bridge */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2 }}
         style={{
           fontFamily: "var(--font-apercu), sans-serif",
           fontWeight: 400,
           fontSize: 13,
           color: TEXT_MID,
           lineHeight: 1.5,
-          marginTop: 22,
-          maxWidth: 320,
+          marginTop: 18,
+          maxWidth: 300,
         }}
       >
-        We focus your effort on{" "}
-        <span style={{ color: LIME, fontWeight: 600 }}>what actually matters</span>
-        {" "}— not everything at once.
-      </p>
+        15 min/day.{" "}
+        <span style={{ color: LIME, fontWeight: 700 }}>Guided. Focused. No guesswork.</span>
+      </motion.p>
 
-      <button
-        onClick={onContinue}
-        style={{
-          marginTop: 24,
-          width: "100%",
-          maxWidth: 360,
-          padding: "18px 0",
-          background: LIME,
-          color: NAVY,
-          border: "none",
-          borderRadius: 14,
-          fontFamily: "var(--font-barlow-condensed), sans-serif",
-          fontWeight: 700,
-          fontSize: 17,
-          letterSpacing: "0.10em",
-          textTransform: "uppercase",
-          cursor: "pointer",
-        }}
+      {/* CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.4, duration: 0.35 }}
+        style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: 20 }}
       >
-        {ctaLabel}
-      </button>
+        <button
+          onClick={onContinue}
+          style={{
+            width: "100%",
+            maxWidth: 360,
+            padding: "20px 32px",
+            background: LIME,
+            color: NAVY,
+            border: "none",
+            borderRadius: 100,
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 700,
+            fontSize: 17,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+            cursor: "pointer",
+            boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+          }}
+        >
+          {ctaLabel}
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+            <path d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </motion.div>
     </motion.div>
   );
 }
