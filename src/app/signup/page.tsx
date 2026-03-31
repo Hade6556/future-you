@@ -55,7 +55,7 @@ export default function SignupPage() {
 
       setEmail(email);
       await syncToServer();
-      router.push(destination);
+      router.push(mode === "login" ? "/" : destination);
     } finally {
       setLoading(false);
     }

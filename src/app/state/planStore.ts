@@ -1037,6 +1037,9 @@ export const usePlanStore = create<PlanState>((set, get) => {
         if (!res.ok) return;
         const data = await res.json();
         // Apply authoritative server state
+        const derivedQuizComplete = Boolean(
+          data.onboardingComplete || data.archetype || data.ambitionType,
+        );
         const patch: Partial<Persisted> = {
           streak: data.streak,
           bestStreak: data.bestStreak,
@@ -1045,9 +1048,31 @@ export const usePlanStore = create<PlanState>((set, get) => {
           lastCompletedDate: data.lastCompletedDate,
           isPremium: data.isPremium,
           trialStartedAt: data.trialStartedAt,
+          userName: data.userName ?? "",
+          dogArchetype: data.archetype ?? null,
+          ambitionType: data.ambitionType ?? null,
+          onboardingComplete: data.onboardingComplete ?? false,
+          planId: data.planId ?? null,
+          quizComplete: derivedQuizComplete,
         };
         setPersisted(patch);
-        set({ ...patch, synced: true });
+        set({
+          streak: patch.streak,
+          bestStreak: patch.bestStreak,
+          streakShields: patch.streakShields,
+          futureScore: patch.futureScore,
+          lastCompletedDate: patch.lastCompletedDate,
+          isPremium: patch.isPremium,
+          trialStartedAt: patch.trialStartedAt,
+          userName: patch.userName ?? "",
+          dogArchetype: patch.dogArchetype ?? null,
+          ambitionType: patch.ambitionType ?? null,
+          onboardingComplete: patch.onboardingComplete ?? false,
+          planId: patch.planId ?? null,
+          planReady: !!patch.planId,
+          quizComplete: patch.quizComplete ?? false,
+          synced: true,
+        });
       } catch {
         // Sync failed silently — localStorage stays as fallback
       }

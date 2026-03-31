@@ -66,6 +66,12 @@ export default function HomeClient() {
     }
   }, [quizComplete, onboardingComplete, router]);
 
+  // Hydrate from server early so returning logged-in users don't get stuck in local-first quiz flow.
+  useEffect(() => {
+    void hydrateFromServer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Record daily visit first (uses local state), then sync with server
   useEffect(() => {
     if (quizComplete && onboardingComplete) {
