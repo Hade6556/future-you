@@ -13,6 +13,10 @@ export async function POST(request: Request) {
       date: string;
     };
 
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({ ok: true });
+    }
+
     const supabase = await createClient();
 
     // Upsert into daily_tasks table

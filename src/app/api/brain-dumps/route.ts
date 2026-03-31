@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
+const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
 export async function GET() {
   const auth = await requireAuth();
   if (auth.error) return auth.error;
+
+  if (!hasSupabase) {
+    return NextResponse.json({ dumps: [] });
+  }
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -51,6 +57,10 @@ export async function POST(req: Request) {
         { error: "content is required" },
         { status: 400 },
       );
+    }
+
+    if (!hasSupabase) {
+      return NextResponse.json({ id: `local-${Date.now()}` });
     }
 
     const supabase = await createClient();

@@ -17,6 +17,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ cleaned: transcript });
   }
 
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ cleaned: transcript });
+  }
+
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 

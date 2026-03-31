@@ -48,6 +48,15 @@ export async function POST(req: NextRequest) {
   const completedPhases = plan.phases.slice(0, Math.max(0, currentPhaseIndex));
   const phasesToRefresh = plan.phases.slice(Math.max(0, currentPhaseIndex));
 
+  if (!process.env.ANTHROPIC_API_KEY) {
+    // No API key — return the plan unchanged
+    return NextResponse.json({
+      plan,
+      adjustedCount: 0,
+      summary: "Plan refresh skipped — no API key configured.",
+    });
+  }
+
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 

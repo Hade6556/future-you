@@ -141,11 +141,8 @@ const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
 
 export async function POST(request: Request) {
-  const hasSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (hasSupabase) {
-    const auth = await requireAuth();
-    if (auth.error) return auth.error;
-  }
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
 
   const limited = rateLimitResponse(request);
   if (limited) return limited;
