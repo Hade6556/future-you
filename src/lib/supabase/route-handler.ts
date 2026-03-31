@@ -2,6 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getSupabaseAnonKey } from "./env";
 
+/**
+ * Server client for Route Handlers only (e.g. /auth/callback).
+ * setAll must not swallow errors — OAuth PKCE exchange must persist session cookies.
+ */
 export async function createClient() {
   const cookieStore = await cookies();
   const supabaseKey = getSupabaseAnonKey();
@@ -19,15 +23,11 @@ export async function createClient() {
           return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Ignore — server component context
-          }
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
         },
       },
-    }
+    },
   );
 }

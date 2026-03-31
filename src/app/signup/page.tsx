@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -23,9 +23,10 @@ export default function SignupPage() {
   const [email, setEmailInput] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const destination = onboardingComplete ? "/" : "/quiz/result";
 
   async function handleEmailAuth() {
@@ -35,20 +36,29 @@ export default function SignupPage() {
     }
     setLoading(true);
     setError(null);
+    setMessage(null);
     try {
-      const { error: authError } =
+      const { data, error: authError } =
         mode === "signup"
           ? await supabase.auth.signUp({ email, password })
           : await supabase.auth.signInWithPassword({ email, password });
 
       if (authError) {
         setError(authError.message);
-      } else {
-        setEmail(email);
-        // Sync localStorage state to server after successful auth
-        await syncToServer();
-        router.push(destination);
+        return;
       }
+
+      // Email confirmation enabled: signUp succeeds with no session until user confirms
+      if (mode === "signup" && !data.session) {
+        setMessage(
+          "Check your email for a confirmation link to finish signing up.",
+        );
+        return;
+      }
+
+      setEmail(email);
+      await syncToServer();
+      router.push(destination);
     } finally {
       setLoading(false);
     }
@@ -152,6 +162,9 @@ export default function SignupPage() {
                 className="h-14 rounded-2xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
               {error && <p className="text-sm text-destructive text-center">{error}</p>}
+              {message && (
+                <p className="text-sm text-center text-muted-foreground">{message}</p>
+              )}
               <button
                 onClick={() => void handleEmailAuth()}
                 disabled={loading}
