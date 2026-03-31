@@ -29,6 +29,37 @@ interface CoachResponse {
   sentiment?: "positive" | "neutral" | "negative";
 }
 
+function parseCoachResponse(textOutput: string): CoachResponse | null {
+  const stripFences = (input: string) =>
+    input
+      .replace(/```json\s*/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+  const cleaned = stripFences(textOutput);
+
+  // 1) Best case: the whole payload is JSON.
+  try {
+    return JSON.parse(cleaned) as CoachResponse;
+  } catch {
+    // continue
+  }
+
+  // 2) Common case: model adds prose before/after JSON block.
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    const candidate = cleaned.slice(firstBrace, lastBrace + 1);
+    try {
+      return JSON.parse(candidate) as CoachResponse;
+    } catch {
+      // continue
+    }
+  }
+
+  return null;
+}
+
 const MOCK_REFLECT_RESPONSE: CoachResponse = {
   message: "That reflection shows real self-awareness. Keep building on moments like this — they compound.",
   actionItem: null,
@@ -134,18 +165,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ ...mock, sentiment });
     }
 
-    try {
-      const stripped = textOutput.replace(/```(?:json)?\n?/g, "").trim();
-      const parsed = JSON.parse(stripped) as CoachResponse;
+    const parsed = parseCoachResponse(textOutput);
+    if (parsed) {
       return NextResponse.json({ ...parsed, sentiment: parsed.sentiment ?? sentiment });
-    } catch {
-      // Claude didn't return clean JSON — wrap the text as a message
-      return NextResponse.json({
-        message: textOutput.slice(0, 300),
-        actionItem: null,
-        sentiment,
-      });
     }
+
+    // Claude didn't return clean JSON — wrap readable text as a message.
+    const readable = textOutput
+      .replace(/```json\s*/gi, "")
+      .replace(/```/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 300);
+    return NextResponse.json({
+      message: readable,
+      actionItem: null,
+      sentiment,
+    });
   } catch (error) {
     console.error("/api/coach error", error);
     return NextResponse.json(
