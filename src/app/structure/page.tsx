@@ -46,6 +46,7 @@ export default function StructurePage() {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const accumulatedRef = useRef("");
   const manualStopRef = useRef(false);
+  const hadRecognitionErrorRef = useRef(false);
 
   const [speechSupported, setSpeechSupported] = useState(false);
   useEffect(() => {
@@ -70,6 +71,7 @@ export default function StructurePage() {
     if (!SR) return;
     accumulatedRef.current = "";
     manualStopRef.current = false;
+    hadRecognitionErrorRef.current = false;
     setRecordingError(null);
 
     const recognition = new SR() as SpeechRecognitionInstance;
@@ -97,6 +99,11 @@ export default function StructurePage() {
     recognition.onend = () => {
       setInterimTranscript("");
       recognitionRef.current = null;
+      if (hadRecognitionErrorRef.current) {
+        hadRecognitionErrorRef.current = false;
+        setRecordingState("idle");
+        return;
+      }
       if (manualStopRef.current) {
         manualStopRef.current = false;
         const transcript = accumulatedRef.current.trim();
@@ -112,6 +119,8 @@ export default function StructurePage() {
     };
 
     recognition.onerror = (e: any) => {
+      hadRecognitionErrorRef.current = true;
+      setRecordingState("idle");
       if (e.error === "aborted") return;
       if (e.error === "no-speech") {
         setRecordingError("No speech detected. Tap Retry to try again.");
@@ -121,10 +130,31 @@ export default function StructurePage() {
         setRecordingError("Microphone access denied. Check your browser permissions.");
         return;
       }
+      if (e.error === "audio-capture") {
+        setRecordingError("No microphone found. Connect a mic and try again.");
+        return;
+      }
+      if (e.error === "service-not-allowed") {
+        setRecordingError("Speech service is blocked in this browser/session. Try Chrome or use text input.");
+        return;
+      }
+      if (e.error === "language-not-supported") {
+        setRecordingError("Selected language is not supported for speech recognition.");
+        return;
+      }
+      if (e.error === "network") {
+        setRecordingError("Network issue while processing speech. Check connection and retry.");
+        return;
+      }
       setRecordingError("Recording failed. Tap Retry to try again.");
     };
 
-    recognition.start();
+    try {
+      recognition.start();
+    } catch {
+      setRecordingState("idle");
+      setRecordingError("Could not start recording. Refresh and check microphone permissions.");
+    }
   }
 
   function stopListening() {
