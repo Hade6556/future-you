@@ -97,8 +97,8 @@ function isJunkUrl(url: string): boolean {
   if (url.includes("linkedin.com") && !url.includes("/events/")) return true;
   // Facebook: only accept actual event pages (/events/), reject pages/groups/posts
   if (url.includes("facebook.com") && !url.includes("/events/")) return true;
-  // Meetup: only accept actual event pages (/events/), reject group/topic/category pages
-  if (url.includes("meetup.com") && !url.includes("/events/")) return true;
+  // Meetup: accept event pages and group pages (groups often host events)
+  if (url.includes("meetup.com") && (url.includes("/topics/") || url.includes("/categories/"))) return true;
   return false;
 }
 
@@ -147,33 +147,37 @@ export function normalizeEvents(
   const seen = new Set<string>();
   const candidates: PipelineEvent[] = [];
 
+  let stats = { total: 0, junkUrl: 0, noTitle: 0, staleTitle: 0, nonEvent: 0, staleDate: 0, noKeyword: 0, deduped: 0, kept: 0 };
+
   for (const { sourceName, results } of sources) {
     for (const item of results) {
+      stats.total++;
       const url = item.url ?? "";
-      if (!url || isJunkUrl(url)) continue;
+      if (!url || isJunkUrl(url)) { stats.junkUrl++; continue; }
 
       const title = (item.title ?? "").trim();
-      if (!title) continue;
-      if (hasStaleTitleYear(title)) continue;
-      if (isNonEventTitle(title)) continue;
+      if (!title) { stats.noTitle++; continue; }
+      if (hasStaleTitleYear(title)) { stats.staleTitle++; continue; }
+      if (isNonEventTitle(title)) { stats.nonEvent++; continue; }
 
       const fullText = [title, item.description ?? "", item.markdown ?? ""].join(" ");
       const date = extractDate(fullText);
       const virtual = isVirtual(fullText);
 
-      if (isStale(date)) continue;
+      if (isStale(date)) { stats.staleDate++; continue; }
 
       // Drop events with no keyword overlap (skip if text too short to evaluate)
-      if (keywords.length > 0 && fullText.length > 50) {
-        if (scoreRelevance(fullText, keywords) < MIN_RELEVANCE_SCORE) continue;
+      if (keywords.length > 0 && fullText.length > 200) {
+        if (scoreRelevance(fullText, keywords) < MIN_RELEVANCE_SCORE) { stats.noKeyword++; continue; }
       }
 
       // Use extracted location from text; fall back to user's location
       const eventLocation = extractLocation(fullText);
 
       const eventId = makeEventId(title, date, eventLocation ?? "");
-      if (seen.has(eventId)) continue;
+      if (seen.has(eventId)) { stats.deduped++; continue; }
       seen.add(eventId);
+      stats.kept++;
 
       candidates.push({
         event_id: eventId,
@@ -190,6 +194,8 @@ export function normalizeEvents(
       });
     }
   }
+
+  console.log(`[normalizer] ${JSON.stringify(stats)}`);
 
   // Round-robin across sources to ensure diversity
   const bySource = new Map<string, PipelineEvent[]>();
