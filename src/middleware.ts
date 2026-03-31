@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseAnonKey } from "@/lib/supabase/env";
 
 /** Routes that require an authenticated user. */
 const PROTECTED_PATHS = ["/account", "/structure", "/tasks", "/journal"];
@@ -15,7 +16,7 @@ export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseAnonKey = getSupabaseAnonKey();
 
   // If Supabase isn't configured yet, pass through
   if (!supabaseUrl || !supabaseAnonKey) {

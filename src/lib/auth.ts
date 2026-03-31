@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { hasSupabasePublicConfig } from "@/lib/supabase/env";
 import { NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 
@@ -18,7 +19,7 @@ export async function requireAuth(): Promise<
   { user: User; error?: never } | { user?: never; error: NextResponse }
 > {
   // If Supabase isn't configured, allow anonymous access
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!hasSupabasePublicConfig()) {
     return { user: ANON_USER };
   }
 
