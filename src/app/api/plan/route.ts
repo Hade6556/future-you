@@ -3,6 +3,8 @@ import { runPipeline } from "@/lib/pipeline";
 import type { UserContext } from "@/app/types/pipeline";
 import { rateLimitResponse } from "@/lib/rateLimit";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   const limited = rateLimitResponse(req);
   if (limited) return limited;

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth";
 
+export const maxDuration = 30;
+
 interface RewriteRequest {
   transcript: string;
   lang: string;

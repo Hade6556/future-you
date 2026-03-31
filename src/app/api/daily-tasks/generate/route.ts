@@ -4,6 +4,8 @@ import { rateLimitResponse } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/auth";
 import type { DailyTasksRequest, DailyTasksResponse, GeneratedTask } from "../../../types/pipeline";
 
+export const maxDuration = 30;
+
 const ARCHETYPE_VOICE: Record<string, string> = {
   steady:
     "Warm and grounding. Frame tasks as building blocks. Use 'we' language.",

@@ -4,6 +4,8 @@ import { rateLimitResponse } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/auth";
 import type { DailyMentorMessage } from "../../types/pipeline";
 
+export const maxDuration = 30;
+
 interface MentorDailyRequest {
   day: number;
   totalDays: number;

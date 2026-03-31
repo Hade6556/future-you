@@ -4,6 +4,8 @@ import { rateLimitResponse } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/auth";
 import type { CheckinResponse, CheckinStatus } from "../../types/pipeline";
 
+export const maxDuration = 30;
+
 interface CheckinRequest {
   status: CheckinStatus;
   day: number;

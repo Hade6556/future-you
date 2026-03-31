@@ -3,6 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/auth";
 
+export const maxDuration = 30;
+
 interface CoachRequestBody {
   /** The user's reflection or message */
   message: string;

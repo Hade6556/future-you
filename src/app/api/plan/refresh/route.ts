@@ -3,6 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import type { GoalPlan, PipelinePhase } from "@/app/types/pipeline";
 
+export const maxDuration = 60;
+
 type RefreshRequest = {
   plan: GoalPlan;
   progress: {

@@ -4,6 +4,8 @@ import { rateLimitResponse } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/auth";
 import type { GeneratedTask, PipelineStep } from "../../../types/pipeline";
 
+export const maxDuration = 30;
+
 interface SwapRequest {
   taskToReplace: GeneratedTask;
   currentStep: PipelineStep | null;

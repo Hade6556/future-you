@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
 
+export const maxDuration = 30;
+
 interface IntakeRequestBody {
   narrative: string;
   tone?: string;
