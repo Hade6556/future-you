@@ -1,72 +1,53 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePlanStore } from "../state/planStore";
 import { createClient } from "@/lib/supabase/client";
 
-type AuthMode = "signup" | "login";
-
 export default function SignupPage() {
   const router = useRouter();
-  const userName = usePlanStore((s) => s.userName);
   const onboardingComplete = usePlanStore((s) => s.onboardingComplete);
   const setEmail = usePlanStore((s) => s.setEmail);
+  const setUserName = usePlanStore((s) => s.setUserName);
   const syncToServer = usePlanStore((s) => s.syncToServer);
 
-  const [mode, setMode] = useState<AuthMode>("signup");
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [email, setEmailInput] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
-  const destination = onboardingComplete ? "/" : "/quiz/result";
 
-  async function handleEmailAuth() {
-    if (!email || !password) {
-      setError("Please enter your email and password.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    setMessage(null);
-    try {
-      const { data, error: authError } =
-        mode === "signup"
-          ? await supabase.auth.signUp({ email, password })
-          : await supabase.auth.signInWithPassword({ email, password });
+  // If user is already authenticated (returning from Google callback), hydrate and redirect
+  useEffect(() => {
+    async function checkSession() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Hydrate name and email from Google profile
+        const fullName = user.user_metadata?.full_name ?? user.user_metadata?.name ?? "";
+        const userEmail = user.email ?? "";
+        if (fullName) setUserName(fullName);
+        if (userEmail) setEmail(userEmail);
+        await syncToServer();
 
-      if (authError) {
-        setError(authError.message);
-        return;
+        if (onboardingComplete) {
+          router.replace("/");
+        } else {
+          router.replace("/intake");
+        }
       }
-
-      if (mode === "signup" && !data.session) {
-        setMessage(
-          "Check your email for a confirmation link to finish signing up.",
-        );
-        return;
-      }
-
-      setEmail(email);
-      await syncToServer();
-      router.push(mode === "login" ? "/" : destination);
-    } finally {
-      setLoading(false);
     }
-  }
+    void checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleGoogleAuth() {
     setLoading(true);
     setError(null);
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/signup` },
     });
     if (authError) {
       setError(authError.message);
@@ -74,18 +55,12 @@ export default function SignupPage() {
     }
   }
 
-  function handleSkip() {
-    router.push(destination);
-  }
-
-  const firstName = userName ? userName.split(" ")[0] : null;
-
   return (
     <div
       className="flex min-h-dvh flex-col items-center justify-start px-6 pb-12 pt-20"
       style={{ background: "var(--bg-base)" }}
     >
-      {/* Background mesh (same as HookScreen) */}
+      {/* Background mesh */}
       <div
         aria-hidden
         style={{
@@ -146,22 +121,8 @@ export default function SignupPage() {
               color: "var(--text-hi)",
             }}
           >
-            {firstName ? (
-              <>
-                Save your plan,{" "}
-                <span style={{ color: "#C8FF00" }}>{firstName}</span>
-              </>
-            ) : mode === "signup" ? (
-              <>
-                Create your{" "}
-                <span style={{ color: "#C8FF00" }}>account</span>
-              </>
-            ) : (
-              <>
-                Welcome{" "}
-                <span style={{ color: "#C8FF00" }}>back</span>
-              </>
-            )}
+            Create your{" "}
+            <span style={{ color: "#C8FF00" }}>account</span>
           </h1>
           <p
             style={{
@@ -171,190 +132,39 @@ export default function SignupPage() {
               lineHeight: 1.5,
             }}
           >
-            {mode === "signup"
-              ? "Keep your progress safe across devices."
-              : "Pick up right where you left off."}
+            Sign in to save your plan and track your progress.
           </p>
         </motion.div>
 
-        {/* Primary buttons (pre-form state) */}
-        <AnimatePresence mode="wait">
-          {!showEmailForm && (
-            <motion.div
-              key="buttons"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ delay: 0.25, duration: 0.3 }}
-              className="flex w-full flex-col gap-3"
-            >
-              {/* Google */}
-              <button
-                onClick={() => void handleGoogleAuth()}
-                disabled={loading}
-                className="flex h-14 w-full items-center justify-center gap-3 rounded-full border font-semibold transition-all active:scale-[0.97] disabled:opacity-50"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  backdropFilter: "blur(12px)",
-                  borderColor: "rgba(255,255,255,0.16)",
-                  color: "var(--text-hi)",
-                  fontSize: 15,
-                }}
-              >
-                <GoogleIcon />
-                <span>Continue with Google</span>
-              </button>
-
-              {/* Divider */}
-              <div className="flex items-center gap-3 py-1">
-                <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.10)" }} />
-                <span
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "var(--text-lo)",
-                  }}
-                >
-                  or
-                </span>
-                <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.10)" }} />
-              </div>
-
-              {/* Email CTA */}
-              <button
-                onClick={() => {
-                  setMode("signup");
-                  setShowEmailForm(true);
-                }}
-                className="btn-cta w-full"
-              >
-                Create account with email
-              </button>
-
-              {/* Login toggle */}
-              <button
-                onClick={() => {
-                  setMode("login");
-                  setShowEmailForm(true);
-                }}
-                className="mt-1 text-sm transition-colors hover:underline"
-                style={{ color: "var(--text-mid)" }}
-              >
-                I already have an account
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Email form */}
-        <AnimatePresence mode="wait">
-          {showEmailForm && (
-            <motion.div
-              key="email-form"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-              className="flex w-full flex-col gap-3"
-            >
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmailInput(e.target.value)}
-                disabled={loading}
-                className="capture-form-input h-14 w-full rounded-2xl px-5 text-[15px] outline-none transition-colors"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  color: "var(--text-hi)",
-                }}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") void handleEmailAuth();
-                }}
-                className="capture-form-input h-14 w-full rounded-2xl px-5 text-[15px] outline-none transition-colors"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  color: "var(--text-hi)",
-                }}
-              />
-
-              {error && (
-                <p className="text-sm" style={{ color: "var(--status-bad)" }}>
-                  {error}
-                </p>
-              )}
-              {message && (
-                <p className="text-sm" style={{ color: "var(--status-good)" }}>
-                  {message}
-                </p>
-              )}
-
-              <button
-                onClick={() => void handleEmailAuth()}
-                disabled={loading}
-                className="btn-cta w-full disabled:opacity-50"
-              >
-                {loading
-                  ? "..."
-                  : mode === "signup"
-                    ? "Create account"
-                    : "Sign in"}
-              </button>
-
-              {mode === "login" && (
-                <Link
-                  href="/forgot-password"
-                  className="text-sm transition-colors hover:underline"
-                  style={{ color: "var(--text-mid)" }}
-                >
-                  Forgot password?
-                </Link>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowEmailForm(false);
-                  setError(null);
-                  setMessage(null);
-                }}
-                className="mt-1 text-sm transition-colors hover:underline"
-                style={{ color: "var(--text-lo)" }}
-              >
-                &larr; Back
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Skip */}
-        <motion.button
-          onClick={handleSkip}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-4 transition-colors hover:underline"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "var(--text-lo)",
-          }}
+        {/* Google auth button */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.3 }}
+          className="flex w-full flex-col gap-3"
         >
-          skip for now
-        </motion.button>
+          <button
+            onClick={() => void handleGoogleAuth()}
+            disabled={loading}
+            className="flex h-14 w-full items-center justify-center gap-3 rounded-full border font-semibold transition-all active:scale-[0.97] disabled:opacity-50"
+            style={{
+              background: "rgba(255,255,255,0.07)",
+              backdropFilter: "blur(12px)",
+              borderColor: "rgba(255,255,255,0.16)",
+              color: "var(--text-hi)",
+              fontSize: 15,
+            }}
+          >
+            <GoogleIcon />
+            <span>{loading ? "Redirecting..." : "Continue with Google"}</span>
+          </button>
+
+          {error && (
+            <p className="text-sm" style={{ color: "var(--status-bad)" }}>
+              {error}
+            </p>
+          )}
+        </motion.div>
 
         {/* Legal */}
         <p

@@ -135,7 +135,7 @@ export default function GeneratingPage() {
     }
 
     // Run intake analysis and plan pipeline in parallel
-    const goalString = AMBITION_GOAL_MAP[ambitionType ?? ""] ?? narrative.slice(0, 100);
+    const goalString = AMBITION_GOAL_MAP[ambitionType ?? ""] || narrative.slice(0, 100);
 
     const intakePromise = fetch("/api/intake", {
       method: "POST",

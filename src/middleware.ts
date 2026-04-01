@@ -3,10 +3,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAnonKey } from "@/lib/supabase/env";
 
 /** Routes that require an authenticated user. */
-const PROTECTED_PATHS = ["/account", "/structure", "/tasks", "/journal"];
+const PROTECTED_PATHS = ["/account", "/structure", "/tasks", "/journal", "/intake", "/generating"];
 
 /** Routes that are always public (no auth check). */
-const PUBLIC_PATHS = ["/", "/signup", "/quiz", "/intake", "/generating", "/plan", "/about", "/brand", "/privacy", "/terms", "/forgot-password", "/auth"];
+const PUBLIC_PATHS = ["/", "/signup", "/quiz", "/plan", "/about", "/brand", "/privacy", "/terms", "/forgot-password", "/auth", "/paywall"];
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));

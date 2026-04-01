@@ -173,7 +173,7 @@ export default function PaywallPage() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   if (isPremium) {
-    router.replace("/plan?reveal=true");
+    router.replace("/");
     return null;
   }
 
@@ -193,12 +193,12 @@ export default function PaywallPage() {
       } else {
         // Stripe not configured — grant access locally for dev
         usePlanStore.getState().setPremium();
-        router.push("/plan?reveal=true");
+        router.push("/");
       }
     } catch {
       // Fallback for dev/offline
       usePlanStore.getState().setPremium();
-      router.push("/plan?reveal=true");
+      router.push("/");
     } finally {
       setCheckoutLoading(false);
     }

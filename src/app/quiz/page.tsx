@@ -13,7 +13,6 @@ import {
   YesNoPills,
   CommitmentScale,
   WinCelebration,
-  CaptureForm,
   MultiSelectStep,
   SliderScaleStep,
   LiveCounterCard,
@@ -61,11 +60,12 @@ export default function QuizPage() {
     let next = currentScreen + 1;
     while (next < total && !isVisibleNow(QUIZ_SCREENS[next])) next++;
     if (next >= total) {
-      router.push("/intake");
+      store.completeQuiz("steady" as ArchetypeId, selectedAmbition.current);
+      router.push("/signup");
       return;
     }
     setCurrentScreen(next);
-  }, [currentScreen, total, router]);
+  }, [currentScreen, total, router, store]);
 
   const goBack = useCallback(() => {
     let prev = currentScreen - 1;
@@ -111,16 +111,6 @@ export default function QuizPage() {
         store.setMultiSelectAnswer(screenId, [label]);
       }
 
-      advance();
-    },
-    [advance, store],
-  );
-
-  const handleCapture = useCallback(
-    (name: string, email: string) => {
-      store.setUserName(name);
-      store.setEmail(email);
-      store.completeQuiz("steady" as ArchetypeId, selectedAmbition.current);
       advance();
     },
     [advance, store],
@@ -233,9 +223,6 @@ export default function QuizPage() {
       case "win-celebration":
         return <WinCelebration onContinue={advance} />;
 
-      case "capture-form":
-        return <CaptureForm onSubmit={handleCapture} />;
-
       default:
         return null;
     }
@@ -257,7 +244,7 @@ export default function QuizPage() {
           position: "fixed",
           inset: 0,
           zIndex: 0,
-          background: isWin || screen?.type === "capture-form"
+          background: isWin
             ? `
               radial-gradient(ellipse 70% 55% at 50% 20%, rgba(200,255,0,0.10) 0%, transparent 60%),
               radial-gradient(ellipse 60% 50% at 10% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
@@ -438,39 +425,6 @@ export default function QuizPage() {
               )}
             </div>
           )}
-
-        {/* ── Capture heading (special layout for form) ── */}
-        {screen?.type === "capture-form" && (
-          <div style={{ padding: "0 20px 16px" }}>
-            <h2
-              style={{
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 700,
-                fontStyle: "italic",
-                fontSize: 40,
-                lineHeight: 0.97,
-                letterSpacing: "-0.025em",
-                color: "rgba(235,242,255,0.92)",
-                margin: "0 0 10px",
-              }}
-            >
-              Where should we<br />send your{" "}
-              <em style={{ fontStyle: "normal", color: "#C8FF00" }}>plan?</em>
-            </h2>
-            <p
-              style={{
-                fontFamily: "var(--font-body), Georgia, serif",
-                fontWeight: 400,
-                fontSize: 14,
-                color: "rgba(120,155,195,0.50)",
-                lineHeight: 1.6,
-                margin: 0,
-              }}
-            >
-              Your personalised plan is built. We just need to know who to send it to.
-            </p>
-          </div>
-        )}
 
         {/* ── Step content ── */}
         <div style={{ padding: isSplash ? 0 : "0 20px 48px" }}>

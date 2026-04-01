@@ -518,10 +518,4 @@ export const QUIZ_SCREENS: QuizScreen[] = [
     autoAdvance: false,
   },
 
-  {
-    id: "capture",
-    type: "capture-form",
-    question: "Where should we send your plan?",
-    autoAdvance: false,
-  },
 ];

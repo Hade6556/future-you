@@ -82,7 +82,10 @@ export default function HomeClient() {
   }, [quizComplete, onboardingComplete]);
 
 
-  if (!quizComplete) return <HookScreen />;
+  if (!quizComplete) {
+    router.replace("/quiz");
+    return null;
+  }
   if (!onboardingComplete) return null;
 
   const firstName   = userName ? userName.split(" ")[0] : "";
