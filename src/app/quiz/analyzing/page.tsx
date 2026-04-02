@@ -4,8 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
-import { MascotReactor } from "../../components/mascot/MascotReactor";
 import { AMBITION_GOAL_MAP } from "../../types/pipeline";
+
+const LIME = "#C8FF00";
+const TEXT_HI = "rgba(235,242,255,0.95)";
+const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_LO = "rgba(120,155,195,0.40)";
 
 const AMBITION_LABELS: Record<string, string> = {
   entrepreneur: "business goals",
@@ -65,13 +69,11 @@ export default function AnalyzingPage() {
     "Your personalized plan is ready.",
   ];
 
-  // Fire plan generation once — runs in background during the animation
   useEffect(() => {
     if (planFired.current) return;
     planFired.current = true;
     const goal = AMBITION_GOAL_MAP[ambitionType ?? "wellness"] ?? "wellness";
 
-    // Derive the domain-specific goals key (e.g., "q_goals_career" for Career & Ambition)
     const domainKeyMap: Record<string, string> = {
       career: "q_goals_career",
       entrepreneur: "q_goals_career",
@@ -88,7 +90,6 @@ export default function AnalyzingPage() {
     const goalsKey = domainKeyMap[ambitionType ?? ""] ?? "";
     const specificGoals = goalsKey ? (multiSelectAnswers[goalsKey] ?? []) : [];
 
-    // Read dream narrative from sessionStorage (set by intake page)
     let dreamNarrative = quizDream ?? null;
     try {
       if (!dreamNarrative && typeof window !== "undefined") {
@@ -97,7 +98,6 @@ export default function AnalyzingPage() {
     } catch { /* SSR guard */ }
 
     const userContext = {
-      // Existing fields
       timeline: quizTimeline ?? undefined,
       commitment: quizCommitment ?? undefined,
       schedule: quizSchedule ?? undefined,
@@ -106,7 +106,6 @@ export default function AnalyzingPage() {
       currentState: quizCurrentState ?? undefined,
       vision: quizVision ?? undefined,
       gender: quizGender ?? undefined,
-      // Quiz signals
       ageGroup: quizAgeGroup ?? undefined,
       specificGoals: specificGoals.length > 0 ? specificGoals : undefined,
       motivations: multiSelectAnswers["q_motivations"]?.length ? multiSelectAnswers["q_motivations"] : undefined,
@@ -114,17 +113,13 @@ export default function AnalyzingPage() {
       selfTrust: multiSelectAnswers["q_self_trust"]?.[0] ?? undefined,
       problems: multiSelectAnswers["q_problems"]?.length ? multiSelectAnswers["q_problems"] : undefined,
       pastAttempts: quizPastAttempts ?? undefined,
-      // Intake signals
       dreamNarrative: dreamNarrative ?? undefined,
-      // Identity signals
       archetype: dogArchetype ?? undefined,
       ambitionDomain: ambitionType ?? undefined,
-      // Wellbeing signals
       moodRating: moodRating ?? undefined,
       sleepQuality: sleepQuality ?? undefined,
       energyLevel: energyLevel ?? undefined,
       stressLevel: stressLevel != null ? String(stressLevel) : undefined,
-      // Domain-specific deep dive answers
       domainAnswers: Object.keys(multiSelectAnswers).length > 0 ? multiSelectAnswers : undefined,
     };
     setPipelineStatus("loading");
@@ -166,21 +161,121 @@ export default function AnalyzingPage() {
   const isDone = step === lines.length - 1;
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6">
-      <div className="flex flex-col items-center gap-8">
-        {/* Mascot with emotion changes */}
-        <motion.div
-          animate={{ scale: isDone ? [1, 1.08, 1] : 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <MascotReactor
-            emotion={isDone ? "celebrating" : "thinking"}
-            size={160}
-          />
-        </motion.div>
+    <div
+      style={{
+        minHeight: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 24px",
+        background: "#060912",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background mesh */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          background:
+            "radial-gradient(ellipse 70% 55% at 50% 20%, rgba(200,255,0,0.06) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 10% 90%, rgba(15,40,110,0.40) 0%, transparent 55%), linear-gradient(170deg, #0f1e3a 0%, #060912 55%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 360 }}>
+        {/* Pulsing concentric rings */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
+          <div style={{ position: "relative", width: 120, height: 120 }}>
+            {/* Outer breathing ring */}
+            <motion.div
+              animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.3, 0.15] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                position: "absolute",
+                inset: -16,
+                borderRadius: "50%",
+                border: "1px solid rgba(200,255,0,0.15)",
+              }}
+            />
+            {/* Middle ring */}
+            <motion.div
+              animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+              style={{
+                position: "absolute",
+                inset: -6,
+                borderRadius: "50%",
+                border: "1px solid rgba(200,255,0,0.20)",
+              }}
+            />
+            {/* Core orb */}
+            <motion.div
+              animate={{ scale: [1, 1.04, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                width: 120,
+                height: 120,
+                borderRadius: "50%",
+                background: "radial-gradient(circle at 40% 35%, rgba(200,255,0,0.20), rgba(200,255,0,0.04) 70%)",
+                border: "1px solid rgba(200,255,0,0.18)",
+                boxShadow: "0 0 60px rgba(200,255,0,0.10), inset 0 0 30px rgba(200,255,0,0.05)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* Inner spinner */}
+              <AnimatePresence mode="wait">
+                {isDone ? (
+                  <motion.div
+                    key="check"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                  >
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                      <circle cx="20" cy="20" r="20" fill={LIME} />
+                      <path d="M12 20.5l5.5 5.5L28 15" stroke="#060912" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="spinner"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: "50%",
+                      border: "2px solid rgba(200,255,0,0.12)",
+                      borderTopColor: LIME,
+                    }}
+                  />
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        </div>
 
         {/* Animated text line */}
-        <div className="h-8 w-full max-w-xs text-center">
+        <div style={{ textAlign: "center", marginBottom: 32, minHeight: 56 }}>
           <AnimatePresence mode="wait">
             <motion.p
               key={step}
@@ -188,46 +283,97 @@ export default function AnalyzingPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className={`text-center font-display text-base ${isDone ? "font-semibold text-primary" : "text-foreground"}`}
+              style={{
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontSize: 16,
+                fontWeight: isDone ? 600 : 500,
+                color: isDone ? LIME : TEXT_HI,
+                margin: 0,
+                lineHeight: 1.4,
+              }}
             >
               {lines[step]}
             </motion.p>
           </AnimatePresence>
         </div>
 
-        {/* Step dots: show which step we're on */}
-        <div className="flex items-center gap-1.5" aria-hidden>
+        {/* Step dots */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            marginBottom: 24,
+          }}
+        >
           {Array.from({ length: STEP_COUNT }).map((_, i) => (
             <motion.span
               key={i}
-              className="rounded-full"
               animate={{
-                width: i === step ? 20 : 6,
-                backgroundColor: i <= step ? "var(--accent-primary)" : "var(--border)",
+                width: i === step ? 22 : 6,
+                background: i <= step ? LIME : "rgba(255,255,255,0.10)",
               }}
-              style={{ height: 6, display: "block" }}
+              style={{
+                height: 6,
+                display: "block",
+                borderRadius: 999,
+              }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
             />
           ))}
         </div>
 
-        {/* Progress bar with shimmer effect */}
-        <div className="relative h-1.5 w-60 overflow-hidden rounded-full bg-secondary">
+        {/* Progress bar */}
+        <div
+          style={{
+            height: 5,
+            width: "100%",
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.06)",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
           <motion.div
-            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary to-accent-glow"
+            style={{
+              position: "absolute",
+              inset: 0,
+              right: "auto",
+              borderRadius: 999,
+              background: `linear-gradient(90deg, ${LIME}, rgba(200,255,0,0.6))`,
+            }}
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
             transition={{ duration: 8, ease: "linear" }}
           />
-          {/* Shimmer overlay */}
+          {/* Shimmer */}
           <motion.div
-            className="absolute inset-y-0 w-16 rounded-full bg-white/30"
-            animate={{ x: ["-64px", "256px"] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              width: 48,
+              borderRadius: 999,
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+            }}
+            animate={{ x: ["-48px", "400px"] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
           />
         </div>
 
-        <p className="font-accent text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        {/* Powered by */}
+        <p
+          style={{
+            fontFamily: "var(--font-jetbrains-mono), monospace",
+            fontSize: 9,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: TEXT_LO,
+            textAlign: "center",
+            marginTop: 16,
+          }}
+        >
           Powered by Behavio AI
         </p>
       </div>
