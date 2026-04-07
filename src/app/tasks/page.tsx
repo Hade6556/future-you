@@ -375,8 +375,45 @@ export default function TasksPage() {
           )}
         </header>
 
-        {/* ─── Morning Check-in (if not done today) ────────────────────── */}
-        {!checkinDoneToday && !tasksLoadedToday && (
+        {/* ─── No plan yet (shown before check-in if no plan) ──────────── */}
+        {!pipelinePlan && !tasksLoadedToday && !loading && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+              padding: "40px 24px",
+              textAlign: "center",
+            }}
+          >
+            <p style={{ fontFamily: FONT_BODY, fontSize: 15, color: TEXT_MID, lineHeight: 1.6 }}>
+              Generate your plan first so we can create targeted daily tasks.
+            </p>
+            <Link
+              href="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "14px 28px",
+                background: LIME,
+                color: NAVY,
+                borderRadius: 14,
+                fontFamily: FONT_HEADING,
+                fontWeight: 800,
+                fontSize: 16,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase" as const,
+                textDecoration: "none",
+              }}
+            >
+              Go to plan
+            </Link>
+          </div>
+        )}
+
+        {/* ─── Morning Check-in (if not done today and plan exists) ───────── */}
+        {pipelinePlan && !checkinDoneToday && !tasksLoadedToday && (
           <MorningCheckin
             userName={userName}
             onSubmit={generateTasks}
@@ -569,7 +606,7 @@ export default function TasksPage() {
         )}
 
         {/* ─── Generation failed or stuck — retry ────────────────────────── */}
-        {checkinDoneToday && !tasksLoadedToday && !loading && (
+        {pipelinePlan && checkinDoneToday && !tasksLoadedToday && !loading && (
           <div
             style={{
               display: "flex",
@@ -607,42 +644,6 @@ export default function TasksPage() {
           </div>
         )}
 
-        {/* ─── No plan yet ─────────────────────────────────────────────── */}
-        {!pipelinePlan && checkinDoneToday && !loading && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 16,
-              padding: "40px 24px",
-              textAlign: "center",
-            }}
-          >
-            <p style={{ fontFamily: FONT_BODY, fontSize: 15, color: TEXT_MID, lineHeight: 1.6 }}>
-              Generate your plan first so we can create targeted daily tasks.
-            </p>
-            <Link
-              href="/"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "14px 28px",
-                background: LIME,
-                color: NAVY,
-                borderRadius: 14,
-                fontFamily: FONT_HEADING,
-                fontWeight: 800,
-                fontSize: 16,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase" as const,
-                textDecoration: "none",
-              }}
-            >
-              Go to plan
-            </Link>
-          </div>
-        )}
       </div>
 
       {/* ─── Bottom sheets ──────────────────────────────────────────────── */}
