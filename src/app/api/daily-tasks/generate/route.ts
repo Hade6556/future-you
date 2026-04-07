@@ -144,7 +144,11 @@ const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) :
 
 export async function POST(request: Request) {
   const auth = await requireAuth();
-  if (auth.error) return auth.error;
+  if (auth.error) {
+    // Fall back to mock tasks instead of blocking the user
+    console.warn("/api/daily-tasks/generate: auth failed, returning mock tasks");
+    return NextResponse.json(MOCK_RESPONSE);
+  }
 
   const limited = rateLimitResponse(request);
   if (limited) return limited;
