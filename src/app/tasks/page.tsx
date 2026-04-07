@@ -391,7 +391,7 @@ export default function TasksPage() {
               Generate your plan first so we can create targeted daily tasks.
             </p>
             <Link
-              href="/"
+              href="/intake"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -407,7 +407,7 @@ export default function TasksPage() {
                 textDecoration: "none",
               }}
             >
-              Go to plan
+              Generate plan
             </Link>
           </div>
         )}

@@ -66,6 +66,13 @@ export default function HomeClient() {
     }
   }, [quizComplete, onboardingComplete, router]);
 
+  // If onboarding is done but no plan was generated, send user back to intake
+  useEffect(() => {
+    if (quizComplete && onboardingComplete && !pipelinePlan) {
+      router.replace("/intake");
+    }
+  }, [quizComplete, onboardingComplete, pipelinePlan, router]);
+
   // Hydrate from server early so returning logged-in users don't get stuck in local-first quiz flow.
   useEffect(() => {
     void hydrateFromServer();
