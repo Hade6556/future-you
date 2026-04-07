@@ -64,7 +64,7 @@ export function PWAInstallBanner() {
             </div>
             <div className="min-w-0">
               <p className="text-[13px] font-semibold text-text-primary">Add to Home Screen</p>
-              <p className="text-[11px] text-text-secondary">One tap to today&apos;s plan</p>
+              <p className="text-[13px] text-text-secondary">One tap to today&apos;s plan</p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">

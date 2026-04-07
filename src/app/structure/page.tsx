@@ -173,6 +173,7 @@ export default function StructurePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcript: rawTranscript, lang }),
+        credentials: "include",
       });
       const data = await res.json() as { cleaned: string };
       cleaned = data.cleaned || rawTranscript;
@@ -187,6 +188,7 @@ export default function StructurePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcript: cleaned }),
+        credentials: "include",
       }).then((r) => r.json() as Promise<{ categories: Array<{ label: string; pct: number }> }>),
       fetch("/api/coach", {
         method: "POST",
@@ -196,6 +198,7 @@ export default function StructurePage() {
           mode: "reflect",
           context: { archetype: dogArchetype, ambitionType, streak, userName, lastReflection },
         }),
+        credentials: "include",
       }).then((r) => r.json() as Promise<{ message: string; actionItem?: string | null; sentiment?: string }>),
     ]);
 
@@ -228,6 +231,7 @@ export default function StructurePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: cleaned, coach_response: coachMsg, sentiment }),
+        credentials: "include",
       });
     } catch { /* non-blocking */ }
 

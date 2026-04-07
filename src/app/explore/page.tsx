@@ -275,7 +275,7 @@ export default function ExplorePage() {
                           display: "inline-block",
                           borderRadius: 999,
                           padding: "4px 10px",
-                          fontSize: 11,
+                          fontSize: 13,
                           fontWeight: 700,
                           letterSpacing: "0.02em",
                           fontFamily: "var(--font-barlow-condensed), sans-serif",

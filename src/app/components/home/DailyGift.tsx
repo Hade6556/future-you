@@ -68,7 +68,7 @@ export function DailyGift({ dayNumber }: Props) {
         }}
       >
         <p
-          className="mb-5 text-[9px] font-black uppercase tracking-[0.22em]"
+          className="mb-5 text-[12px] font-black uppercase tracking-[0.22em]"
           style={{ color: "var(--accent-secondary)" }}
         >
           Today&apos;s Gift

@@ -405,7 +405,7 @@ export default function AmbitionMapOrbs({ categories }: Props) {
               <span
                 style={{
                   ...FONT_MONO,
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: 600,
                   color: TEXT_HI,
                   minWidth: 30,
@@ -419,7 +419,7 @@ export default function AmbitionMapOrbs({ categories }: Props) {
               <span
                 style={{
                   ...FONT_MONO,
-                  fontSize: 9,
+                  fontSize: 12,
                   fontWeight: 600,
                   color: deltaColor,
                   background:

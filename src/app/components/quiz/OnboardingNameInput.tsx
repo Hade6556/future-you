@@ -51,7 +51,7 @@ export function OnboardingNameInput({
           labelFloated
             ? {
                 top: 0,
-                fontSize: "11px",
+                fontSize: "13px",
                 fontWeight: 600,
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",

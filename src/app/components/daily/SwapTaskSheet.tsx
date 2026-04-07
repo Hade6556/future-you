@@ -40,6 +40,7 @@ export default function SwapTaskSheet({ task, currentStep, ambitionType, energy,
           energy,
           timeAvailable,
         }),
+        credentials: "include",
       });
       const data = await res.json();
       if (data.replacement) {

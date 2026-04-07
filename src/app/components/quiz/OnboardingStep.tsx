@@ -40,7 +40,7 @@ export function OnboardingStep({
   const pct = Math.round((step / totalSteps) * 100);
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center px-5 py-10">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-5 py-6">
       {/* Ambient glow behind card */}
       <div className="relative w-full max-w-[360px]">
         <div
@@ -58,7 +58,7 @@ export function OnboardingStep({
           style={{ boxShadow: "var(--oq-card-shadow)" }}
         >
           <motion.div
-            className="flex flex-col gap-6 rounded-3xl bg-card px-8 py-8"
+            className="flex flex-col gap-5 rounded-3xl bg-card px-6 py-6"
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
@@ -84,7 +84,7 @@ export function OnboardingStep({
                 />
               </div>
               <span
-                className="shrink-0 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground"
+                className="shrink-0 text-[13px] font-semibold uppercase tracking-widest text-muted-foreground"
               >
                 Step {step} of {totalSteps}
               </span>
@@ -171,7 +171,7 @@ export function OnboardingStep({
               </button>
 
               {/* Microcopy */}
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="text-[13px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Quick · Private · No spam
               </p>
             </div>

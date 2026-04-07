@@ -108,7 +108,7 @@ export function NavBar() {
   const labelStyle = (active: boolean): React.CSSProperties => ({
     fontFamily: "var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif",
     fontWeight: 700,
-    fontSize: 9,
+    fontSize: 12,
     letterSpacing: "0.10em",
     textTransform: "uppercase",
     color: active ? "#C8FF00" : "rgba(120,155,195,0.50)",
@@ -274,7 +274,7 @@ export function NavBar() {
                   <span style={{
                     fontFamily: "var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif",
                     fontWeight: 700,
-                    fontSize: 9,
+                    fontSize: 12,
                     letterSpacing: "0.10em",
                     textTransform: "uppercase",
                     color: "rgba(235,242,255,0.70)",

@@ -60,7 +60,7 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
             </div>
 
             <p
-              className="mb-5 text-[11px] font-bold uppercase tracking-[0.18em]"
+              className="mb-5 text-[13px] font-bold uppercase tracking-[0.18em]"
               style={{ color: "var(--text-muted)" }}
             >
               Today at a Glance
@@ -70,7 +70,7 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
               {/* Streak */}
               <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Streak</p>
+                  <p className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Streak</p>
                   <p className="text-[28px] font-extrabold leading-none" style={{ color: "rgba(235,242,255,0.92)" }}>
                     {streak}
                     <span className="ml-1 text-[13px] font-semibold" style={{ color: "rgba(120,155,195,0.75)" }}>days</span>
@@ -81,7 +81,7 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
 
               {/* Today's status */}
               <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
-                <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Today's task</p>
+                <p className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Today's task</p>
                 <span
                   className="rounded-full px-3 py-1 text-[12px] font-bold"
                   style={{ background: status.bg, color: status.text }}
@@ -94,7 +94,7 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
               {dayInfo && (
                 <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Plan progress</p>
+                    <p className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Plan progress</p>
                     <p className="text-[13px] font-bold" style={{ color: "rgba(235,242,255,0.92)" }}>
                       Day {dayInfo.currentDay}
                       <span className="font-normal" style={{ color: "rgba(120,155,195,0.75)" }}> / {dayInfo.totalDays}</span>

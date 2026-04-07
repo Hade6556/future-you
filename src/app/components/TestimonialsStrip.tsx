@@ -61,7 +61,7 @@ export function TestimonialsStrip() {
         >
           {/* Day badge — top right */}
           <div
-            className="absolute right-4 top-4 rounded-full px-2.5 py-0.5 text-[11px] font-bold"
+            className="absolute right-4 top-4 rounded-full px-2.5 py-0.5 text-[13px] font-bold"
             style={{ backgroundColor: LIME, color: "#060912" }}
           >
             Day {t.day}
@@ -90,7 +90,7 @@ export function TestimonialsStrip() {
               <span className="text-[13px] font-semibold leading-tight" style={{ color: DARK }}>
                 {t.name}
               </span>
-              <span className="mt-1 text-[11px] leading-tight" style={{ color: MUTED }}>
+              <span className="mt-1 text-[13px] leading-tight" style={{ color: MUTED }}>
                 {t.meta}
               </span>
             </div>

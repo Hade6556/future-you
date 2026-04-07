@@ -122,7 +122,7 @@ const sourceBadgeStyle: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,0.20)",
   borderRadius: 999,
   padding: "4px 10px",
-  fontSize: 11,
+  fontSize: 13,
   color: "#fff",
   backdropFilter: "blur(8px)",
   WebkitBackdropFilter: "blur(8px)",
@@ -532,7 +532,7 @@ function EventCard({ event, userLocation }: { event: PipelineEvent; userLocation
       {/* Body */}
       <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "16px 16px 20px" }}>
         {/* Scraped-from attribution */}
-        <p style={{ fontSize: 11, color: TEXT_LO, fontFamily: FONT_MONO }}>
+        <p style={{ fontSize: 13, color: TEXT_LO, fontFamily: FONT_MONO }}>
           Scraped from{" "}
           <span style={{ fontWeight: 500 }}>
             {sourceMeta ? sourceMeta.label : event.source_name}
@@ -660,6 +660,7 @@ export default function EventsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ goal, location: locationInput }),
+        credentials: "include",
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));

@@ -102,7 +102,7 @@ export function HookScreen() {
             style={{
               textAlign: "center",
               fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 11,
+              fontSize: 13,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "rgba(120,155,195,0.56)",

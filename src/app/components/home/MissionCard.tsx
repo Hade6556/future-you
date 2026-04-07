@@ -14,7 +14,7 @@ function StatusLabel({ status }: { status: CheckinStatus }) {
   const { label, bg } = map[status];
   return (
     <span
-      className="rounded-full px-2.5 py-0.5 text-[10px] font-bold text-white"
+      className="rounded-full px-2.5 py-0.5 text-[13px] font-bold text-white"
       style={{ background: bg }}
     >
       {label}
@@ -62,7 +62,7 @@ export function MissionCard() {
 
         {/* Title */}
         <div className="flex-1 flex flex-col justify-center gap-1 mt-2">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+          <p className="text-[13px] font-bold uppercase tracking-wider text-white/70">
             Today
           </p>
           <p className="text-[16px] font-extrabold leading-snug text-white">

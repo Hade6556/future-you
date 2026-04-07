@@ -31,7 +31,7 @@ const body: CSSProperties = {
 
 const eyebrow: CSSProperties = {
   fontFamily: "var(--font-jetbrains-mono), monospace",
-  fontSize: 10,
+  fontSize: 13,
   letterSpacing: "0.16em",
   textTransform: "uppercase",
   color: TEXT_LO,
@@ -229,7 +229,7 @@ export default function AccountPage() {
               Account
             </h1>
             {email && (
-              <p style={{ ...eyebrow, marginTop: 4, fontSize: 11 }}>{email}</p>
+              <p style={{ ...eyebrow, marginTop: 4, fontSize: 13 }}>{email}</p>
             )}
           </div>
         </div>
@@ -291,7 +291,7 @@ export default function AccountPage() {
               style={{
                 borderRadius: 999,
                 padding: "4px 12px",
-                fontSize: 10,
+                fontSize: 13,
                 fontWeight: 700,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
@@ -396,7 +396,7 @@ export default function AccountPage() {
               href={l.href}
               style={{
                 ...eyebrow,
-                fontSize: 10,
+                fontSize: 13,
                 color: TEXT_LO,
                 textDecoration: "none",
               }}

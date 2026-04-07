@@ -114,7 +114,7 @@ export function StreakCard() {
             </p>
             {streakShields > 0 && (
               <span className="text-[13px] leading-none" title={`${streakShields} streak shield${streakShields > 1 ? "s" : ""}`}>
-                🛡️{streakShields > 1 && <span className="text-[10px] font-bold text-white/80">×{streakShields}</span>}
+                🛡️{streakShields > 1 && <span className="text-[13px] font-bold text-white/80">×{streakShields}</span>}
               </span>
             )}
           </div>
@@ -123,7 +123,7 @@ export function StreakCard() {
           </p>
           {/* Personal best */}
           {bestStreak > 0 && (
-            <p className="mt-0.5 text-[10px] text-white/50">
+            <p className="mt-0.5 text-[13px] text-white/50">
               {streak >= bestStreak ? "personal best 🏅" : `best: ${bestStreak}`}
             </p>
           )}
@@ -131,7 +131,7 @@ export function StreakCard() {
           {(() => {
             const next = getNextMilestone(streak);
             return next ? (
-              <p className="mt-0.5 text-[10px] text-white/60">
+              <p className="mt-0.5 text-[13px] text-white/60">
                 {next - streak} day{next - streak !== 1 ? "s" : ""} to {next === 7 ? "🔥 7" : next === 14 ? "⚡ 14" : next === 30 ? "🏆 30" : `${next}`}
               </p>
             ) : null;
@@ -154,11 +154,11 @@ export function StreakCard() {
             />
           </div>
           <div className="flex justify-between">
-            <span className="text-[9px] text-white/50">0</span>
+            <span className="text-[12px] text-white/50">0</span>
             {streak >= 7 && (
-              <span className="text-[9px] text-white/70">🔥 7</span>
+              <span className="text-[12px] text-white/70">🔥 7</span>
             )}
-            <span className="text-[9px] text-white/50">30</span>
+            <span className="text-[12px] text-white/50">30</span>
           </div>
         </div>
       </div>

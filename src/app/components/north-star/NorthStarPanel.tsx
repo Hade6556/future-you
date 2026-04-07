@@ -40,7 +40,7 @@ export function NorthStarPanel() {
         <div className="mx-auto flex min-w-0 max-w-lg flex-1 flex-col">
           <HeroSection onOpen={open} />
           <section className="flex flex-1 flex-col gap-3 overflow-y-auto py-6 md:gap-4">
-            <p className="operator-label text-[10px] text-muted-foreground">Stacked Rituals</p>
+            <p className="operator-label text-[13px] text-muted-foreground">Stacked Rituals</p>
             {status.chips.map((chip) => (
               <button
                 key={chip.id}

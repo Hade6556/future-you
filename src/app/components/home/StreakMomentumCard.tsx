@@ -58,7 +58,7 @@ export function StreakMomentumCard() {
         <span
           style={{
             fontFamily: "var(--font-jetbrains-mono), monospace",
-            fontSize: 9,
+            fontSize: 12,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
             color: "rgba(120,155,195,0.50)",
@@ -116,7 +116,7 @@ export function StreakMomentumCard() {
               <span
                 style={{
                   fontFamily: "var(--font-jetbrains-mono), monospace",
-                  fontSize: 8,
+                  fontSize: 12,
                   letterSpacing: "0.06em",
                   color: isToday
                     ? "rgba(200,255,0,0.70)"

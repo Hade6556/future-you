@@ -147,6 +147,7 @@ export default function MentorsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ goal, location: locationInput }),
+        credentials: "include",
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));

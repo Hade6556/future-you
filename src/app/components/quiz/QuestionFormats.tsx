@@ -14,8 +14,8 @@ import {
 const LIME = "#C8FF00";
 const NAVY = "#0A1628";
 const TEXT_HI = "rgba(235,242,255,0.92)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const TEXT_LO = "rgba(120,155,195,0.40)";
+const TEXT_MID = "rgba(120,155,195,0.85)";
+const TEXT_LO = "rgba(120,155,195,0.55)";
 const GLASS = "rgba(255,255,255,0.07)";
 const GLASS_BORDER = "rgba(255,255,255,0.14)";
 
@@ -72,18 +72,17 @@ export function SplashStep({ onContinue }: { onContinue: () => void }) {
       >
         <h1
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
-            fontStyle: "italic",
-            fontSize: 50,
-            lineHeight: 0.96,
-            letterSpacing: "-0.03em",
+            fontSize: 36,
+            lineHeight: 1.05,
+            letterSpacing: "-0.02em",
             color: TEXT_HI,
             margin: "0 0 18px",
           }}
         >
           Your{" "}
-          <em style={{ fontStyle: "normal", color: LIME }}>best self</em>
+          <em style={{ fontStyle: "italic", color: LIME }}>best self</em>
           {" "}is already<br />in there.
         </h1>
         <p
@@ -113,13 +112,13 @@ export function SplashStep({ onContinue }: { onContinue: () => void }) {
             width: "100%",
             background: LIME,
             color: "#060912",
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
             fontSize: 18,
             letterSpacing: "0.1em",
             textTransform: "uppercase",
             borderRadius: 100,
-            padding: "20px 32px",
+            padding: "16px 28px",
             border: "none",
             cursor: "pointer",
             boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
@@ -137,7 +136,7 @@ export function SplashStep({ onContinue }: { onContinue: () => void }) {
         <p
           style={{
             fontFamily: "var(--font-jetbrains-mono), monospace",
-            fontSize: 10,
+            fontSize: 13,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: TEXT_LO,
@@ -197,6 +196,8 @@ export function TwoColCards({ options, onSelect }: TwoColCardsProps) {
               WebkitBackdropFilter: "blur(16px)",
               cursor: "pointer",
               minHeight: 150,
+              boxShadow: isSelected ? "0 0 24px rgba(200,255,0,0.18)" : "none",
+              transition: "box-shadow 0.2s",
             }}
           >
             {opt.icon && (
@@ -205,10 +206,9 @@ export function TwoColCards({ options, onSelect }: TwoColCardsProps) {
             <span
               style={{
                 fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 700,
-                fontSize: 17,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
+                fontWeight: 600,
+                fontSize: 16,
+                letterSpacing: "0.02em",
                 color: isSelected ? LIME : TEXT_HI,
               }}
             >
@@ -254,9 +254,9 @@ export function ListRows({ options, onSelect }: ListRowsProps) {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
-              padding: "12px 14px",
-              borderRadius: 12,
+              gap: 12,
+              padding: "14px 16px",
+              borderRadius: 14,
               border: `1px solid ${isSelected ? "rgba(200,255,0,0.40)" : GLASS_BORDER}`,
               background: isSelected ? "rgba(200,255,0,0.10)" : GLASS,
               backdropFilter: "blur(16px)",
@@ -269,14 +269,14 @@ export function ListRows({ options, onSelect }: ListRowsProps) {
             {opt.icon && (
               <span
                 style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 8,
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
                   background: "rgba(255,255,255,0.06)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 15,
+                  fontSize: 22,
                   flexShrink: 0,
                 }}
               >
@@ -285,8 +285,8 @@ export function ListRows({ options, onSelect }: ListRowsProps) {
             )}
             <span
               style={{
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 700,
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontWeight: 500,
                 fontSize: 15,
                 color: isSelected ? LIME : TEXT_HI,
                 flex: 1,
@@ -378,8 +378,8 @@ export function MultiSelect({ options, onContinue }: MultiSelectProps) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 14,
-                padding: "16px 18px",
+                gap: 12,
+                padding: "14px 16px",
                 borderRadius: 14,
                 border: `1px solid ${on ? "rgba(200,255,0,0.40)" : GLASS_BORDER}`,
                 background: on ? "rgba(200,255,0,0.10)" : GLASS,
@@ -393,14 +393,14 @@ export function MultiSelect({ options, onContinue }: MultiSelectProps) {
               {opt.icon && (
                 <span
                   style={{
-                    width: 38,
-                    height: 38,
+                    width: 34,
+                    height: 34,
                     borderRadius: 10,
                     background: "rgba(255,255,255,0.06)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 18,
+                    fontSize: 22,
                     flexShrink: 0,
                   }}
                 >
@@ -409,9 +409,9 @@ export function MultiSelect({ options, onContinue }: MultiSelectProps) {
               )}
               <span
                 style={{
-                  fontFamily: "var(--font-barlow-condensed), sans-serif",
-                  fontWeight: 700,
-                  fontSize: 16,
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 500,
+                  fontSize: 15,
                   color: on ? LIME : TEXT_HI,
                   flex: 1,
                 }}
@@ -459,11 +459,11 @@ export function MultiSelect({ options, onContinue }: MultiSelectProps) {
           color: "#060912",
           fontFamily: "var(--font-barlow-condensed), sans-serif",
           fontWeight: 700,
-          fontSize: 18,
+          fontSize: 17,
           letterSpacing: "0.1em",
           textTransform: "uppercase",
           borderRadius: 100,
-          padding: "20px 32px",
+          padding: "16px 28px",
           border: "none",
           cursor: canContinue ? "pointer" : "default",
           boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
@@ -529,13 +529,15 @@ export function SliderScale({ scaleLabels, onContinue }: SliderScaleProps) {
                 WebkitBackdropFilter: "blur(12px)",
                 cursor: "pointer",
                 minHeight: 72,
+                boxShadow: isSelected ? "0 4px 16px rgba(200,255,0,0.18)" : "none",
+                transition: "box-shadow 0.2s",
               }}
             >
               <span
                 style={{
                   fontFamily: "var(--font-barlow-condensed), sans-serif",
                   fontWeight: 800,
-                  fontSize: 18,
+                  fontSize: 20,
                   color: isSelected ? NAVY : TEXT_HI,
                 }}
               >
@@ -543,11 +545,12 @@ export function SliderScale({ scaleLabels, onContinue }: SliderScaleProps) {
               </span>
               <span
                 style={{
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                  fontSize: 9,
-                  letterSpacing: "0.06em",
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  letterSpacing: "0.04em",
                   textTransform: "uppercase",
-                  color: isSelected ? "rgba(6,9,18,0.55)" : TEXT_LO,
+                  color: isSelected ? "rgba(6,9,18,0.60)" : TEXT_LO,
                   textAlign: "center",
                   lineHeight: 1.2,
                 }}
@@ -573,11 +576,11 @@ export function SliderScale({ scaleLabels, onContinue }: SliderScaleProps) {
               color: "#060912",
               fontFamily: "var(--font-barlow-condensed), sans-serif",
               fontWeight: 700,
-              fontSize: 18,
+              fontSize: 17,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               borderRadius: 100,
-              padding: "20px 32px",
+              padding: "16px 28px",
               border: "none",
               cursor: "pointer",
               boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
@@ -645,10 +648,9 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
           >
             <span
               style={{
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 900,
-                fontStyle: "italic",
-                fontSize: 96,
+                fontSize: 72,
                 lineHeight: 0.9,
                 letterSpacing: "-0.03em",
                 color: LIME,
@@ -672,11 +674,10 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
       >
         <p
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
-            fontWeight: 700,
-            fontStyle: "italic",
-            fontSize: 24,
-            lineHeight: 1.15,
+            fontFamily: "var(--font-display), sans-serif",
+            fontWeight: 600,
+            fontSize: 22,
+            lineHeight: 1.2,
             letterSpacing: "-0.01em",
             color: TEXT_HI,
             margin: "0 0 6px",
@@ -754,7 +755,7 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
               <span
                 key={i}
                 style={{
-                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontFamily: "var(--font-display), sans-serif",
                   fontSize: 18,
                   color: TEXT_LO,
                   margin: "0 4px",
@@ -777,7 +778,7 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
                 <span
                   style={{
                     fontFamily: "var(--font-jetbrains-mono), monospace",
-                    fontSize: 8,
+                    fontSize: 12,
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     color: TEXT_LO,
@@ -874,7 +875,7 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
             <span
               style={{
                 fontFamily: "var(--font-jetbrains-mono), monospace",
-                fontSize: 9,
+                fontSize: 12,
                 letterSpacing: "0.06em",
                 color: TEXT_LO,
               }}
@@ -893,13 +894,13 @@ export function InsightCard({ stat, headline, body, ctaLabel, avatars, badges, o
           maxWidth: 360,
           background: LIME,
           color: "#060912",
-          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontFamily: "var(--font-display), sans-serif",
           fontWeight: 700,
           fontSize: 18,
           letterSpacing: "0.1em",
           textTransform: "uppercase",
           borderRadius: 100,
-          padding: "20px 32px",
+          padding: "16px 28px",
           border: "none",
           cursor: "pointer",
           boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
@@ -949,7 +950,7 @@ export function YesNoPills({ onSelect }: YesNoProps) {
             whileTap={{ scale: 0.96 }}
             style={{
               flex: 1,
-              padding: "20px 16px",
+              padding: "24px 16px",
               borderRadius: 100,
               border: `1px solid ${isSelected ? LIME : GLASS_BORDER}`,
               background: isSelected ? LIME : GLASS,
@@ -957,11 +958,13 @@ export function YesNoPills({ onSelect }: YesNoProps) {
               WebkitBackdropFilter: "blur(16px)",
               cursor: "pointer",
               fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 800,
+              fontWeight: 700,
               fontSize: 18,
               letterSpacing: "0.08em",
               textTransform: "uppercase" as const,
               color: isSelected ? NAVY : TEXT_HI,
+              boxShadow: isSelected ? "0 0 20px rgba(200,255,0,0.22)" : "none",
+              transition: "box-shadow 0.2s",
             }}
           >
             {label}
@@ -987,23 +990,34 @@ export function CommitmentScale({ subtext, onSelect }: CommitmentScaleProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24, width: "100%" }}>
       {subtext && (
-        <p
+        <div
           style={{
-            fontFamily: "var(--font-jetbrains-mono), monospace",
-            fontSize: 10,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: TEXT_LO,
-            textAlign: "center",
-            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
           }}
         >
-          {subtext}
-        </p>
+          <span style={{ flex: 1, height: 1, background: "rgba(200,255,0,0.12)" }} />
+          <span
+            style={{
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 700,
+              fontSize: 12,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "rgba(200,255,0,0.55)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {subtext}
+          </span>
+          <span style={{ flex: 1, height: 1, background: "rgba(200,255,0,0.12)" }} />
+        </div>
       )}
 
-      <div style={{ display: "flex", gap: 8, width: "100%" }}>
-        {[1, 2, 3, 4, 5].map((val) => {
+      <div style={{ display: "flex", gap: 10, width: "100%" }}>
+        {[1, 2, 3, 4].map((val) => {
           const isSelected = selected === val;
           return (
             <motion.button
@@ -1015,8 +1029,8 @@ export function CommitmentScale({ subtext, onSelect }: CommitmentScaleProps) {
               whileTap={{ scale: 0.92 }}
               style={{
                 flex: 1,
-                aspectRatio: "1",
-                borderRadius: 14,
+                padding: "22px 8px",
+                borderRadius: 16,
                 border: `1px solid ${isSelected ? LIME : GLASS_BORDER}`,
                 background: isSelected ? LIME : GLASS,
                 backdropFilter: "blur(12px)",
@@ -1024,11 +1038,13 @@ export function CommitmentScale({ subtext, onSelect }: CommitmentScaleProps) {
                 cursor: "pointer",
                 fontFamily: "var(--font-barlow-condensed), sans-serif",
                 fontWeight: 800,
-                fontSize: 22,
+                fontSize: 26,
                 color: isSelected ? NAVY : TEXT_HI,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                boxShadow: isSelected ? "0 0 20px rgba(200,255,0,0.20)" : "none",
+                transition: "box-shadow 0.2s",
               }}
             >
               {val}
@@ -1054,7 +1070,7 @@ export function CommitmentScale({ subtext, onSelect }: CommitmentScaleProps) {
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               borderRadius: 100,
-              padding: "20px 32px",
+              padding: "16px 28px",
               border: "none",
               cursor: "pointer",
               boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
@@ -1198,7 +1214,7 @@ export function LiveCounterCard({
           <span
             style={{
               fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: 600,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
@@ -1218,7 +1234,7 @@ export function LiveCounterCard({
         >
           <div
             style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontFamily: "var(--font-display), sans-serif",
               fontWeight: 800,
               fontSize: 56,
               lineHeight: 1,
@@ -1309,7 +1325,7 @@ export function LiveCounterCard({
               <span
                 style={{
                   fontFamily: "var(--font-jetbrains-mono), monospace",
-                  fontSize: 9,
+                  fontSize: 12,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   color: TEXT_LO,
@@ -1369,12 +1385,12 @@ export function LiveCounterCard({
           marginTop: 12,
           width: "100%",
           maxWidth: 360,
-          padding: "20px 32px",
+          padding: "16px 28px",
           background: LIME,
           color: NAVY,
           border: "none",
           borderRadius: 100,
-          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontFamily: "var(--font-display), sans-serif",
           fontWeight: 700,
           fontSize: 17,
           letterSpacing: "0.10em",
@@ -1396,7 +1412,7 @@ export function LiveCounterCard({
       <p
         style={{
           fontFamily: "var(--font-jetbrains-mono), monospace",
-          fontSize: 10,
+          fontSize: 13,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
           color: TEXT_LO,
@@ -1498,10 +1514,9 @@ export function ComparisonCard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         style={{
-          fontFamily: "var(--font-barlow-condensed), sans-serif",
-          fontWeight: 700,
-          fontStyle: "italic",
-          fontSize: 22,
+          fontFamily: "var(--font-display), sans-serif",
+          fontWeight: 600,
+          fontSize: 20,
           lineHeight: 1.2,
           color: TEXT_HI,
           margin: "0 0 20px",
@@ -1537,9 +1552,9 @@ export function ComparisonCard({
         />
         <div
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
-            fontSize: 10,
+            fontSize: 13,
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             color: "#FF6B6B",
@@ -1584,7 +1599,7 @@ export function ComparisonCard({
                 style={{
                   fontFamily: "var(--font-apercu), sans-serif",
                   fontWeight: 400,
-                  fontSize: 11,
+                  fontSize: 13,
                   color: TEXT_LO,
                   lineHeight: 1.3,
                   marginTop: 1,
@@ -1628,9 +1643,8 @@ export function ComparisonCard({
         </div>
         <span
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
-            fontStyle: "italic",
             fontSize: 14,
             letterSpacing: "0.04em",
             color: LIME,
@@ -1667,9 +1681,9 @@ export function ComparisonCard({
         />
         <div
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
-            fontSize: 10,
+            fontSize: 13,
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             color: LIME,
@@ -1714,7 +1728,7 @@ export function ComparisonCard({
                 style={{
                   fontFamily: "var(--font-apercu), sans-serif",
                   fontWeight: 400,
-                  fontSize: 11,
+                  fontSize: 13,
                   color: TEXT_MID,
                   lineHeight: 1.3,
                   marginTop: 1,
@@ -1759,12 +1773,12 @@ export function ComparisonCard({
           style={{
             width: "100%",
             maxWidth: 360,
-            padding: "20px 32px",
+            padding: "16px 28px",
             background: LIME,
             color: NAVY,
             border: "none",
             borderRadius: 100,
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
             fontSize: 17,
             letterSpacing: "0.10em",
@@ -1829,10 +1843,9 @@ export function TimelineCard({
       >
         <span
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 900,
-            fontStyle: "italic",
-            fontSize: 84,
+            fontSize: 64,
             lineHeight: 0.9,
             color: LIME,
             textShadow: "0 0 60px rgba(200,255,0,0.30), 0 0 120px rgba(200,255,0,0.12)",
@@ -1852,11 +1865,10 @@ export function TimelineCard({
       >
         <p
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
-            fontWeight: 700,
-            fontStyle: "italic",
-            fontSize: 22,
-            lineHeight: 1.15,
+            fontFamily: "var(--font-display), sans-serif",
+            fontWeight: 600,
+            fontSize: 20,
+            lineHeight: 1.2,
             color: TEXT_HI,
             margin: "0 0 4px",
           }}
@@ -1911,9 +1923,9 @@ export function TimelineCard({
           />
           <div
             style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontFamily: "var(--font-display), sans-serif",
               fontWeight: 700,
-              fontSize: 10,
+              fontSize: 13,
               letterSpacing: "0.16em",
               textTransform: "uppercase",
               color: "#FF6B6B",
@@ -1937,9 +1949,9 @@ export function TimelineCard({
             >
               <div
                 style={{
-                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontFamily: "var(--font-display), sans-serif",
                   fontWeight: 700,
-                  fontSize: 8,
+                  fontSize: 12,
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   color: "rgba(255,107,107,0.45)",
@@ -1951,10 +1963,9 @@ export function TimelineCard({
               <div
                 style={{
                   fontFamily: "var(--font-apercu), sans-serif",
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: i === TIMELINE.length - 1 ? 500 : 400,
                   color: i === TIMELINE.length - 1 ? "rgba(255,107,107,0.75)" : TEXT_LO,
-                  fontStyle: i === TIMELINE.length - 1 ? "italic" : "normal",
                   lineHeight: 1.35,
                 }}
               >
@@ -1990,9 +2001,9 @@ export function TimelineCard({
           />
           <div
             style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontFamily: "var(--font-display), sans-serif",
               fontWeight: 700,
-              fontSize: 10,
+              fontSize: 13,
               letterSpacing: "0.16em",
               textTransform: "uppercase",
               color: LIME,
@@ -2016,9 +2027,9 @@ export function TimelineCard({
             >
               <div
                 style={{
-                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontFamily: "var(--font-display), sans-serif",
                   fontWeight: 700,
-                  fontSize: 8,
+                  fontSize: 12,
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   color: "rgba(200,255,0,0.50)",
@@ -2030,7 +2041,7 @@ export function TimelineCard({
               <div
                 style={{
                   fontFamily: "var(--font-apercu), sans-serif",
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: i === TIMELINE.length - 1 ? 700 : 500,
                   color: i === TIMELINE.length - 1 ? LIME : TEXT_HI,
                   lineHeight: 1.35,
@@ -2080,12 +2091,12 @@ export function TimelineCard({
           style={{
             width: "100%",
             maxWidth: 360,
-            padding: "20px 32px",
+            padding: "16px 28px",
             background: LIME,
             color: NAVY,
             border: "none",
             borderRadius: 100,
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
             fontSize: 17,
             letterSpacing: "0.10em",
@@ -2189,7 +2200,7 @@ function ProgressChart({
             key={l.label}
             style={{
               fontFamily: "var(--font-apercu), sans-serif",
-              fontSize: 11,
+              fontSize: 13,
               color: l.color,
               display: "flex",
               alignItems: "center",
@@ -2256,7 +2267,7 @@ function ProgressChart({
           x={toX(4) - 4}
           y={toY(primaryLine.points[4]) - 10}
           fill={primaryLine.color}
-          fontSize="9"
+          fontSize="12"
           fontFamily="var(--font-apercu), sans-serif"
           fontWeight="700"
           textAnchor="end"
@@ -2267,7 +2278,7 @@ function ProgressChart({
           x={toX(4) - 4}
           y={toY(baseline.points[4]) + 14}
           fill={baseline.color}
-          fontSize="8"
+          fontSize="12"
           fontFamily="var(--font-apercu), sans-serif"
           fontWeight="600"
           textAnchor="end"
@@ -2282,7 +2293,7 @@ function ProgressChart({
             x={toX(i)}
             y={H - 4}
             fill="rgba(255,255,255,0.35)"
-            fontSize="8"
+            fontSize="12"
             fontFamily="var(--font-jetbrains-mono), monospace"
             textAnchor="middle"
             letterSpacing="0.06em"
@@ -2434,10 +2445,9 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
       >
         <div
           style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 800,
-            fontStyle: "italic",
-            fontSize: 52,
+            fontSize: 40,
             lineHeight: 1,
             letterSpacing: "-0.02em",
             color: LIME,
@@ -2478,7 +2488,7 @@ export function WinCelebration({ onContinue }: { onContinue: () => void }) {
             color: NAVY,
             border: "none",
             borderRadius: 14,
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 700,
             fontSize: 17,
             letterSpacing: "0.10em",
@@ -2537,7 +2547,7 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
     border: `1px solid ${GLASS_BORDER}`,
     borderRadius: 14,
     color: TEXT_HI,
-    fontFamily: "var(--font-body), Georgia, serif",
+    fontFamily: "var(--font-apercu), sans-serif",
     fontWeight: 400,
     fontSize: 16,
     outline: "none",
@@ -2574,11 +2584,11 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
           color: "#060912",
           fontFamily: "var(--font-barlow-condensed), sans-serif",
           fontWeight: 700,
-          fontSize: 18,
+          fontSize: 17,
           letterSpacing: "0.1em",
           textTransform: "uppercase",
           borderRadius: 100,
-          padding: "20px 32px",
+          padding: "16px 28px",
           border: "none",
           cursor: canSubmit ? "pointer" : "default",
           marginTop: 4,
@@ -2597,7 +2607,7 @@ export function CaptureForm({ onSubmit }: CaptureFormProps) {
       <p
         style={{
           fontFamily: "var(--font-jetbrains-mono), monospace",
-          fontSize: 9,
+          fontSize: 12,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
           color: TEXT_LO,
@@ -2656,9 +2666,9 @@ export function MultiSelectStep({ options, onSubmit }: MultiSelectStepProps) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                padding: "12px 14px",
-                borderRadius: 12,
+                gap: 12,
+                padding: "14px 16px",
+                borderRadius: 14,
                 border: `1px solid ${isOn ? LIME : GLASS_BORDER}`,
                 background: isOn ? "rgba(200,255,0,0.10)" : GLASS,
                 backdropFilter: "blur(16px)",
@@ -2671,14 +2681,14 @@ export function MultiSelectStep({ options, onSubmit }: MultiSelectStepProps) {
               {opt.icon && (
                 <span
                   style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 8,
+                    width: 34,
+                    height: 34,
+                    borderRadius: 10,
                     background: "rgba(255,255,255,0.06)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 15,
+                    fontSize: 22,
                     flexShrink: 0,
                   }}
                 >
@@ -2687,8 +2697,8 @@ export function MultiSelectStep({ options, onSubmit }: MultiSelectStepProps) {
               )}
               <span
                 style={{
-                  fontFamily: "var(--font-barlow-condensed), sans-serif",
-                  fontWeight: 700,
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 500,
                   fontSize: 15,
                   color: isOn ? LIME : TEXT_HI,
                   flex: 1,
@@ -2750,11 +2760,11 @@ export function MultiSelectStep({ options, onSubmit }: MultiSelectStepProps) {
               color: "#060912",
               fontFamily: "var(--font-barlow-condensed), sans-serif",
               fontWeight: 700,
-              fontSize: 18,
+              fontSize: 17,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               borderRadius: 100,
-              padding: "20px 32px",
+              padding: "16px 28px",
               border: "none",
               cursor: "pointer",
               boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
@@ -2871,14 +2881,16 @@ export function SliderScaleStep({ labels, onSelect }: SliderScaleStepProps) {
                   backdropFilter: "blur(16px)",
                   WebkitBackdropFilter: "blur(16px)",
                   cursor: "pointer",
-                  fontFamily: "var(--font-barlow-condensed), sans-serif",
-                  fontWeight: 700,
-                  fontSize: 13,
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 500,
+                  fontSize: 12,
                   letterSpacing: "0.04em",
                   textTransform: "uppercase",
                   color: isOn ? LIME : TEXT_HI,
                   textAlign: "center",
                   lineHeight: 1.2,
+                  boxShadow: isOn ? "0 4px 14px rgba(200,255,0,0.16)" : "none",
+                  transition: "box-shadow 0.2s",
                 }}
               >
                 {label}
@@ -2903,11 +2915,11 @@ export function SliderScaleStep({ labels, onSelect }: SliderScaleStepProps) {
               color: "#060912",
               fontFamily: "var(--font-barlow-condensed), sans-serif",
               fontWeight: 700,
-              fontSize: 18,
+              fontSize: 17,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               borderRadius: 100,
-              padding: "20px 32px",
+              padding: "16px 28px",
               border: "none",
               cursor: "pointer",
               boxShadow: "0 8px 32px rgba(200,255,0,0.25)",

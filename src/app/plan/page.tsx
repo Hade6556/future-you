@@ -51,7 +51,7 @@ const eyebrow: React.CSSProperties = {
   fontWeight: 700,
   textTransform: "uppercase",
   letterSpacing: "0.2em",
-  fontSize: 10,
+  fontSize: 13,
   color: TEXT_LO,
   margin: 0,
 };
@@ -65,7 +65,7 @@ const limeBadge: React.CSSProperties = {
   padding: "6px 16px",
   fontFamily: "var(--font-barlow-condensed), sans-serif",
   fontWeight: 700,
-  fontSize: 11,
+  fontSize: 13,
   textTransform: "uppercase",
   letterSpacing: "0.15em",
 };
@@ -411,6 +411,7 @@ export default function PlanPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(pipelinePlan),
+        credentials: "include",
       });
       if (!res.ok) {
         const data = await res.json() as { error?: string };
@@ -666,7 +667,7 @@ export default function PlanPage() {
                       1
                     </div>
                     <div>
-                      <p style={{ ...eyebrow, color: "rgba(200,255,0,0.60)", fontSize: 9, letterSpacing: "0.22em" }}>
+                      <p style={{ ...eyebrow, color: "rgba(200,255,0,0.60)", fontSize: 12, letterSpacing: "0.22em" }}>
                         Today&apos;s focus
                       </p>
                       <h3

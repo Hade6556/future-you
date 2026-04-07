@@ -57,7 +57,7 @@ function ReflectionCard({ reflection }: { reflection: Reflection }) {
           style={{
             fontFamily: "var(--font-barlow-condensed), sans-serif",
             fontWeight: 700,
-            fontSize: 10,
+            fontSize: 13,
             letterSpacing: "0.2em",
             textTransform: "uppercase",
             color: TEXT_LO,
@@ -202,7 +202,7 @@ export default function JournalPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/brain-dumps");
+        const res = await fetch("/api/brain-dumps", { credentials: "include" });
         const { dumps } = await res.json() as { dumps: Array<{ id: string; date: string; content: string; coach_response: string | null; sentiment: "positive" | "neutral" | "negative" | null; timestamp: string }> };
         setReflections(
           dumps.map((d) => ({

@@ -198,6 +198,7 @@ export default function TasksPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
+          credentials: "include",
         });
 
         if (res.ok) {
@@ -461,7 +462,7 @@ export default function TasksPage() {
                   <p
                     style={{
                       fontFamily: FONT_MONO,
-                      fontSize: 11,
+                      fontSize: 13,
                       fontWeight: 500,
                       color: TEXT_MID,
                       letterSpacing: "0.04em",
@@ -474,7 +475,7 @@ export default function TasksPage() {
                   <p
                     style={{
                       fontFamily: FONT_MONO,
-                      fontSize: 11,
+                      fontSize: 13,
                       color: TEXT_MID,
                       margin: 0,
                     }}

@@ -28,7 +28,7 @@ export function InspirationQuotes({ domain }: InspirationQuotesProps) {
       {/* Header */}
       <div className="px-5 pt-5 pb-0 flex items-center gap-1.5">
         <span
-          className="text-[10px] font-bold uppercase tracking-[0.2em]"
+          className="text-[13px] font-bold uppercase tracking-[0.2em]"
           style={{ color: "var(--accent-primary)" }}
         >
           ✦ Inspired by

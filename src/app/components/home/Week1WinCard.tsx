@@ -58,7 +58,7 @@ export function Week1WinCard({ currentDay, tasksCompleted, totalTasks, isPremium
           padding: "5px 14px",
           fontFamily: "var(--font-barlow-condensed), sans-serif",
           fontWeight: 700,
-          fontSize: 10,
+          fontSize: 13,
           textTransform: "uppercase",
           letterSpacing: "0.15em",
           color: LIME,
@@ -111,7 +111,7 @@ export function Week1WinCard({ currentDay, tasksCompleted, totalTasks, isPremium
           <p
             style={{
               fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: TEXT_LO,
@@ -138,7 +138,7 @@ export function Week1WinCard({ currentDay, tasksCompleted, totalTasks, isPremium
           <p
             style={{
               fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: TEXT_LO,
@@ -165,7 +165,7 @@ export function Week1WinCard({ currentDay, tasksCompleted, totalTasks, isPremium
           <p
             style={{
               fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: TEXT_LO,

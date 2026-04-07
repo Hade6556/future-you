@@ -79,6 +79,7 @@ export default function NewEntryPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcript: text }),
+        credentials: "include",
       }).then((r) => r.json() as Promise<{ categories: Array<{ label: string; pct: number }> }>),
       fetch("/api/coach", {
         method: "POST",
@@ -88,6 +89,7 @@ export default function NewEntryPage() {
           mode: "reflect",
           context: { archetype: dogArchetype, ambitionType, streak, userName, lastReflection },
         }),
+        credentials: "include",
       }).then((r) => r.json() as Promise<{ message: string; actionItem?: string | null; sentiment?: string }>),
     ]);
 
@@ -124,6 +126,7 @@ export default function NewEntryPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: text, coach_response: coachMsg, sentiment }),
+        credentials: "include",
       });
     } catch { /* non-blocking */ }
 
@@ -294,7 +297,7 @@ export default function NewEntryPage() {
           </h1>
           <p style={{
             fontFamily: "var(--font-jetbrains-mono), monospace",
-            fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase",
+            fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase",
             color: TEXT_LO, margin: "8px 0 0",
           }}>
             Get it out. No filter needed.
@@ -307,7 +310,7 @@ export default function NewEntryPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <span style={{
               fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 9, fontWeight: 500, letterSpacing: "0.14em", textTransform: "uppercase",
+              fontSize: 12, fontWeight: 500, letterSpacing: "0.14em", textTransform: "uppercase",
               color: TEXT_LO,
             }}>
               How are you feeling?
@@ -334,7 +337,7 @@ export default function NewEntryPage() {
                       boxShadow: active ? `0 0 10px ${color}80` : "none",
                     }} />
                     <span style={{
-                      ...FONT_BODY, fontSize: 10, fontWeight: 600,
+                      ...FONT_BODY, fontSize: 13, fontWeight: 600,
                       color: active ? TEXT_HI : TEXT_MID,
                     }}>
                       {label}

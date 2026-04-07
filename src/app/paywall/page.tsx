@@ -30,8 +30,8 @@ const bodyText: React.CSSProperties = {
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "var(--font-jetbrains-mono), monospace",
-  fontSize: 10,
-  letterSpacing: "0.16em",
+  fontSize: 13,
+  letterSpacing: "0.12em",
   textTransform: "uppercase" as const,
   color: TEXT_LO,
   margin: 0,
@@ -70,16 +70,16 @@ function BlurredPlanPreview() {
                 color: NAVY,
                 fontFamily: "var(--font-barlow-condensed), sans-serif",
                 fontWeight: 800,
-                fontSize: 11,
+                fontSize: 13,
               }}
             >
               1
             </span>
-            <span style={{ ...heading, fontSize: 14, fontStyle: "normal" }}>
+            <span style={{ ...heading, fontSize: 15, fontStyle: "normal" }}>
               {phases[0].phase_name}
             </span>
           </div>
-          <p style={{ ...bodyText, fontSize: 12, paddingLeft: 34 }}>
+          <p style={{ ...bodyText, fontSize: 14, paddingLeft: 34 }}>
             {phases[0].goal}
           </p>
         </div>
@@ -109,16 +109,16 @@ function BlurredPlanPreview() {
                   color: NAVY,
                   fontFamily: "var(--font-barlow-condensed), sans-serif",
                   fontWeight: 800,
-                  fontSize: 11,
+                  fontSize: 13,
                 }}
               >
                 {i + 2}
               </span>
-              <span style={{ ...heading, fontSize: 13, fontStyle: "normal" }}>
+              <span style={{ ...heading, fontSize: 15, fontStyle: "normal" }}>
                 {phase.phase_name}
               </span>
             </div>
-            <p style={{ ...bodyText, fontSize: 11, paddingLeft: 34 }}>
+            <p style={{ ...bodyText, fontSize: 13, paddingLeft: 34 }}>
               {phase.goal}
             </p>
           </div>
@@ -136,7 +136,7 @@ function BlurredPlanPreview() {
           alignItems: "center",
         }}
       >
-        <span style={{ ...eyebrow, fontSize: 9 }}>
+        <span style={{ ...eyebrow }}>
           {phases.length} phases · {totalWeeks} weeks
         </span>
         <span
@@ -147,7 +147,7 @@ function BlurredPlanPreview() {
             color: LIME,
             fontFamily: "var(--font-barlow-condensed), sans-serif",
             fontWeight: 700,
-            fontSize: 11,
+            fontSize: 13,
             textTransform: "uppercase",
             letterSpacing: "0.08em",
           }}
@@ -186,6 +186,7 @@ export default function PaywallPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: "pro_annual" }),
+        credentials: "include",
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
@@ -249,7 +250,7 @@ export default function PaywallPage() {
           flexDirection: "column",
           alignItems: "center",
           minHeight: "100dvh",
-          padding: "max(4rem, env(safe-area-inset-top, 4rem)) 24px 60px",
+          padding: "max(3rem, env(safe-area-inset-top, 3rem)) 24px 40px",
         }}
       >
         <motion.div
@@ -330,7 +331,7 @@ export default function PaywallPage() {
           <p
             style={{
               ...bodyText,
-              fontSize: 12,
+              fontSize: 13,
               color: TEXT_LO,
               textAlign: "center",
               marginTop: 10,
@@ -350,7 +351,7 @@ export default function PaywallPage() {
             }}
           >
             {BRAND.paywall.step3.trust.map((t) => (
-              <span key={t} style={{ ...eyebrow, fontSize: 9 }}>
+              <span key={t} style={{ ...eyebrow }}>
                 {t}
               </span>
             ))}

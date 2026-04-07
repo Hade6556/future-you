@@ -77,8 +77,6 @@ export function parseGoal(input: string): { goalKey: string; goalConfig: GoalCon
     return { goalKey: bestKey, goalConfig: goals[bestKey] };
   }
 
-  const supported = Object.values(goals).map((g) => g.display_name).join(", ");
-  throw new Error(
-    `Could not match goal "${input}" to a supported goal. Supported: ${supported}`
-  );
+  const fallbackKey = "wellness";
+  return { goalKey: fallbackKey, goalConfig: goals[fallbackKey] };
 }

@@ -45,7 +45,7 @@ export default function EveningWrapup({ tasks, journaledToday, tomorrowStepTitle
       <p
         style={{
           fontFamily: FONT_MONO,
-          fontSize: 11,
+          fontSize: 13,
           fontWeight: 500,
           color: LIME,
           letterSpacing: "0.06em",
@@ -97,7 +97,7 @@ export default function EveningWrapup({ tasks, journaledToday, tomorrowStepTitle
           <p
             style={{
               fontFamily: FONT_MONO,
-              fontSize: 10,
+              fontSize: 13,
               color: TEXT_MID,
               letterSpacing: "0.06em",
               textTransform: "uppercase" as const,

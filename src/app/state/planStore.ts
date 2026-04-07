@@ -1033,6 +1033,7 @@ export const usePlanStore = create<PlanState>((set, get) => {
             intakeResponse: null,
             pipelineOutput: null,
           }),
+          credentials: "include",
         });
         if (!res.ok) return;
         const data = await res.json();

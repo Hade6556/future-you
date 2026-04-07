@@ -140,7 +140,7 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
           ))}
         </div>
 
-        <p className="text-center font-accent text-[10px] uppercase tracking-wider text-muted-foreground">
+        <p className="text-center font-accent text-[13px] uppercase tracking-wider text-muted-foreground">
           Streak: {streak} {streak === 1 ? "day" : "days"}
         </p>
       </div>

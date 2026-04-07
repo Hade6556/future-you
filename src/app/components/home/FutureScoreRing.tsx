@@ -73,7 +73,7 @@ export function FutureScoreRing() {
     <div className="mx-4 flex flex-col items-center gap-1">
       {/* Label */}
       <p
-        className="text-[10px] font-bold uppercase tracking-[0.22em]"
+        className="text-[13px] font-bold uppercase tracking-[0.22em]"
         style={{ color: "var(--text-muted)" }}
       >
         Behavio Score

@@ -114,7 +114,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
             <p
               style={{
                 fontFamily: FONT_MONO,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 500,
                 color: TEXT_MID,
                 letterSpacing: "0.06em",
@@ -177,7 +177,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
             <p
               style={{
                 fontFamily: FONT_MONO,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 500,
                 color: TEXT_MID,
                 letterSpacing: "0.06em",
@@ -247,7 +247,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
             <p
               style={{
                 fontFamily: FONT_MONO,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 500,
                 color: TEXT_MID,
                 letterSpacing: "0.06em",
@@ -295,7 +295,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
                   <span
                     style={{
                       fontFamily: FONT_BODY,
-                      fontSize: 10,
+                      fontSize: 13,
                       color: TEXT_MID,
                       lineHeight: 1.3,
                       textAlign: "center" as const,
@@ -337,7 +337,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
             <p
               style={{
                 fontFamily: FONT_MONO,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 500,
                 color: TEXT_MID,
                 letterSpacing: "0.06em",

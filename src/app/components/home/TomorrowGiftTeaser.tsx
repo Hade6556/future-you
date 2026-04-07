@@ -45,7 +45,7 @@ export function TomorrowGiftTeaser({ dayNumber }: Props) {
       transition={{ delay: 0.45 }}
     >
       <p
-        className="mb-2 px-1 text-[10px] font-black uppercase tracking-widest"
+        className="mb-2 px-1 text-[13px] font-black uppercase tracking-widest"
         style={{ color: "var(--text-muted)" }}
       >
         Tomorrow&apos;s gift

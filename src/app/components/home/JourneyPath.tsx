@@ -35,13 +35,13 @@ export function JourneyPath({ plan, dayInfo }: Props) {
     <div className="mx-4">
       <div className="mb-2 flex items-center justify-between">
         <p
-          className="text-[10px] font-bold uppercase tracking-[0.18em]"
+          className="text-[13px] font-bold uppercase tracking-[0.18em]"
           style={{ color: "var(--text-muted)" }}
         >
           Your Journey
         </p>
         {daysToNextPhase !== null && daysToNextPhase > 0 && (
-          <p className="text-[11px] font-semibold" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-[13px] font-semibold" style={{ color: "var(--text-secondary)" }}>
             Phase {nextPhaseIndex + 1} in {daysToNextPhase}d
           </p>
         )}
@@ -116,7 +116,7 @@ export function JourneyPath({ plan, dayInfo }: Props) {
                   {/* Phase label */}
                   <div className="text-center">
                     <p
-                      className="text-[10px] font-bold leading-tight"
+                      className="text-[13px] font-bold leading-tight"
                       style={{
                         color: isCompleted
                           ? "var(--accent-secondary)"
@@ -129,12 +129,12 @@ export function JourneyPath({ plan, dayInfo }: Props) {
                       {phase.phase_name}
                     </p>
                     {isCurrent && (
-                      <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "var(--accent-primary)" }}>
+                      <p className="text-[12px] font-bold uppercase tracking-wider" style={{ color: "var(--accent-primary)" }}>
                         You are here
                       </p>
                     )}
                     {isFuture && (
-                      <p className="text-[9px]" style={{ color: "var(--text-muted)" }}>
+                      <p className="text-[12px]" style={{ color: "var(--text-muted)" }}>
                         tap to peek →
                       </p>
                     )}
@@ -182,7 +182,7 @@ export function JourneyPath({ plan, dayInfo }: Props) {
               <div className="mx-auto mb-5 h-1 w-10 rounded-full" style={{ background: "var(--card-stroke)" }} />
 
               <p
-                className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em]"
+                className="mb-1 text-[13px] font-bold uppercase tracking-[0.2em]"
                 style={{ color: "var(--accent-primary)" }}
               >
                 Coming up
@@ -200,7 +200,7 @@ export function JourneyPath({ plan, dayInfo }: Props) {
               {previewPhase.milestones.length > 0 && (
                 <div>
                   <p
-                    className="mb-2 text-[10px] font-bold uppercase tracking-wider"
+                    className="mb-2 text-[13px] font-bold uppercase tracking-wider"
                     style={{ color: "var(--text-muted)" }}
                   >
                     Milestones

@@ -137,7 +137,7 @@ export default function AddRecurringSheet({ open, onClose, onAdd }: Props) {
                       borderRadius: 10,
                       cursor: "pointer",
                       fontFamily: FONT_BODY,
-                      fontSize: 11,
+                      fontSize: 13,
                       fontWeight: 600,
                       color: active ? LIME : TEXT_MID,
                       textAlign: "center" as const,

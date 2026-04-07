@@ -55,6 +55,7 @@ export function CoachChat({ className }: { className?: string }) {
       const res = await fetch("/api/coach", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           message: text,
           mode: "chat",

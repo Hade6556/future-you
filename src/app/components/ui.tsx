@@ -19,7 +19,7 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <p className={cn("font-accent text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground", className)}>
+    <p className={cn("font-accent text-[13px] font-medium uppercase tracking-[0.2em] text-muted-foreground", className)}>
       {children}
     </p>
   );

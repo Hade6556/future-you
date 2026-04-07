@@ -113,7 +113,7 @@ export function StreakChain() {
               </span>
             </div>
             <p
-              className="text-[11px] font-semibold"
+              className="text-[13px] font-semibold"
               style={{ color: isAtRisk ? "var(--alert-bg)" : "var(--text-secondary)" }}
             >
               {copy}
@@ -129,14 +129,14 @@ export function StreakChain() {
                 <span key={i} className="text-[18px]" aria-hidden>🛡️</span>
               ))}
               {streakShields > 3 && (
-                <span className="text-[11px] font-bold" style={{ color: "var(--text-secondary)" }}>
+                <span className="text-[13px] font-bold" style={{ color: "var(--text-secondary)" }}>
                   ×{streakShields}
                 </span>
               )}
             </div>
           )}
           {bestStreak > 0 && (
-            <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+            <p className="text-[13px]" style={{ color: "var(--text-muted)" }}>
               {streak >= bestStreak && streak > 0 ? "🏅 personal best" : `best: ${bestStreak}`}
             </p>
           )}
@@ -154,7 +154,7 @@ export function StreakChain() {
             return (
               <div key={i} className="flex flex-1 justify-center" style={{ transform: "translateX(50%)" }}>
                 <span
-                  className="text-[10px] leading-none"
+                  className="text-[13px] leading-none"
                   style={{ opacity: earned ? 1 : 0.25 }}
                 >
                   🛡️
@@ -213,7 +213,7 @@ export function StreakChain() {
             return (
               <div key={i} className="flex flex-1 justify-center">
                 <span
-                  className="text-[8px] font-bold"
+                  className="text-[12px] font-bold"
                   style={{ color: day <= streak ? "var(--accent-primary)" : "var(--text-muted)" }}
                 >
                   {day}
@@ -244,7 +244,7 @@ export function StreakChain() {
       <AnimatePresence>
         {riskTier === "none" && nextMilestone && (
           <motion.p
-            className="text-center text-[11px] font-semibold"
+            className="text-center text-[13px] font-semibold"
             style={{ color: "var(--text-secondary)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -257,7 +257,7 @@ export function StreakChain() {
         )}
         {streak >= 30 && (
           <motion.p
-            className="text-center text-[11px] font-bold"
+            className="text-center text-[13px] font-bold"
             style={{ color: "var(--accent-warm)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

@@ -259,7 +259,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
             style={{
               fontFamily: "var(--font-body), Georgia, serif",
               fontWeight: 400,
-              fontSize: 11,
+              fontSize: 13,
               color: "rgba(120,155,195,0.75)",
               paddingBottom: 3,
             }}
@@ -284,7 +284,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
           <span
             style={{
               fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.05em",
               color: rawDelta >= 0 ? "#4CAF7D" : "#FF5555",
               display: "block",

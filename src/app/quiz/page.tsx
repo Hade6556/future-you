@@ -20,6 +20,7 @@ import {
   TimelineCard,
 } from "../components/quiz/QuestionFormats";
 import type { ArchetypeId, AmbitionDomain } from "../types/plan";
+import { scoreQuizFromMap } from "../data/archetypes";
 
 const SOCIAL_PROOF_AVATARS = [
   "/mock/people/alex-chen.jpg",
@@ -60,8 +61,23 @@ export default function QuizPage() {
     let next = currentScreen + 1;
     while (next < total && !isVisibleNow(QUIZ_SCREENS[next])) next++;
     if (next >= total) {
-      store.completeQuiz("steady" as ArchetypeId, selectedAmbition.current);
-      router.push("/signup");
+      // Compute archetype from accumulated quiz scores
+      const allAnswers = usePlanStore.getState().multiSelectAnswers;
+      const scoreMap: Record<string, number> = {};
+      for (const [screenId, labels] of Object.entries(allAnswers)) {
+        const scr = QUIZ_SCREENS.find((s) => s.id === screenId);
+        if (!scr?.options) continue;
+        for (const label of labels) {
+          const opt = scr.options.find((o) => o.label === label);
+          if (!opt?.scores) continue;
+          for (const [key, pts] of Object.entries(opt.scores)) {
+            scoreMap[key] = (scoreMap[key] ?? 0) + pts;
+          }
+        }
+      }
+      const archetype = scoreQuizFromMap(scoreMap);
+      store.completeQuiz(archetype.id as ArchetypeId, selectedAmbition.current);
+      router.push("/quiz/analyzing");
       return;
     }
     setCurrentScreen(next);
@@ -360,19 +376,18 @@ export default function QuizPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span
                     style={{
-                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontFamily: "var(--font-display), sans-serif",
                       fontWeight: 400,
-                      fontStyle: "italic",
                       fontSize: 12,
-                      color: "rgba(120,155,195,0.50)",
+                      color: "rgba(120,155,195,0.55)",
                     }}
                   >
                     {screen?.id ? "Building your plan" : ""}
                   </span>
                   <span
                     style={{
-                      fontFamily: "var(--font-barlow-condensed), sans-serif",
-                      fontWeight: 700,
+                      fontFamily: "var(--font-display), sans-serif",
+                      fontWeight: 600,
                       fontSize: 12,
                       color: "#C8FF00",
                     }}
@@ -400,11 +415,11 @@ export default function QuizPage() {
                   fontFamily: "var(--font-barlow-condensed), sans-serif",
                   fontWeight: 700,
                   fontStyle: "italic",
-                  fontSize: 38,
-                  lineHeight: 0.97,
-                  letterSpacing: "-0.025em",
-                  color: "rgba(235,242,255,0.92)",
-                  margin: "0 0 6px",
+                  fontSize: 32,
+                  lineHeight: 1.08,
+                  letterSpacing: "-0.02em",
+                  color: "rgba(235,242,255,0.95)",
+                  margin: "0 0 8px",
                 }}
               >
                 {screen.question}
@@ -412,11 +427,11 @@ export default function QuizPage() {
               {screen.subtext && (
                 <p
                   style={{
-                    fontFamily: "var(--font-body), Georgia, serif",
+                    fontFamily: "var(--font-apercu), sans-serif",
                     fontWeight: 400,
-                    fontSize: 13,
-                    color: "rgba(120,155,195,0.50)",
-                    lineHeight: 1.55,
+                    fontSize: 14,
+                    color: "rgba(120,155,195,0.75)",
+                    lineHeight: 1.5,
                     margin: 0,
                   }}
                 >

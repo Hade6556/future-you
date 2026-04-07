@@ -62,7 +62,7 @@ export function PhoenixCard({ priorStreak, onStart }: Props) {
           transition={{ delay: 0.4 }}
         >
           <p
-            className="mb-2 text-center text-[10px] font-bold uppercase tracking-widest"
+            className="mb-2 text-center text-[13px] font-bold uppercase tracking-widest"
             style={{ color: "var(--text-muted)", opacity: 0.6 }}
           >
             Your {priorStreak}-day chain

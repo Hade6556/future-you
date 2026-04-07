@@ -127,6 +127,7 @@ export default function AnalyzingPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ goal, userContext }),
+      credentials: "include",
     })
       .then((r) => {
         if (!r.ok) throw new Error(`Pipeline returned ${r.status}`);
@@ -366,7 +367,7 @@ export default function AnalyzingPage() {
         <p
           style={{
             fontFamily: "var(--font-jetbrains-mono), monospace",
-            fontSize: 9,
+            fontSize: 12,
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             color: TEXT_LO,

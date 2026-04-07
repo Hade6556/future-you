@@ -68,6 +68,7 @@ export function DailyCoachingSection() {
           phaseName: dayInfo.currentPhase?.phase_name ?? null,
           yesterdayStatus: null,
         }),
+        credentials: "include",
       });
       const data = (await res.json()) as DailyMentorMessage;
       setMentorMsg(data);
@@ -109,6 +110,7 @@ export function DailyCoachingSection() {
       const res = await fetch("/api/mentor-checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           status,
           day: dayInfo?.currentDay ?? 1,
@@ -190,7 +192,7 @@ export function DailyCoachingSection() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 500, damping: 22 }}
               >
-                <span className="text-[11px] font-black uppercase leading-tight">Done<br />✓</span>
+                <span className="text-[13px] font-black uppercase leading-tight">Done<br />✓</span>
               </motion.div>
             </motion.div>
           )}
@@ -200,7 +202,7 @@ export function DailyCoachingSection() {
           <CardContent className="px-6 py-7 space-y-5">
             {/* Day label */}
             {dayInfo && (
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--text-muted)" }}>
+              <p className="text-[13px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--text-muted)" }}>
                 Day {dayInfo.currentDay} of {dayInfo.totalDays}
                 {dayInfo.currentPhase ? ` · ${dayInfo.currentPhase.phase_name}` : ""}
               </p>

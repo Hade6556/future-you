@@ -29,17 +29,17 @@ export function WeeklyMomentum() {
     >
       <div className="mb-3 flex items-center justify-between">
         <p
-          className="text-[10px] font-bold uppercase tracking-[0.18em]"
+          className="text-[13px] font-bold uppercase tracking-[0.12em]"
           style={{ color: "var(--text-muted)" }}
         >
           This Week
         </p>
         <div className="flex items-center gap-2">
-          <p className="text-[12px] font-bold" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-[13px] font-bold" style={{ color: "var(--text-secondary)" }}>
             {completedCount}/7 days
           </p>
           {weeklyBest > 0 && (
-            <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+            <p className="text-[13px]" style={{ color: "var(--text-muted)" }}>
               · best: {weeklyBest}
             </p>
           )}
@@ -75,7 +75,7 @@ export function WeeklyMomentum() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "10px",
+                  fontSize: "13px",
                 }}
                 aria-label={`${DAY_LABELS[i]}: ${done ? "completed" : isToday ? "today" : isFuture ? "upcoming" : "missed"}`}
               >
@@ -92,7 +92,7 @@ export function WeeklyMomentum() {
                 )}
               </div>
               <span
-                className="text-[9px] font-bold"
+                className="text-[13px] font-bold"
                 style={{
                   color: done
                     ? "var(--accent-secondary)"
@@ -110,7 +110,7 @@ export function WeeklyMomentum() {
 
       {/* Copy */}
       <p
-        className="mt-2.5 text-center text-[12px] font-semibold"
+        className="mt-2.5 text-center text-[14px] font-semibold"
         style={{ color: "var(--text-secondary)" }}
       >
         {copy}

@@ -4,18 +4,21 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
+import { createClient } from "@/lib/supabase/client";
 
 const LIME = "#C8FF00";
 const TEXT_HI = "rgba(235,242,255,0.92)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
+const TEXT_MID = "rgba(120,155,195,0.85)";
 
 export default function ResultPage() {
   const router = useRouter();
   const userName = usePlanStore((s) => s.userName);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push("/intake");
+    const timer = setTimeout(async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      router.push(user ? "/intake" : "/signup");
     }, 3000);
     return () => clearTimeout(timer);
   }, [router]);
@@ -77,18 +80,17 @@ export default function ResultPage() {
 
           <h1
             style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 800,
-              fontStyle: "italic",
-              fontSize: 42,
-              lineHeight: 1,
-              letterSpacing: "-0.02em",
+              fontFamily: "var(--font-display), sans-serif",
+              fontWeight: 700,
+              fontSize: 32,
+              lineHeight: 1.1,
+              letterSpacing: "-0.01em",
               color: TEXT_HI,
               margin: "0 0 12px",
             }}
           >
             Building your{" "}
-            <em style={{ fontStyle: "normal", color: LIME }}>plan</em>
+            <span style={{ color: LIME }}>plan</span>
           </h1>
 
           <p

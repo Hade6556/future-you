@@ -44,7 +44,7 @@ export default function TaskSection({ priority, tasks, onToggle, onDefer, onSwap
           <span
             style={{
               fontFamily: FONT_MONO,
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: 600,
               color: config.accent,
               letterSpacing: "0.06em",
@@ -57,7 +57,7 @@ export default function TaskSection({ priority, tasks, onToggle, onDefer, onSwap
         <span
           style={{
             fontFamily: FONT_MONO,
-            fontSize: 11,
+            fontSize: 13,
             color: TEXT_MID,
           }}
         >

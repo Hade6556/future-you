@@ -80,7 +80,10 @@ export default function GeneratingPage() {
     if (apiDone.current && stagesDone.current && !navigated.current) {
       navigated.current = true;
       setProgress(100);
-      setTimeout(() => router.push("/paywall"), 350);
+      setTimeout(() => {
+        const premium = usePlanStore.getState().isPremium;
+        router.push(premium ? "/" : "/paywall");
+      }, 350);
     }
   };
 
@@ -141,6 +144,7 @@ export default function GeneratingPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ narrative, tone: "Life Coach" }),
+      credentials: "include",
     }).then((res) => {
       if (!res.ok)
         return res
@@ -164,6 +168,7 @@ export default function GeneratingPage() {
           obstacles: quizObstacles,
         },
       }),
+      credentials: "include",
     }).then((res) => {
       if (!res.ok) {
         console.error(`[generating] /api/plan returned ${res.status}`);

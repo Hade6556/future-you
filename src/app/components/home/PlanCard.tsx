@@ -41,11 +41,11 @@ export function PlanCard() {
       >
         {/* Header row */}
         <div className="flex items-start justify-between">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+          <p className="text-[13px] font-bold uppercase tracking-wider text-white/70">
             My Plan
           </p>
           {dayInfo && (
-            <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white">
+            <span className="rounded-full bg-white/20 px-2 py-0.5 text-[13px] font-bold text-white">
               Day {dayInfo.currentDay}
             </span>
           )}
@@ -56,7 +56,7 @@ export function PlanCard() {
           <p className="text-[28px] font-extrabold leading-none text-white">
             {planReady && dayInfo ? `${dayInfo.currentDay}` : "—"}
           </p>
-          <p className="text-[11px] text-white/70">
+          <p className="text-[13px] text-white/70">
             {planReady && dayInfo ? `of ${dayInfo.totalDays} days` : "not started"}
           </p>
         </div>
@@ -80,7 +80,7 @@ export function PlanCard() {
                   </svg>
                 )}
               </div>
-              <p className="truncate text-[10px] font-medium text-white/90">
+              <p className="truncate text-[13px] font-medium text-white/90">
                 {task}
               </p>
             </div>

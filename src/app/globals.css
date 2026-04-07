@@ -33,9 +33,9 @@
   --bg-base:     #060912;
   --bg-raised:   #0F2040;
   --cta:         #C8FF00;
-  --text-hi:     rgba(235,242,255,0.92);
-  --text-mid:    rgba(120,155,195,0.75);
-  --text-lo:     rgba(120,155,195,0.40);
+  --text-hi:     rgba(235,242,255,0.95);
+  --text-mid:    rgba(120,155,195,0.85);
+  --text-lo:     rgba(120,155,195,0.55);
   --status-good: #4CAF7D;
   --status-bad:  #FF5555;
   --status-warn: #F5A623;
@@ -54,9 +54,9 @@
   --card-surface:    rgba(255,255,255,0.07);
   --card-stroke:     rgba(255,255,255,0.14);
 
-  --text-primary:   rgba(235,242,255,0.92);
-  --text-secondary: rgba(120,155,195,0.75);
-  --text-muted:     rgba(120,155,195,0.40);
+  --text-primary:   rgba(235,242,255,0.95);
+  --text-secondary: rgba(120,155,195,0.85);
+  --text-muted:     rgba(120,155,195,0.55);
 
   --accent-primary:       #C8FF00;
   --accent-primary-hover: #B3E600;
@@ -288,14 +288,14 @@
   --type-body-weight: 400;
   --type-body-line:   1.75;
 
-  --type-body-s-size:   14px;
+  --type-body-s-size:   15px;
   --type-body-s-weight: 400;
 
-  --type-label-size:     11px;
+  --type-label-size:     13px;
   --type-label-weight:   600;
-  --type-label-tracking: 0.16em;
+  --type-label-tracking: 0.12em;
 
-  --type-caption-size:   11px;
+  --type-caption-size:   13px;
   --type-caption-weight: 400;
 
   --type-stat-size:   96px;
@@ -423,7 +423,7 @@
   }
   .type-mono {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
     letter-spacing: 0.04em;
     color: var(--p-teal);
@@ -487,7 +487,7 @@
     padding: 12px 24px;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 0.04em;
     text-transform: none;
     cursor: pointer;

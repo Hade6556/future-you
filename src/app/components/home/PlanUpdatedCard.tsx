@@ -85,7 +85,7 @@ export function PlanUpdatedCard({ summary, onDismiss }: Props) {
             marginTop: 8,
             fontFamily: "var(--font-barlow-condensed), sans-serif",
             fontWeight: 700,
-            fontSize: 11,
+            fontSize: 13,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             color: TEXT_HI,

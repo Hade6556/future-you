@@ -44,7 +44,7 @@ export default function DayContextBanner({
         <span
           style={{
             fontFamily: FONT_MONO,
-            fontSize: 11,
+            fontSize: 13,
             fontWeight: 500,
             color: LIME,
             letterSpacing: "0.06em",
@@ -56,7 +56,7 @@ export default function DayContextBanner({
         <span
           style={{
             fontFamily: FONT_MONO,
-            fontSize: 11,
+            fontSize: 13,
             fontWeight: 500,
             color: TEXT_MID,
           }}
@@ -130,7 +130,7 @@ export default function DayContextBanner({
         <p
           style={{
             fontFamily: FONT_MONO,
-            fontSize: 11,
+            fontSize: 13,
             color: "rgba(200,255,0,0.7)",
             marginTop: 8,
             padding: "6px 10px",

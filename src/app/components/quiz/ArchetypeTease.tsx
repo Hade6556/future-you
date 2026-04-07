@@ -30,7 +30,7 @@ export function ArchetypeTease({ selectedIndex }: Props) {
           <path d="M12 2L4 6v6l8 4 8-4V6l-8-4zm0 2.18l5.5 2.75v5.14L12 14.68l-5.5-2.61V6.93L12 4.18z" />
         </svg>
       </motion.div>
-      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      <span className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
         or
       </span>
       <motion.div

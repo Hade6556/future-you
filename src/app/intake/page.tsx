@@ -20,6 +20,7 @@ export default function IntakePage() {
   const ambitionType = usePlanStore((s) => s.ambitionType);
   const userName = usePlanStore((s) => s.userName);
   const completeOnboarding = usePlanStore((s) => s.completeOnboarding);
+  const completeQuiz = usePlanStore((s) => s.completeQuiz);
   const [narrative, setNarrative] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -46,6 +47,10 @@ export default function IntakePage() {
       // ignore private mode
     }
 
+    const { quizComplete: alreadyDone } = usePlanStore.getState();
+    if (!alreadyDone) {
+      completeQuiz("steady", ambitionType || "career");
+    }
     completeOnboarding();
     router.push("/generating");
   };
@@ -93,7 +98,7 @@ export default function IntakePage() {
           display: "flex",
           flexDirection: "column",
           minHeight: "100dvh",
-          padding: "max(5rem, env(safe-area-inset-top, 5rem)) 24px 48px",
+          padding: "max(3.5rem, env(safe-area-inset-top, 3.5rem)) 24px 32px",
         }}
       >
         {/* Logo */}
@@ -134,7 +139,7 @@ export default function IntakePage() {
                 display: "inline-block",
                 fontFamily: "var(--font-barlow-condensed), sans-serif",
                 fontWeight: 700,
-                fontSize: 10,
+                fontSize: 13,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
                 color: LIME,
@@ -201,10 +206,10 @@ export default function IntakePage() {
               }}
               placeholder="e.g. I want to launch my first product by summer, feel confident enough to pitch investors, and build a small team I'm proud of..."
               autoFocus
-              rows={5}
+              rows={3}
               style={{
                 width: "100%",
-                minHeight: 140,
+                minHeight: 100,
                 resize: "none",
                 padding: "16px 18px",
                 background: GLASS,
@@ -285,7 +290,7 @@ export default function IntakePage() {
             <p
               style={{
                 fontFamily: "var(--font-jetbrains-mono), monospace",
-                fontSize: 10,
+                fontSize: 13,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 color: TEXT_LO,

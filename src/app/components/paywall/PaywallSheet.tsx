@@ -96,6 +96,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: "pro_annual" }),
+        credentials: "include",
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
@@ -103,11 +104,11 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
       } else {
         // Stripe not configured — grant access locally for dev
         usePlanStore.getState().setPremium();
-        router.push("/signup");
+        router.push("/");
       }
     } catch {
       usePlanStore.getState().setPremium();
-      router.push("/signup");
+      router.push("/");
     } finally {
       setCheckoutLoading(false);
     }
@@ -147,7 +148,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
 
   const eyebrow: React.CSSProperties = {
     fontFamily: "var(--font-jetbrains-mono), monospace",
-    fontSize: 10,
+    fontSize: 13,
     letterSpacing: "0.16em",
     textTransform: "uppercase" as const,
     color: TEXT_LO,
@@ -284,7 +285,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                             borderRadius: "50%",
                             background: LIME,
                             color: NAVY,
-                            fontSize: 10,
+                            fontSize: 13,
                             fontWeight: 700,
                             flexShrink: 0,
                             marginTop: 2,
@@ -389,7 +390,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                     }}
                   >
                     {BRAND.paywall.step3.trust.map((t) => (
-                      <span key={t} style={{ ...eyebrow, fontSize: 9 }}>
+                      <span key={t} style={{ ...eyebrow, fontSize: 12 }}>
                         {t}
                       </span>
                     ))}
