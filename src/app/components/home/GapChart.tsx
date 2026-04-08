@@ -227,8 +227,8 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         border: "1px solid rgba(255,255,255,0.14)",
-        borderRadius: 20,
-        padding: "16px 16px 14px",
+        borderRadius: 16,
+        padding: "14px 16px 10px",
         overflow: "hidden",
       }}
     >
@@ -241,13 +241,13 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
         }}
       />
 
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 8 }}>
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 6 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
           <span
             style={{
               fontFamily: "var(--font-barlow-condensed), sans-serif",
               fontWeight: 700,
-              fontSize: 38,
+              fontSize: 28,
               lineHeight: 1,
               color: "#C8FF00",
               letterSpacing: "-0.03em",
@@ -260,7 +260,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
               fontFamily: "var(--font-body), Georgia, serif",
               fontWeight: 400,
               fontSize: 13,
-              color: "rgba(120,155,195,0.75)",
+              color: "rgba(140,170,210,0.80)",
               paddingBottom: 3,
             }}
           >
@@ -300,7 +300,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
           height: 2,
           background: "rgba(255,255,255,0.08)",
           borderRadius: 2,
-          marginBottom: 10,
+          marginBottom: 6,
           overflow: "hidden",
         }}
       >
@@ -317,7 +317,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
 
       <canvas
         ref={canvasRef}
-        style={{ width: "100%", height: 200, display: "block" }}
+        style={{ width: "100%", height: 120, display: "block" }}
       />
     </section>
   );

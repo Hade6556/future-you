@@ -13,7 +13,6 @@ import { GapChart } from "./components/home/GapChart";
 import { Week1WinCard } from "./components/home/Week1WinCard";
 import { PlanUpdatedCard } from "./components/home/PlanUpdatedCard";
 import { StreakMomentumCard } from "./components/home/StreakMomentumCard";
-import { MilestoneCard } from "./components/home/MilestoneCard";
 
 
 function formatHeaderDate(): string {
@@ -51,8 +50,6 @@ export default function HomeClient() {
   const todayTasks           = usePlanStore((s) => s.todayTasks);
   const todayTasksDate       = usePlanStore((s) => s.todayTasksDate);
   const toggleDailyTask      = usePlanStore((s) => s.toggleDailyTask);
-  const journalDates         = usePlanStore((s) => s.journalDates);
-
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const dayInfo = useMemo(
@@ -96,23 +93,10 @@ export default function HomeClient() {
   if (!onboardingComplete) return null;
 
   const firstName   = userName ? userName.split(" ")[0] : "";
-  const questTitle  = dayInfo?.currentStep?.title ?? "Today's ritual";
-
   const today = todayISO();
   const tasksReady = todayTasksDate === today && todayTasks.length > 0;
   const activeTasks = todayTasks.filter((t) => !t.deferred);
   const doneCount = activeTasks.filter((t) => t.completed).length;
-
-  const daysSinceJournal = (() => {
-    if (!journalDates) return null;
-    for (let i = 0; i < 30; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      if (journalDates[key]) return i;
-    }
-    return null;
-  })();
 
   const greetingText = (() => {
     if (todayStatus === "done")    return `You closed the gap today, ${firstName || "you"}.`;
@@ -159,9 +143,9 @@ export default function HomeClient() {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 16,
+            gap: 10,
             padding:
-              "max(3.25rem, calc(env(safe-area-inset-top, 0px) + 2.75rem)) max(24px, env(safe-area-inset-right, 24px)) 24px max(24px, env(safe-area-inset-left, 24px))",
+              "max(2.5rem, calc(env(safe-area-inset-top, 0px) + 2rem)) max(20px, env(safe-area-inset-right, 20px)) 20px max(20px, env(safe-area-inset-left, 20px))",
           }}
         >
 
@@ -181,10 +165,10 @@ export default function HomeClient() {
                   fontFamily: "var(--font-barlow-condensed), sans-serif",
                   fontWeight: 900,
                   fontStyle: "italic",
-                  fontSize: 32,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.025em",
-                  color: "rgba(235,242,255,0.92)",
+                  fontSize: 28,
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.02em",
+                  color: "rgba(240,245,255,0.95)",
                   margin: 0,
                 }}
               >
@@ -193,11 +177,11 @@ export default function HomeClient() {
               <p
                 style={{
                   fontFamily: "var(--font-jetbrains-mono), monospace",
-                  fontSize: 13,
+                  fontSize: 12,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  color: "rgba(120,155,195,0.62)",
-                  margin: "6px 0 0",
+                  color: "rgba(140,170,210,0.70)",
+                  margin: "4px 0 0",
                   lineHeight: 1.35,
                 }}
               >
@@ -255,12 +239,12 @@ export default function HomeClient() {
                 backdropFilter: "blur(16px)",
                 WebkitBackdropFilter: "blur(16px)",
                 border: "1px solid rgba(255,85,85,0.30)",
-                borderRadius: 20,
-                padding: "14px 16px",
+                borderRadius: 14,
+                padding: "10px 14px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: 12,
+                gap: 10,
               }}
             >
               <div>
@@ -268,7 +252,7 @@ export default function HomeClient() {
                   style={{
                     fontFamily: "var(--font-barlow-condensed), sans-serif",
                     fontWeight: 700,
-                    fontSize: 13,
+                    fontSize: 12,
                     color: "#FF5555",
                     marginBottom: 2,
                   }}
@@ -277,10 +261,10 @@ export default function HomeClient() {
                 </p>
                 <p
                   style={{
-                    fontFamily: "var(--font-body), Georgia, serif",
+                    fontFamily: "var(--font-apercu), sans-serif",
                     fontWeight: 400,
                     fontSize: 12,
-                    color: "rgba(120,155,195,0.75)",
+                    color: "rgba(140,170,210,0.75)",
                   }}
                 >
                   Gap-closure rate down. Two actions today recovers the ground.
@@ -307,8 +291,8 @@ export default function HomeClient() {
               backdropFilter: "blur(16px)",
               WebkitBackdropFilter: "blur(16px)",
               border: "1px solid rgba(255,255,255,0.14)",
-              borderRadius: 20,
-              padding: "20px",
+              borderRadius: 16,
+              padding: "14px 16px",
               overflow: "hidden",
             }}
           >
@@ -325,11 +309,11 @@ export default function HomeClient() {
               style={{
                 fontFamily: "var(--font-barlow-condensed), sans-serif",
                 fontWeight: 700,
-                fontSize: 13,
+                fontSize: 12,
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
-                color: "rgba(120,155,195,0.40)",
-                marginBottom: 14,
+                color: "rgba(140,170,210,0.50)",
+                marginBottom: 8,
               }}
             >
               Today&apos;s tasks
@@ -338,7 +322,7 @@ export default function HomeClient() {
             {tasksReady ? (
               <>
                 <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  {activeTasks.slice(0, 4).map((task) => (
+                  {activeTasks.slice(0, 2).map((task) => (
                     <button
                       key={task.id}
                       type="button"
@@ -346,8 +330,8 @@ export default function HomeClient() {
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: 12,
-                        padding: "10px 0",
+                        gap: 10,
+                        padding: "8px 0",
                         background: "none",
                         border: "none",
                         cursor: "pointer",
@@ -380,7 +364,8 @@ export default function HomeClient() {
                         style={{
                           fontFamily: "var(--font-apercu), sans-serif",
                           fontSize: 14,
-                          color: task.completed ? "rgba(120,155,195,0.40)" : "rgba(235,242,255,0.88)",
+                          lineHeight: 1.4,
+                          color: task.completed ? "rgba(140,170,210,0.45)" : "rgba(240,245,255,0.92)",
                           textDecoration: task.completed ? "line-through" : "none",
                           flex: 1,
                           minWidth: 0,
@@ -406,7 +391,7 @@ export default function HomeClient() {
                 </div>
                 <div
                   style={{
-                    marginTop: 12,
+                    marginTop: 8,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
@@ -481,92 +466,6 @@ export default function HomeClient() {
             planStartDate={planStartDate}
             totalDays={dayInfo?.totalDays ?? 112}
             currentDay={dayInfo?.currentDay ?? 1}
-          />
-
-          {/* Quick Actions */}
-          <div style={{ display: "flex", gap: 10 }}>
-            <Link
-              href="/journal/new"
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 6,
-                padding: "14px 8px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.10)",
-                borderRadius: 16,
-                textDecoration: "none",
-                position: "relative",
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(200,255,0,0.70)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
-              <span style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(120,155,195,0.55)" }}>
-                Journal
-              </span>
-              {daysSinceJournal !== null && daysSinceJournal >= 2 && (
-                <span style={{
-                  position: "absolute", top: 6, right: 8,
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                  fontSize: 7, color: "rgba(245,166,35,0.80)",
-                }}>
-                  {daysSinceJournal}d
-                </span>
-              )}
-            </Link>
-            <Link
-              href="/structure"
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 6,
-                padding: "14px 8px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.10)",
-                borderRadius: 16,
-                textDecoration: "none",
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(200,255,0,0.70)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
-              </svg>
-              <span style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(120,155,195,0.55)" }}>
-                Reflect
-              </span>
-            </Link>
-            <Link
-              href="/plan"
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 6,
-                padding: "14px 8px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.10)",
-                borderRadius: 16,
-                textDecoration: "none",
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(200,255,0,0.70)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
-              </svg>
-              <span style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(120,155,195,0.55)" }}>
-                My Plan
-              </span>
-            </Link>
-          </div>
-
-          {/* Next Milestone */}
-          <MilestoneCard
-            streak={streak}
-            dayInfo={dayInfo}
           />
 
           {/* Week 1 Win conversion card (non-premium, days 7-14) */}

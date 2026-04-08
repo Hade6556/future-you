@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { hasSupabasePublicConfig } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/route-handler";
 
 /**
  * POST /api/sync
@@ -65,13 +65,35 @@ export async function POST(req: Request) {
   const body = (await req.json()) as SyncPayload;
 
   // Fetch current server state
-  const { data: serverUser, error: fetchErr } = await supabase
+  let { data: serverUser, error: fetchErr } = await supabase
     .from("users")
     .select(
       "streak, last_completed_date, user_name, archetype, ambition_type, is_premium, trial_started_at, stripe_customer_id, best_streak, streak_shields, future_score, onboarding_complete, quiz_data",
     )
     .eq("id", auth.user.id)
     .single();
+
+  // If user row doesn't exist yet (trigger may not have fired), create it
+  if (fetchErr && fetchErr.code === "PGRST116") {
+    const { data: newUser, error: insertErr } = await supabase
+      .from("users")
+      .insert({
+        id: auth.user.id,
+        email: auth.user.email ?? "",
+        user_name: body.userName || null,
+      })
+      .select(
+        "streak, last_completed_date, user_name, archetype, ambition_type, is_premium, trial_started_at, stripe_customer_id, best_streak, streak_shields, future_score, onboarding_complete, quiz_data",
+      )
+      .single();
+
+    if (insertErr || !newUser) {
+      console.error("[sync] failed to create user row", insertErr);
+      return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
+    }
+    serverUser = newUser;
+    fetchErr = null;
+  }
 
   if (fetchErr || !serverUser) {
     console.error("[sync] failed to fetch user", fetchErr);

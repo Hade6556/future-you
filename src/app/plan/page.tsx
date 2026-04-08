@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -363,8 +363,6 @@ export default function PlanPage() {
   const pipelinePlan = usePlanStore((s) => s.pipelinePlan);
   const userName = usePlanStore((s) => s.userName);
   const ambitionType = usePlanStore((s) => s.ambitionType);
-  const googleCalendarConnected = usePlanStore((s) => s.googleCalendarConnected);
-  const setGoogleCalendarConnected = usePlanStore((s) => s.setGoogleCalendarConnected);
   const isPremium = usePlanStore((s) => s.isPremium);
 
   const handleUnlockPlan = () => {
@@ -375,8 +373,6 @@ export default function PlanPage() {
 
   const [plan, setPlan] = useState<IntakeResponse | null | undefined>(undefined);
   const [pathIndex, setPathIndex] = useState(0);
-  const [calendarSyncing, setCalendarSyncing] = useState(false);
-  const [calendarSyncError, setCalendarSyncError] = useState<string | null>(null);
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -390,39 +386,6 @@ export default function PlanPage() {
     }, 0);
     return () => clearTimeout(id);
   }, [planId, setPlanReady]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const calStatus = params.get("calendar");
-    if (calStatus === "connected") {
-      setGoogleCalendarConnected(true);
-      const url = new URL(window.location.href);
-      url.searchParams.delete("calendar");
-      window.history.replaceState({}, "", url.toString());
-    }
-  }, [setGoogleCalendarConnected]);
-
-  const handleCalendarSync = useCallback(async () => {
-    if (!pipelinePlan) return;
-    setCalendarSyncing(true);
-    setCalendarSyncError(null);
-    try {
-      const res = await fetch("/api/calendar/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pipelinePlan),
-        credentials: "include",
-      });
-      if (!res.ok) {
-        const data = await res.json() as { error?: string };
-        setCalendarSyncError(data.error ?? "Sync failed");
-      }
-    } catch {
-      setCalendarSyncError("Network error during sync");
-    } finally {
-      setCalendarSyncing(false);
-    }
-  }, [pipelinePlan]);
 
   const handleDropIn = () => {
     acceptPlan();
@@ -923,110 +886,6 @@ export default function PlanPage() {
                     Unlock full plan
                   </button>
                 </motion.div>
-              )}
-            </div>
-          )}
-
-          {/* ── Google Calendar connect / sync ────────────────────── */}
-          {pipelinePlan && (
-            <div style={{ marginBottom: 24 }}>
-              {!googleCalendarConnected ? (
-                <button
-                  onClick={() => {
-                    window.location.href = "/api/auth/google-calendar";
-                  }}
-                  style={outlineButton}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden
-                  >
-                    <rect
-                      x="3"
-                      y="4"
-                      width="18"
-                      height="18"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M3 9h18"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M8 2v4M16 2v4"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  Connect Google Calendar
-                </button>
-              ) : (
-                <button
-                  onClick={() => void handleCalendarSync()}
-                  disabled={calendarSyncing}
-                  style={{
-                    ...outlineButton,
-                    opacity: calendarSyncing ? 0.5 : 1,
-                    cursor: calendarSyncing ? "not-allowed" : "pointer",
-                  }}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden
-                  >
-                    <rect
-                      x="3"
-                      y="4"
-                      width="18"
-                      height="18"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M3 9h18"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M8 2v4M16 2v4"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M8 14l2.5 2.5L16 11"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  {calendarSyncing ? "Syncing…" : "Sync Plan to Calendar"}
-                </button>
-              )}
-              {calendarSyncError && (
-                <p
-                  style={{
-                    ...bodyText,
-                    textAlign: "center",
-                    fontSize: 13,
-                    color: "#ff6b6b",
-                    marginTop: 10,
-                  }}
-                >
-                  {calendarSyncError}
-                </p>
               )}
             </div>
           )}

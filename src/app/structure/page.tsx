@@ -114,7 +114,23 @@ export default function StructurePage() {
           setRecordingError("Nothing was recorded. Tap Retry to try again.");
         }
       } else {
-        setRecordingError("Recording stopped unexpectedly. Tap Retry to try again.");
+        // Auto-restart: the Web Speech API often fires onend spontaneously
+        // (especially on mobile). Re-create and start a new instance to
+        // keep capturing without losing what was already accumulated.
+        try {
+          const fresh = new SR() as SpeechRecognitionInstance;
+          fresh.continuous = true;
+          fresh.interimResults = true;
+          fresh.lang = recognition.lang;
+          fresh.onstart = recognition.onstart;
+          fresh.onresult = recognition.onresult;
+          fresh.onend = recognition.onend;
+          fresh.onerror = recognition.onerror;
+          recognitionRef.current = fresh;
+          fresh.start();
+        } catch {
+          setRecordingError("Recording stopped unexpectedly. Tap Retry to try again.");
+        }
       }
     };
 

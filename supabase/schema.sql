@@ -57,9 +57,13 @@ alter table public.reflections enable row level security;
 alter table public.events enable row level security;
 
 -- RLS Policies: users can only see/modify their own data
+drop policy if exists "users: own row" on public.users;
 create policy "users: own row" on public.users for all using (auth.uid() = id);
+drop policy if exists "plans: own rows" on public.plans;
 create policy "plans: own rows" on public.plans for all using (auth.uid() = user_id);
+drop policy if exists "reflections: own rows" on public.reflections;
 create policy "reflections: own rows" on public.reflections for all using (auth.uid() = user_id);
+drop policy if exists "events: own rows" on public.events;
 create policy "events: own rows" on public.events for all using (auth.uid() = user_id);
 
 -- Auto-create user profile on signup
@@ -109,6 +113,7 @@ create table if not exists public.daily_activity (
 );
 
 alter table public.daily_activity enable row level security;
+drop policy if exists "daily_activity: own rows" on public.daily_activity;
 create policy "daily_activity: own rows" on public.daily_activity for all using (auth.uid() = user_id);
 
 -- Morning check-in columns on daily_activity
@@ -139,6 +144,7 @@ create table if not exists public.daily_tasks (
 );
 
 alter table public.daily_tasks enable row level security;
+drop policy if exists "daily_tasks: own rows" on public.daily_tasks;
 create policy "daily_tasks: own rows" on public.daily_tasks for all using (auth.uid() = user_id);
 
 -- Recurring tasks — user-defined tasks that repeat on selected days
@@ -153,4 +159,5 @@ create table if not exists public.recurring_tasks (
 );
 
 alter table public.recurring_tasks enable row level security;
+drop policy if exists "recurring_tasks: own rows" on public.recurring_tasks;
 create policy "recurring_tasks: own rows" on public.recurring_tasks for all using (auth.uid() = user_id);

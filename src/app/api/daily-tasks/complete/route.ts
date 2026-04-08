@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { hasSupabasePublicConfig } from "@/lib/supabase/env";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/route-handler";
 
 export async function POST(request: Request) {
   const auth = await requireAuth();

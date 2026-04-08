@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getOAuth2Client } from "@/lib/google-calendar";
 import type { StoredTokens } from "@/lib/google-calendar";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/route-handler";
 
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url);

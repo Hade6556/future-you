@@ -26,15 +26,24 @@ function keywordFallback(transcript: string): Array<{ label: string; pct: number
     .map(([label, words]) => [label, words.filter((w) => lower.includes(w)).length] as [string, number])
     .filter(([, score]) => score > 0)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
+    .slice(0, 4);
 
-  if (scores.length === 0) return [{ label: "Reflection", pct: 100 }];
+  if (scores.length === 0) return [{ label: "Reflection", pct: 55 }, { label: "Planning", pct: 45 }];
+
+  // If only one category matched, add a generic secondary category
+  if (scores.length === 1) {
+    scores.push(["Mindset", 1]);
+  }
 
   const total = scores.reduce((s, [, n]) => s + n, 0);
-  const cats = scores.map(([label, n]) => ({ label, pct: Math.round((n / total) * 100) }));
-  // Ensure percentages sum to 100
-  const diff = 100 - cats.reduce((s, c) => s + c.pct, 0);
-  cats[0].pct += diff;
+  const cats = scores.map(([label, n]) => ({
+    label,
+    pct: Math.min(70, Math.round((n / total) * 100)),
+  }));
+  // Redistribute to ensure no single category dominates and sum is 100
+  const sum = cats.reduce((s, c) => s + c.pct, 0);
+  const diff = 100 - sum;
+  cats[cats.length - 1].pct += diff;
   return cats;
 }
 
@@ -67,9 +76,11 @@ export async function POST(req: Request) {
           role: "user",
           content: `Classify the main topics in this voice transcript. Return ONLY a valid JSON array — no explanation, no markdown, no code fences.
 
-Format: [{"label":"Topic name","pct":60},{"label":"Other topic","pct":40}]
+Format: [{"label":"Topic name","pct":50},{"label":"Other topic","pct":30},{"label":"Third topic","pct":20}]
+- Return EXACTLY 2 to 4 categories — never just one
 - Labels: 1–3 natural words (e.g. "Fitness", "Work stress", "Family")
-- Percentages: integers summing to exactly 100
+- Percentages: integers summing to exactly 100, no single category above 70
+- Even if the transcript focuses on one area, identify secondary themes (mindset, planning, motivation, etc.)
 
 Transcript: ${transcript}`,
         },
@@ -83,11 +94,25 @@ Transcript: ${transcript}`,
       return NextResponse.json({ categories: keywordFallback(transcript) });
     }
 
-    const categories = JSON.parse(match[0]) as Array<{ label: string; pct: number }>;
+    let categories = JSON.parse(match[0]) as Array<{ label: string; pct: number }>;
     if (!Array.isArray(categories) || !categories.length) {
       return NextResponse.json({ categories: keywordFallback(transcript) });
     }
-    return NextResponse.json({ categories });
+    // Guard: if the model returned a single 100% category, add a secondary one
+    if (categories.length === 1) {
+      categories = [
+        { label: categories[0].label, pct: 65 },
+        { label: "Mindset", pct: 35 },
+      ];
+    }
+    // Cap any single category at 70% and redistribute
+    const capped = categories.map((c) => ({ ...c, pct: Math.min(70, c.pct) }));
+    const cappedSum = capped.reduce((s, c) => s + c.pct, 0);
+    if (cappedSum !== 100) {
+      const diff = 100 - cappedSum;
+      capped[capped.length - 1].pct += diff;
+    }
+    return NextResponse.json({ categories: capped });
   } catch (err) {
     console.error("[analyze-dump] error:", err);
     return NextResponse.json({ categories: keywordFallback(transcript) });

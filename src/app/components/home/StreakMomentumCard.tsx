@@ -28,8 +28,8 @@ export function StreakMomentumCard() {
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         border: "1px solid rgba(255,255,255,0.14)",
-        borderRadius: 20,
-        padding: "20px",
+        borderRadius: 16,
+        padding: "14px 16px",
         overflow: "hidden",
       }}
     >
@@ -47,7 +47,7 @@ export function StreakMomentumCard() {
           style={{
             fontFamily: "var(--font-barlow-condensed), sans-serif",
             fontWeight: 900,
-            fontSize: 48,
+            fontSize: 36,
             lineHeight: 1,
             color: streak > 0 ? "#C8FF00" : "rgba(120,155,195,0.40)",
             letterSpacing: "-0.03em",
@@ -61,7 +61,7 @@ export function StreakMomentumCard() {
             fontSize: 12,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
-            color: "rgba(120,155,195,0.50)",
+            color: "rgba(140,170,210,0.60)",
             paddingBottom: 4,
           }}
         >
@@ -70,7 +70,7 @@ export function StreakMomentumCard() {
       </div>
 
       {/* 7-day dot row */}
-      <div style={{ display: "flex", gap: 6, marginTop: 16, justifyContent: "space-between" }}>
+      <div style={{ display: "flex", gap: 6, marginTop: 10, justifyContent: "space-between" }}>
         {weekDates.map((date, i) => {
           const isToday = date === today;
           const isFuture = date > today;
@@ -81,8 +81,8 @@ export function StreakMomentumCard() {
             <div key={date} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, flex: 1 }}>
               <div
                 style={{
-                  width: 28,
-                  height: 28,
+                  width: 24,
+                  height: 24,
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
@@ -139,7 +139,7 @@ export function StreakMomentumCard() {
           color: streak >= bestStreak && streak > 0
             ? "#C8FF00"
             : "rgba(120,155,195,0.55)",
-          marginTop: 14,
+          marginTop: 8,
           marginBottom: 0,
           textAlign: "center",
         }}

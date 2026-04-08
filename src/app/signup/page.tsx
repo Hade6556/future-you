@@ -52,13 +52,19 @@ export default function SignupPage() {
     setError(null);
 
     if (mode === "signup") {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: emailInput,
         password,
         options: { data: { full_name: nameInput } },
       });
       if (signUpError) {
         setError(signUpError.message);
+        setLoading(false);
+        return;
+      }
+      // If email confirmation is required, session will be null
+      if (signUpData.user && !signUpData.session) {
+        setError("Check your email for a confirmation link, then log in.");
         setLoading(false);
         return;
       }
@@ -80,7 +86,11 @@ export default function SignupPage() {
       setEmail(emailInput);
     }
 
-    await syncToServer();
+    try {
+      await syncToServer();
+    } catch (e) {
+      console.warn("[signup] sync failed, continuing anyway", e);
+    }
 
     if (onboardingComplete) {
       router.replace("/");

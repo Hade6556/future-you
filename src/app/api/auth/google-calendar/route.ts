@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthUrl } from "@/lib/google-calendar";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/route-handler";
 
 export async function GET(request: Request) {
   const { origin } = new URL(request.url);
