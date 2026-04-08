@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { OrbAvatar } from "./mascot/OrbAvatar";
+import { BehavioLogo } from "./BehavioLogo";
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(false);
@@ -40,20 +41,7 @@ export default function SplashScreen() {
       <OrbAvatar emotion="default" size={96} />
 
       {/* Wordmark */}
-      <div style={{ display: "flex", alignItems: "baseline", gap: 0 }}>
-        <span
-          style={{
-            fontFamily: "var(--font-barlow-condensed), sans-serif",
-            fontStyle: "italic",
-            fontWeight: 700,
-            fontSize: 28,
-            color: "#C8FF00",
-            letterSpacing: "0.02em",
-          }}
-        >
-          behavio
-        </span>
-      </div>
+      <BehavioLogo size={28} />
 
       {/* Pulsing dots */}
       <div className="flex gap-2">

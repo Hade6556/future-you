@@ -10,6 +10,7 @@ import { usePlanStore } from "../state/planStore";
 import { ARCHETYPES } from "../data/archetypes";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { InspirationQuotes } from "../components/InspirationQuotes";
+import { BehavioLogo } from "../components/BehavioLogo";
 import { downloadPlanPDF } from "../components/PlanExportPDF";
 
 const STORAGE_KEY_PREFIX = "behavio-plan-";
@@ -534,22 +535,9 @@ export default function PlanPage() {
           style={{
             paddingTop: "max(3.5rem, env(safe-area-inset-top, 3.5rem))",
             paddingBottom: 28,
-            display: "flex",
-            alignItems: "baseline",
           }}
         >
-          <span
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 700,
-              fontStyle: "italic",
-              fontSize: 20,
-              color: "rgba(200,255,0,0.85)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            behavio
-          </span>
+          <BehavioLogo size={20} />
         </div>
 
         <div style={{ maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>

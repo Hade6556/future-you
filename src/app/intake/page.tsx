@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
+import { BehavioLogo } from "../components/BehavioLogo";
 
 const LIME  = "#C8FF00";
 const TEXT_HI = "rgba(235,242,255,0.92)";
@@ -107,23 +108,10 @@ export default function IntakePage() {
             position: "absolute",
             top: "max(3.5rem, env(safe-area-inset-top, 3.5rem))",
             left: 28,
-            display: "flex",
-            alignItems: "baseline",
             zIndex: 10,
           }}
         >
-          <span
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 700,
-              fontStyle: "italic",
-              fontSize: 20,
-              color: "rgba(200,255,0,0.85)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            behavio
-          </span>
+          <BehavioLogo size={20} />
         </div>
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 0 }}>

@@ -9,6 +9,7 @@ import {
   buildWinCelebrationLines,
   WIN_CELEBRATION_BASELINE,
 } from "../../utils/winCelebrationThemes";
+import { BehavioLogo } from "../BehavioLogo";
 
 /* ─── Design tokens ─── */
 const LIME = "#C8FF00";
@@ -21,22 +22,7 @@ const GLASS_BORDER = "rgba(255,255,255,0.14)";
 
 /* ─── Wordmark ─── */
 function Wordmark({ size = 22 }: { size?: number }) {
-  return (
-    <span style={{ display: "inline-flex", alignItems: "baseline", gap: 2, lineHeight: 1 }}>
-      <span
-        style={{
-          fontFamily: "var(--font-barlow-condensed), sans-serif",
-          fontStyle: "italic",
-          fontWeight: 700,
-          fontSize: size,
-          color: LIME,
-          letterSpacing: "0.02em",
-        }}
-      >
-        behavio
-      </span>
-    </span>
-  );
+  return <BehavioLogo size={size} />;
 }
 
 /* ══════════════════════════════════════════════════════

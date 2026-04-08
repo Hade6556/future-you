@@ -21,6 +21,7 @@ import {
 } from "../components/quiz/QuestionFormats";
 import type { ArchetypeId, AmbitionDomain } from "../types/plan";
 import { scoreQuizFromMap } from "../data/archetypes";
+import { BehavioLogo } from "../components/BehavioLogo";
 
 const SOCIAL_PROOF_AVATARS = [
   "/mock/people/alex-chen.jpg",
@@ -296,23 +297,10 @@ export default function QuizPage() {
               position: "absolute",
               top: "max(3.5rem, env(safe-area-inset-top, 3.5rem))",
               left: 28,
-              display: "flex",
-              alignItems: "baseline",
               zIndex: 10,
             }}
           >
-            <span
-              style={{
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 700,
-                fontStyle: "italic",
-                fontSize: 20,
-                color: "rgba(200,255,0,0.85)",
-                letterSpacing: "0.02em",
-              }}
-            >
-              behavio
-            </span>
+            <BehavioLogo size={20} />
           </div>
         )}
 
