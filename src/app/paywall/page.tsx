@@ -194,26 +194,27 @@ export default function PaywallPage() {
   }
 
   const handleStartFree = async () => {
-    setPaywallSeen();
-    startTrial();
     setCheckoutLoading(true);
 
-    // Ensure user is authenticated before calling Stripe checkout
     try {
+      const { ensureAnonymousSession } = await import("@/lib/supabase/ensure-anonymous-session");
+      await ensureAnonymousSession();
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setCheckoutLoading(false);
-        router.push("/signup?next=/paywall");
+        alert(
+          "Could not start a browser session for checkout. In Supabase: Authentication → Providers → enable Anonymous (and keep Email on if you still want optional email accounts).",
+        );
         return;
       }
     } catch {
-      // Supabase not configured — continue to checkout (dev fallback below)
+      /* Supabase not configured — continue to billing session (local-only dev) */
     }
 
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await fetch("/api/billing/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: selectedPlan }),
@@ -221,11 +222,13 @@ export default function PaywallPage() {
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
+        setPaywallSeen();
+        startTrial();
         window.location.href = data.url;
-      } else {
-        setCheckoutLoading(false);
-        alert(data.error ?? "Payment is not available right now. Please try again later.");
+        return;
       }
+      setCheckoutLoading(false);
+      alert(data.error ?? "Payment is not available right now. Please try again later.");
     } catch {
       setCheckoutLoading(false);
       alert("Something went wrong. Please try again.");
@@ -333,10 +336,10 @@ export default function PaywallPage() {
             <PaywallPlanPicker
               value={selectedPlan}
               onChange={setSelectedPlan}
-              monthlyAvailable={checkoutOptions?.monthlyAvailable ?? false}
+              monthlyAvailable={checkoutOptions?.monthlyAvailable !== false}
               disabled={checkoutLoading}
             />
-            {checkoutOptions?.monthlyAvailable && selectedPlan === "pro_annual" ? (
+            {checkoutOptions?.monthlyAvailable !== false && selectedPlan === "pro_annual" ? (
               <p
                 style={{
                   ...bodyText,

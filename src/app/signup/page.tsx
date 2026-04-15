@@ -17,6 +17,21 @@ function getSafeNextPath(): string | null {
   return raw;
 }
 
+/** Where Supabase sends users after they click the email confirmation link (must be in Supabase Redirect URLs). */
+function getEmailConfirmationRedirectUrl(): string {
+  const callback = new URL("/auth/callback", window.location.origin);
+  const next = getSafeNextPath();
+  if (next) callback.searchParams.set("next", next);
+  return callback.toString();
+}
+
+function formatAuthError(message: string): string {
+  if (/email logins are disabled/i.test(message)) {
+    return "Supabase has email/password turned off. Open your Supabase project → Authentication → Providers → Email → enable the Email provider (and “Confirm email” only if you want that gate). Then try again.";
+  }
+  return message;
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const onboardingComplete = usePlanStore((s) => s.onboardingComplete);
@@ -45,8 +60,10 @@ export default function SignupPage() {
         await syncToServer();
 
         const next = getSafeNextPath();
-        if (onboardingComplete) {
-          router.replace(next ?? "/");
+        if (next) {
+          router.replace(next);
+        } else if (onboardingComplete) {
+          router.replace("/");
         } else {
           router.replace("/onboarding");
         }
@@ -67,17 +84,19 @@ export default function SignupPage() {
         password,
         options: {
           data: { full_name: nameInput },
-          emailRedirectTo: `${window.location.origin}/onboarding`,
+          emailRedirectTo: getEmailConfirmationRedirectUrl(),
         },
       });
       if (signUpError) {
-        setError(signUpError.message);
+        setError(formatAuthError(signUpError.message));
         setLoading(false);
         return;
       }
-      // If email confirmation is required, session will be null
+      // When "Confirm email" is ON in Supabase, there is no session until they click the link.
       if (signUpData.user && !signUpData.session) {
-        setError("Check your email for a confirmation link, then log in.");
+        setError(
+          "Confirm your email from the link we sent, then you’ll land in the app. To skip this step: Supabase → Authentication → Providers → Email → turn off “Confirm email”.",
+        );
         setLoading(false);
         return;
       }
@@ -89,7 +108,7 @@ export default function SignupPage() {
         password,
       });
       if (signInError) {
-        setError(signInError.message);
+        setError(formatAuthError(signInError.message));
         setLoading(false);
         return;
       }
@@ -106,8 +125,10 @@ export default function SignupPage() {
     }
 
     const next = getSafeNextPath();
-    if (onboardingComplete) {
-      router.replace(next ?? "/");
+    if (next) {
+      router.replace(next);
+    } else if (onboardingComplete) {
+      router.replace("/");
     } else {
       router.replace("/onboarding");
     }

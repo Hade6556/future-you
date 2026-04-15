@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
 import { BRAND } from "../../data/copy";
@@ -74,7 +73,6 @@ function ProgressRing({ size = 56 }: { size?: number }) {
 }
 
 export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
-  const router = useRouter();
   const startTrial = usePlanStore((s) => s.startTrial);
   const setPaywallSeen = usePlanStore((s) => s.setPaywallSeen);
   const maxStep = variant === "onboarding" ? 3 : 2;
@@ -95,11 +93,29 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
   }, [checkoutOptions, selectedPlan]);
 
   const handleStartFree = async () => {
-    setPaywallSeen();
-    startTrial();
     setCheckoutLoading(true);
+
     try {
-      const res = await fetch("/api/checkout", {
+      const { ensureAnonymousSession } = await import("@/lib/supabase/ensure-anonymous-session");
+      await ensureAnonymousSession();
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setCheckoutLoading(false);
+        alert(
+          "Could not start a browser session for checkout. In Supabase: Authentication → Providers → enable Anonymous.",
+        );
+        return;
+      }
+    } catch {
+      /* Supabase not configured — continue to billing session */
+    }
+
+    try {
+      const res = await fetch("/api/billing/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: selectedPlan }),
@@ -107,17 +123,16 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
+        setPaywallSeen();
+        startTrial();
         window.location.href = data.url;
-      } else {
-        // Stripe not configured — grant access locally for dev
-        usePlanStore.getState().setPremium();
-        router.push("/");
+        return;
       }
-    } catch {
-      usePlanStore.getState().setPremium();
-      router.push("/");
-    } finally {
       setCheckoutLoading(false);
+      alert(data.error ?? "Payment is not available right now. Please try again later.");
+    } catch {
+      setCheckoutLoading(false);
+      alert("Something went wrong. Please try again.");
     }
   };
 
@@ -366,10 +381,10 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                     <PaywallPlanPicker
                       value={selectedPlan}
                       onChange={setSelectedPlan}
-                      monthlyAvailable={checkoutOptions?.monthlyAvailable ?? false}
+                      monthlyAvailable={checkoutOptions?.monthlyAvailable !== false}
                       disabled={checkoutLoading}
                     />
-                    {checkoutOptions?.monthlyAvailable && selectedPlan === "pro_annual" ? (
+                    {checkoutOptions?.monthlyAvailable !== false && selectedPlan === "pro_annual" ? (
                       <p
                         style={{
                           ...bodyText,

@@ -91,7 +91,6 @@ export default function AccountPage() {
   const email = usePlanStore((s) => s.email);
   const isPremium = usePlanStore((s) => s.isPremium);
   const setUserName = usePlanStore((s) => s.setUserName);
-  const setPremium = usePlanStore((s) => s.setPremium);
   const resetStore = usePlanStore((s) => s.resetForDemo);
 
   const [editName, setEditName] = useState(userName || "");
@@ -118,7 +117,7 @@ export default function AccountPage() {
   }
 
   function handleUpgrade() {
-    setPremium();
+    router.push("/paywall");
   }
 
   const initial = (userName || email || "?").charAt(0).toUpperCase();

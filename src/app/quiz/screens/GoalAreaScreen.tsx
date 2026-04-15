@@ -26,8 +26,10 @@ const OPTIONS: GoalArea[] = [
 export default function GoalAreaScreen({ onNext }: { onNext: () => void }) {
   const goalArea = useQuizStore((s) => s.answers.goalArea);
   const setGoalArea = useQuizStore((s) => s.setGoalArea);
+  const setSpecificGoals = useQuizStore((s) => s.setSpecificGoals);
 
   function handleSelect(opt: GoalArea) {
+    if (opt !== goalArea) setSpecificGoals([]);
     setGoalArea(opt);
     trackAnswerSelected("goal_area", opt);
   }
@@ -41,8 +43,8 @@ export default function GoalAreaScreen({ onNext }: { onNext: () => void }) {
       style={{ flex: 1, display: "flex", flexDirection: "column" }}
     >
       <QuizHeader
-        question="What area of your life feels most stuck right now?"
-        subhead="Your entire 90-day plan will be built around this."
+        question="Which part of your life should this plan focus on first?"
+        subhead="One screen, one choice. Next you’ll pick a concrete outcome in that area."
       />
       <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
         {OPTIONS.map((opt) => (

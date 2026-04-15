@@ -34,6 +34,14 @@ export function parseMarketingIntentParam(raw: string | null): MarketingIntent |
   return null;
 }
 
+/** Map quiz goal area → marketing intent for theming + API bias (no extra user screen). */
+export function inferMarketingIntentFromQuizGoalArea(goalArea: string | undefined): MarketingIntent {
+  if (!goalArea) return "money_stability";
+  if (goalArea.includes("Health") || goalArea.includes("Energy")) return "health_weight";
+  if (goalArea.includes("Relationship")) return "relationships";
+  return "money_stability";
+}
+
 export function defaultAmbitionForIntent(intent: MarketingIntent): AmbitionDomain {
   switch (intent) {
     case "health_weight":

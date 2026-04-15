@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { usePlanStore } from "./state/planStore";
 import { parseMarketingIntentParam } from "./types/marketingIntent";
 import { trackEvent } from "./quiz/utils/analytics";
-import IntentLanding from "./IntentLanding";
 
 const HomeClient = dynamic(() => import("./HomeClient"), { ssr: false });
 
@@ -17,7 +16,6 @@ export default function RootGate() {
   const quizComplete = usePlanStore((s) => s.quizComplete);
   const onboardingComplete = usePlanStore((s) => s.onboardingComplete);
   const pipelinePlan = usePlanStore((s) => s.pipelinePlan);
-  const marketingIntent = usePlanStore((s) => s.marketingIntent);
   const isPremium = usePlanStore((s) => s.isPremium);
   const hydrateFromServer = usePlanStore((s) => s.hydrateFromServer);
 
@@ -68,15 +66,21 @@ export default function RootGate() {
     return () => clearInterval(poll);
   }, [hydrateFromServer]);
 
+  /** Single funnel: quiz → generating → paywall. No intent picker on `/`. */
   useEffect(() => {
-    if (!urlBoot || funnelComplete || !marketingIntent) return;
+    if (!urlBoot || funnelComplete) return;
+    if (!quizComplete) {
+      router.replace("/quiz");
+      return;
+    }
     if (quizComplete && onboardingComplete && !pipelinePlan) {
-      // Onboarding done but plan not yet generated — resume generation
       router.replace("/generating");
-    } else {
+      return;
+    }
+    if (quizComplete && !onboardingComplete) {
       router.replace("/onboarding");
     }
-  }, [urlBoot, funnelComplete, marketingIntent, quizComplete, onboardingComplete, pipelinePlan, router]);
+  }, [urlBoot, funnelComplete, quizComplete, onboardingComplete, pipelinePlan, router]);
 
   useEffect(() => {
     if (!urlBoot || !funnelComplete || isPremium) return;
@@ -93,10 +97,6 @@ export default function RootGate() {
 
   if (funnelComplete && !isPremium) {
     return null;
-  }
-
-  if (!marketingIntent) {
-    return <IntentLanding />;
   }
 
   return null;

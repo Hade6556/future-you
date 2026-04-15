@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { NavBar } from "./NavBar";
+import { EnsureAnonymousSession } from "./EnsureAnonymousSession";
 import { usePlanStore } from "../state/planStore";
 
 const hideNav = ["/signup", "/onboarding", "/generating", "/journal/new", "/quiz"];
@@ -19,6 +20,7 @@ export default function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="app-shell">
+      <EnsureAnonymousSession />
       <div className="app-phone-canvas">
         {/* Global background gradient mesh — glass only works over this */}
         <div

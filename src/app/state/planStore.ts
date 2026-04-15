@@ -454,7 +454,6 @@ type PlanState = {
   getCurrentStep: () => PipelineStep | null;
   completeOnboarding: () => void;
   startTrial: () => void;
-  setPremium: () => void;
   setPaywallSeen: () => void;
   setAppTourSeen: () => void;
   appTourSeen: boolean;
@@ -807,11 +806,6 @@ export const usePlanStore = create<PlanState>((set, get) => {
       const now = new Date().toISOString();
       setPersisted({ trialStartedAt: now });
       set({ trialStartedAt: now });
-    },
-
-    setPremium: () => {
-      setPersisted({ isPremium: true });
-      set({ isPremium: true });
     },
 
     setPaywallSeen: () => {

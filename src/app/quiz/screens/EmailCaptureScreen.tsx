@@ -43,7 +43,7 @@ export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
           letterSpacing: "-0.01em",
         }}
       >
-        Save your progress — your plan is almost ready.
+        Optional — reminders only
       </h2>
       <p
         style={{
@@ -54,8 +54,8 @@ export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
           lineHeight: 1.5,
         }}
       >
-        Enter your email and we&apos;ll save everything. Your personalised plan
-        will be waiting.
+        Add an email if you want plan reminders. This is not sign-up — you can skip
+        and continue. Payment (if you subscribe) happens on Stripe next.
       </p>
 
       <input
@@ -80,7 +80,7 @@ export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
         }}
       />
 
-      <CTAButton label="Save my progress →" onClick={handleSubmit} disabled={!valid} />
+      <CTAButton label="Continue with this email →" onClick={handleSubmit} disabled={!valid} />
 
       <button
         type="button"

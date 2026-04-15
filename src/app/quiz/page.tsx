@@ -8,6 +8,7 @@ import { usePlanStore } from "../state/planStore";
 import { trackScreenViewed } from "./utils/analytics";
 import ProgressBar from "./components/ProgressBar";
 import type { AmbitionDomain, ArchetypeId } from "../types/plan";
+import { inferMarketingIntentFromQuizGoalArea } from "../types/marketingIntent";
 
 const GOAL_AREA_TO_AMBITION: Record<string, AmbitionDomain> = {
   "Career & Purpose": "career",
@@ -117,6 +118,10 @@ export default function QuizPage() {
       : `I want to focus on ${answers.goalArea ?? "personal growth"}.`;
 
     if (answers.email) store.setEmail(answers.email);
+    const fromUrl = store.marketingIntent;
+    store.setMarketingIntent(
+      fromUrl ?? inferMarketingIntentFromQuizGoalArea(answers.goalArea),
+    );
     store.completeQuiz(archetype, ambition);
     store.completeOnboarding();
     store.setPendingNarrative(narrative);

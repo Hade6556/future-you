@@ -8,10 +8,11 @@ export type CheckoutOptions = {
   annualAvailable: boolean;
 };
 
-const fallback: CheckoutOptions = {
+const fallbackOnError: CheckoutOptions = {
   trialDays: 7,
-  monthlyAvailable: false,
-  annualAvailable: false,
+  /** If the plans request fails (network, ad blockers), still show both rows; POST will validate. */
+  monthlyAvailable: true,
+  annualAvailable: true,
 };
 
 export function useCheckoutOptions() {
@@ -19,21 +20,21 @@ export function useCheckoutOptions() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/checkout")
+    fetch("/api/billing/plans")
       .then(async (res) => {
-        if (!res.ok) throw new Error("checkout options");
+        if (!res.ok) throw new Error("billing plans");
         return res.json() as Promise<CheckoutOptions>;
       })
       .then((data) => {
         if (cancelled) return;
         setOptions({
-          trialDays: typeof data.trialDays === "number" ? data.trialDays : fallback.trialDays,
+          trialDays: typeof data.trialDays === "number" ? data.trialDays : fallbackOnError.trialDays,
           monthlyAvailable: !!data.monthlyAvailable,
           annualAvailable: !!data.annualAvailable,
         });
       })
       .catch(() => {
-        if (!cancelled) setOptions(fallback);
+        if (!cancelled) setOptions(fallbackOnError);
       });
     return () => {
       cancelled = true;

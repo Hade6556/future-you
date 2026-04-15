@@ -14,12 +14,13 @@ export const PRICING = {
     pro_monthly: {
       id: "pro_monthly" as const,
       label: "Monthly",
-      priceLine: "€5.99/month",
+      /** Shown after trial — match your Stripe price */
+      priceLine: "€9.99/month",
       recommended: false,
     },
   },
   /** Shown when both plans are offered */
-  annualSavingsHint: "Best value — save vs paying monthly",
+  annualSavingsHint: "Best value — €44/year vs ~€120 if billed monthly for a year",
 } as const;
 
 export function formatTrialPriceNote(trialDays: number, planId: SubscriptionPlanId): string {

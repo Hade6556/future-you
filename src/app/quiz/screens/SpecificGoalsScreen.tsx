@@ -52,12 +52,9 @@ export default function SpecificGoalsScreen({ onNext }: { onNext: () => void }) 
 
   const options = goalArea ? GOAL_OPTIONS[goalArea] : [];
 
-  function toggle(opt: string) {
-    const next = specificGoals.includes(opt)
-      ? specificGoals.filter((g) => g !== opt)
-      : [...specificGoals, opt];
-    setSpecificGoals(next);
-    trackAnswerSelected("specific_goals", next);
+  function selectOne(opt: string) {
+    setSpecificGoals([opt]);
+    trackAnswerSelected("specific_goals", [opt]);
   }
 
   return (
@@ -69,8 +66,8 @@ export default function SpecificGoalsScreen({ onNext }: { onNext: () => void }) 
       style={{ flex: 1, display: "flex", flexDirection: "column" }}
     >
       <QuizHeader
-        question={`What does success look like for you in ${goalArea ?? "your goal area"}?`}
-        subhead="Select all that apply."
+        question="What would a win look like in that area?"
+        subhead="One choice on this screen — you can refine it later."
       />
       <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
         {options.map((opt) => (
@@ -78,7 +75,7 @@ export default function SpecificGoalsScreen({ onNext }: { onNext: () => void }) 
             key={opt}
             label={opt}
             selected={specificGoals.includes(opt)}
-            onSelect={() => toggle(opt)}
+            onSelect={() => selectOne(opt)}
           />
         ))}
       </div>
@@ -86,7 +83,7 @@ export default function SpecificGoalsScreen({ onNext }: { onNext: () => void }) 
         <CTAButton
           label="Continue"
           onClick={onNext}
-          disabled={specificGoals.length === 0}
+          disabled={specificGoals.length !== 1}
         />
       </div>
     </motion.div>

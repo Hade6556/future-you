@@ -47,8 +47,11 @@ export default function OnboardingPage() {
   const [selectedGoal, setSelectedGoal] = useState<AmbitionDomain | null>(null);
 
   useEffect(() => {
-    if (!marketingIntent) return;
-    setSelectedGoal((prev) => prev ?? defaultAmbitionForIntent(marketingIntent));
+    setSelectedGoal((prev) => {
+      if (prev) return prev;
+      if (marketingIntent) return defaultAmbitionForIntent(marketingIntent);
+      return "confidence";
+    });
   }, [marketingIntent]);
   const [locationInput, setLocationInput] = useState("");
   const [narrative, setNarrative] = useState("");
