@@ -1,5 +1,7 @@
 /** TypeScript types mirroring the Python GoalPlan Pydantic model. */
 
+import type { MarketingIntent } from "./marketingIntent";
+
 export type PipelineStep = {
   step_number: number;
   title: string;
@@ -86,6 +88,8 @@ export type UserContext = {
   // Identity signals
   archetype?: string | null;
   ambitionDomain?: string | null;
+  /** Universal landing funnel entry — biases plan generation */
+  marketingIntent?: MarketingIntent | null;
 
   // Wellbeing signals
   moodRating?: number | null;
@@ -170,6 +174,8 @@ export type DailyTasksRequest = {
   userProfileDigest: string | null;
   challengeLevel: ChallengeLevel;
   mustDoCompletionRate7d: number;
+  /** False when cached plan phases don't match ambitionType — model must follow ambition, not old plan text */
+  planAlignedWithAmbition?: boolean;
 };
 
 export type DailyTasksResponse = {
@@ -182,12 +188,12 @@ export type DailyTasksResponse = {
 
 /** Maps the app's ambition domain to a goal string the pipeline understands. */
 export const AMBITION_GOAL_MAP: Partial<Record<string, string>> = {
-  entrepreneur: "become entrepreneur",
-  athlete: "become athlete",
+  entrepreneur: "become an entrepreneur",
+  athlete: "become an athlete",
   weight_loss: "lose weight",
-  creative: "creative",
-  student: "student",
-  wellness: "wellness",
+  creative: "pursue creative work",
+  student: "excel as a student",
+  wellness: "improve wellness",
   career: "advance my career",
   finance: "build financial security",
   language: "learn a language",

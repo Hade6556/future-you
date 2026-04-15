@@ -7,21 +7,15 @@ import { motion } from "framer-motion";
 import type { IntakeResponse } from "../types/plan";
 import type { PipelinePhase } from "../types/pipeline";
 import { usePlanStore } from "../state/planStore";
-import { ARCHETYPES } from "../data/archetypes";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { InspirationQuotes } from "../components/InspirationQuotes";
 import { BehavioLogo } from "../components/BehavioLogo";
 import { downloadPlanPDF } from "../components/PlanExportPDF";
+import AmbitionMapOrbs from "../components/AmbitionMapOrbs";
+import { BEHAVIO_INTAKE_SAVED_EVENT } from "@/lib/behavio-intake-event";
+import { ACCENT as LIME, NAVY_PANEL as NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS, GLASS_BORDER } from "@/app/theme";
 
 const STORAGE_KEY_PREFIX = "behavio-plan-";
-
-const LIME = "#C8FF00";
-const NAVY = "#0A1628";
-const TEXT_HI = "rgba(235,242,255,0.92)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const TEXT_LO = "rgba(120,155,195,0.40)";
-const GLASS = "rgba(255,255,255,0.07)";
-const GLASS_BORDER = "rgba(255,255,255,0.14)";
 
 const glassCard: React.CSSProperties = {
   background: GLASS,
@@ -59,8 +53,8 @@ const eyebrow: React.CSSProperties = {
 
 const limeBadge: React.CSSProperties = {
   display: "inline-block",
-  background: "rgba(200,255,0,0.08)",
-  border: "1px solid rgba(200,255,0,0.18)",
+  background: "rgba(94,205,161,0.08)",
+  border: "1px solid rgba(94,205,161,0.18)",
   color: LIME,
   borderRadius: 100,
   padding: "6px 16px",
@@ -85,7 +79,7 @@ const ctaButton: React.CSSProperties = {
   padding: "20px 32px",
   border: "none",
   cursor: "pointer",
-  boxShadow: "0 8px 32px rgba(200,255,0,0.25)",
+  boxShadow: "0 8px 32px rgba(94,205,161,0.25)",
   textAlign: "center" as const,
 };
 
@@ -321,13 +315,13 @@ function PhaseCard({
                       style={{
                         fontFamily: "var(--font-body), Georgia, serif",
                         fontSize: 12,
-                        color: LIME,
+                        color: TEXT_MID,
                         marginTop: 4,
                         margin: 0,
                         marginBlockStart: 4,
                       }}
                     >
-                      ✓ {step.success_metric}
+                      Target: {step.success_metric}
                     </p>
                   </div>
                 ))}
@@ -365,12 +359,20 @@ export default function PlanPage() {
   const userName = usePlanStore((s) => s.userName);
   const ambitionType = usePlanStore((s) => s.ambitionType);
   const isPremium = usePlanStore((s) => s.isPremium);
+  const ambitionCategories = usePlanStore((s) => s.ambitionCategories);
+
+  // Hard paywall: non-premium users cannot view the plan page
+  useEffect(() => {
+    if (!isPremium && pipelinePlan) {
+      router.replace("/paywall");
+    }
+  }, [isPremium, pipelinePlan, router]);
 
   const handleUnlockPlan = () => {
     router.push("/paywall");
   };
 
-  const arch = archetype ? ARCHETYPES.find((a) => a.id === archetype) : null;
+  const arch = null;
 
   const [plan, setPlan] = useState<IntakeResponse | null | undefined>(undefined);
   const [pathIndex, setPathIndex] = useState(0);
@@ -387,6 +389,22 @@ export default function PlanPage() {
     }, 0);
     return () => clearTimeout(id);
   }, [planId, setPlanReady]);
+
+  // Generating page saves stub intake first, then replaces when /api/intake finishes.
+  useEffect(() => {
+    if (!planId) return undefined;
+    const reload = () => {
+      const data = getPlanFromStorage(planId);
+      if (data) setPlan(data);
+    };
+    const onIntakeSaved = (e: Event) => {
+      const detail = (e as CustomEvent<{ planId?: string }>).detail;
+      if (detail?.planId !== planId) return;
+      reload();
+    };
+    window.addEventListener(BEHAVIO_INTAKE_SAVED_EVENT, onIntakeSaved);
+    return () => window.removeEventListener(BEHAVIO_INTAKE_SAVED_EVENT, onIntakeSaved);
+  }, [planId]);
 
   const handleDropIn = () => {
     acceptPlan();
@@ -468,7 +486,7 @@ export default function PlanPage() {
             No plan yet. Let&apos;s build your roadmap — your coach is ready.
           </p>
           <Link
-            href="/intake"
+            href="/onboarding"
             style={{
               ...ctaButton,
               display: "inline-block",
@@ -507,7 +525,7 @@ export default function PlanPage() {
           inset: 0,
           zIndex: 0,
           background: `
-            radial-gradient(ellipse 70% 55% at 50% 20%, rgba(200,255,0,0.10) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 55% at 50% 20%, rgba(94,205,161,0.10) 0%, transparent 60%),
             radial-gradient(ellipse 60% 50% at 10% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
             linear-gradient(170deg, #0f1e3a 0%, #060912 55%)
           `,
@@ -576,8 +594,8 @@ export default function PlanPage() {
               {day1Step && (
                 <div
                   style={{
-                    background: "rgba(200,255,0,0.04)",
-                    border: "1px solid rgba(200,255,0,0.16)",
+                    background: "rgba(94,205,161,0.04)",
+                    border: "1px solid rgba(94,205,161,0.16)",
                     backdropFilter: "blur(16px)",
                     WebkitBackdropFilter: "blur(16px)",
                     borderRadius: 20,
@@ -595,7 +613,7 @@ export default function PlanPage() {
                       left: 0,
                       right: 0,
                       height: 1,
-                      background: "linear-gradient(90deg, transparent, rgba(200,255,0,0.30), transparent)",
+                      background: "linear-gradient(90deg, transparent, rgba(94,205,161,0.30), transparent)",
                     }}
                   />
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -618,7 +636,7 @@ export default function PlanPage() {
                       1
                     </div>
                     <div>
-                      <p style={{ ...eyebrow, color: "rgba(200,255,0,0.60)", fontSize: 12, letterSpacing: "0.22em" }}>
+                      <p style={{ ...eyebrow, color: "rgba(94,205,161,0.60)", fontSize: 12, letterSpacing: "0.22em" }}>
                         Today&apos;s focus
                       </p>
                       <h3
@@ -688,17 +706,12 @@ export default function PlanPage() {
             </div>
           )}
 
-          {!isReveal && arch && (
-            <p
-              style={{
-                ...bodyText,
-                fontSize: 14,
-                fontWeight: 500,
-                marginBottom: 20,
-              }}
-            >
-              Built for {arch.name}s
-            </p>
+          {/* ── Ambition Map ───────────────────────────────────── */}
+          {!isReveal && ambitionCategories.length > 0 && (
+            <div style={{ ...glassCard, padding: 20, marginBottom: 20 }}>
+              <p style={{ ...eyebrow, marginBottom: 14 }}>Ambition Map</p>
+              <AmbitionMapOrbs categories={ambitionCategories} />
+            </div>
           )}
 
           {/* ── Values & Strengths ────────────────────────────────── */}
@@ -729,8 +742,8 @@ export default function PlanPage() {
                   key={r}
                   style={{
                     display: "inline-block",
-                    background: "rgba(200,255,0,0.18)",
-                    border: "1px solid rgba(200,255,0,0.30)",
+                    background: "rgba(94,205,161,0.18)",
+                    border: "1px solid rgba(94,205,161,0.30)",
                     color: LIME,
                     borderRadius: 100,
                     padding: "5px 14px",
@@ -833,8 +846,8 @@ export default function PlanPage() {
                   transition={{ delay: 0.3, duration: 0.3 }}
                   style={{
                     marginTop: 16,
-                    background: "rgba(200,255,0,0.04)",
-                    border: "1px solid rgba(200,255,0,0.16)",
+                    background: "rgba(94,205,161,0.04)",
+                    border: "1px solid rgba(94,205,161,0.16)",
                     borderRadius: 16,
                     padding: "20px 24px",
                     textAlign: "center",

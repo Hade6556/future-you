@@ -6,6 +6,16 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePlanStore } from "../state/planStore";
 import { createClient } from "@/lib/supabase/client";
+import { ACCENT, GLASS, GLASS_BORDER, ON_ACCENT, accentRgba } from "@/app/theme";
+
+/** Internal redirect only — avoids open redirects. */
+function getSafeNextPath(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.search).get("next");
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.includes("://")) return null;
+  if (raw.startsWith("/signup")) return null;
+  return raw;
+}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -34,11 +44,11 @@ export default function SignupPage() {
         if (userEmail) setEmail(userEmail);
         await syncToServer();
 
+        const next = getSafeNextPath();
         if (onboardingComplete) {
-          router.replace("/");
+          router.replace(next ?? "/");
         } else {
-          const quizDone = usePlanStore.getState().quizComplete;
-          router.replace(quizDone ? "/intake" : "/quiz");
+          router.replace("/onboarding");
         }
       }
     }
@@ -55,7 +65,10 @@ export default function SignupPage() {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: emailInput,
         password,
-        options: { data: { full_name: nameInput } },
+        options: {
+          data: { full_name: nameInput },
+          emailRedirectTo: `${window.location.origin}/onboarding`,
+        },
       });
       if (signUpError) {
         setError(signUpError.message);
@@ -92,11 +105,11 @@ export default function SignupPage() {
       console.warn("[signup] sync failed, continuing anyway", e);
     }
 
+    const next = getSafeNextPath();
     if (onboardingComplete) {
-      router.replace("/");
+      router.replace(next ?? "/");
     } else {
-      const quizDone = usePlanStore.getState().quizComplete;
-      router.replace(quizDone ? "/intake" : "/quiz");
+      router.replace("/onboarding");
     }
   }
 
@@ -136,15 +149,15 @@ export default function SignupPage() {
             className="absolute inset-0 rounded-full"
             style={{
               background:
-                "radial-gradient(circle, rgba(200,255,0,0.25) 0%, rgba(45,212,192,0.12) 50%, transparent 70%)",
+                `radial-gradient(circle, ${accentRgba(0.25)} 0%, rgba(45,212,192,0.12) 50%, transparent 70%)`,
               filter: "blur(20px)",
             }}
           />
           <div
             className="relative h-16 w-16 rounded-full"
             style={{
-              background: "linear-gradient(135deg, #C8FF00 0%, #2DD4C0 100%)",
-              boxShadow: "0 0 40px rgba(200,255,0,0.30)",
+              background: `linear-gradient(135deg, ${ACCENT} 0%, #2DD4C0 100%)`,
+              boxShadow: `0 0 40px ${accentRgba(0.3)}`,
             }}
           />
         </div>
@@ -167,9 +180,9 @@ export default function SignupPage() {
             }}
           >
             {mode === "signup" ? (
-              <>Create your{" "}<span style={{ color: "#C8FF00" }}>account</span></>
+              <>Create your{" "}<span style={{ color: ACCENT }}>account</span></>
             ) : (
-              <>Welcome{" "}<span style={{ color: "#C8FF00" }}>back</span></>
+              <>Welcome{" "}<span style={{ color: ACCENT }}>back</span></>
             )}
           </h1>
           <p
@@ -201,11 +214,11 @@ export default function SignupPage() {
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
               required
-              className="h-12 w-full rounded-xl border px-4 text-sm outline-none transition-colors focus:border-[#C8FF00]"
+              className="h-12 w-full rounded-xl border px-4 text-sm outline-none transition-colors focus:border-[var(--cta)]"
               style={{
-                background: "rgba(255,255,255,0.07)",
+                background: GLASS,
                 backdropFilter: "blur(12px)",
-                borderColor: "rgba(255,255,255,0.16)",
+                borderColor: GLASS_BORDER,
                 color: "var(--text-hi)",
               }}
             />
@@ -216,11 +229,11 @@ export default function SignupPage() {
             value={emailInput}
             onChange={(e) => setEmailInput(e.target.value)}
             required
-            className="h-12 w-full rounded-xl border px-4 text-sm outline-none transition-colors focus:border-[#C8FF00]"
+            className="h-12 w-full rounded-xl border px-4 text-sm outline-none transition-colors focus:border-[var(--cta)]"
             style={{
-              background: "rgba(255,255,255,0.07)",
+              background: GLASS,
               backdropFilter: "blur(12px)",
-              borderColor: "rgba(255,255,255,0.16)",
+              borderColor: GLASS_BORDER,
               color: "var(--text-hi)",
             }}
           />
@@ -231,11 +244,11 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="h-12 w-full rounded-xl border px-4 text-sm outline-none transition-colors focus:border-[#C8FF00]"
+            className="h-12 w-full rounded-xl border px-4 text-sm outline-none transition-colors focus:border-[var(--cta)]"
             style={{
-              background: "rgba(255,255,255,0.07)",
+              background: GLASS,
               backdropFilter: "blur(12px)",
-              borderColor: "rgba(255,255,255,0.16)",
+              borderColor: GLASS_BORDER,
               color: "var(--text-hi)",
             }}
           />
@@ -245,9 +258,9 @@ export default function SignupPage() {
             disabled={loading}
             className="flex h-14 w-full items-center justify-center gap-3 rounded-full border font-semibold transition-all active:scale-[0.97] disabled:opacity-50"
             style={{
-              background: "linear-gradient(135deg, #C8FF00 0%, #2DD4C0 100%)",
+              background: `linear-gradient(135deg, ${ACCENT} 0%, #2DD4C0 100%)`,
               border: "none",
-              color: "#0a0f1a",
+              color: ON_ACCENT,
               fontSize: 15,
             }}
           >

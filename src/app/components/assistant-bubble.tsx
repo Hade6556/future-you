@@ -50,7 +50,7 @@ export function AssistantBubble({ onClose }: AssistantBubbleProps) {
   ].join(" ");
 
   const chips: { id: ChipId; label: string; status: TileStatus; href: string; cta: string; disabled: boolean }[] = [
-    { id: "identity", label: "Quiz & Profile", status: identityStatus, href: "/quiz", cta: "Take quiz", disabled: false },
+    { id: "identity", label: "Quiz & Profile", status: identityStatus, href: "/", cta: "Take quiz", disabled: false },
     { id: "plan", label: "Coaching Plan", status: planStatus, href: "/plan", cta: "View plan", disabled: !planReady },
     { id: "daily", label: "Daily Coaching", status: dailyStatusTile, href: "/", cta: "Open session", disabled: !planReady },
   ];

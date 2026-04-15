@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
 import { Button } from "@/components/ui/button";
-import { OrbAvatar } from "./mascot/OrbAvatar";
+// OrbAvatar removed in simplification
 
 interface CoachMessage {
   role: "user" | "assistant";
@@ -139,8 +139,7 @@ export function CoachChat({ className }: { className?: string }) {
             transition={{ duration: 0.2 }}
             className="flex justify-start items-end gap-2"
           >
-            {/* Milo thinking face as typing indicator */}
-            <OrbAvatar emotion="thinking" size={40} />
+            {/* Typing indicator */}
             <div className="bg-secondary rounded-2xl px-4 py-3">
               <div className="flex gap-1 items-center">
                 {[0, 1, 2].map((i) => (

@@ -3,13 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { EnergyLevel, TimeAvailable, ChallengeLevel } from "../../types/pipeline";
-
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const GLASS = "rgba(255,255,255,0.07)";
-const GLASS_BORDER = "rgba(255,255,255,0.14)";
+import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID, GLASS, GLASS_BORDER } from "@/app/theme";
 const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
 const FONT_BODY = "var(--font-apercu), sans-serif";
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
@@ -43,8 +37,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
   const [energy, setEnergy] = useState<EnergyLevel | null>(null);
   const [time, setTime] = useState<TimeAvailable | null>(null);
   const [challenge, setChallenge] = useState<ChallengeLevel>("push");
-  const [focus, setFocus] = useState<string>(suggestedFocus ?? "");
-  const [step, setStep] = useState(0); // 0=energy, 1=time, 2=challenge, 3=focus
+  const [step, setStep] = useState(0); // 0=energy, 1=time, 2=challenge
 
   function getGreeting(): string {
     const h = new Date().getHours();
@@ -57,7 +50,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
 
   function handleSubmit() {
     if (!canSubmit) return;
-    onSubmit(energy!, time!, focus.trim() || null, challenge);
+    onSubmit(energy!, time!, null, challenge);
   }
 
   return (
@@ -140,7 +133,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
                     alignItems: "center",
                     gap: 6,
                     padding: "16px 8px",
-                    background: energy === opt.value ? "rgba(200,255,0,0.12)" : "rgba(255,255,255,0.04)",
+                    background: energy === opt.value ? "rgba(94,205,161,0.12)" : "rgba(255,255,255,0.04)",
                     border: energy === opt.value ? "2px solid " + LIME : "2px solid rgba(255,255,255,0.08)",
                     borderRadius: 16,
                     cursor: "pointer",
@@ -199,7 +192,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
                   style={{
                     flex: "1 1 calc(50% - 4px)",
                     padding: "14px 8px",
-                    background: time === opt.value ? "rgba(200,255,0,0.12)" : "rgba(255,255,255,0.04)",
+                    background: time === opt.value ? "rgba(94,205,161,0.12)" : "rgba(255,255,255,0.04)",
                     border: time === opt.value ? "2px solid " + LIME : "2px solid rgba(255,255,255,0.08)",
                     borderRadius: 14,
                     cursor: "pointer",
@@ -264,7 +257,11 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
                   type="button"
                   onClick={() => {
                     setChallenge(opt.value);
-                    setTimeout(() => setStep(3), 200);
+                    setTimeout(() => {
+                      if (energy !== null && time !== null) {
+                        onSubmit(energy, time, null, opt.value);
+                      }
+                    }, 250);
                   }}
                   style={{
                     flex: 1,
@@ -273,7 +270,7 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
                     alignItems: "center",
                     gap: 4,
                     padding: "14px 6px",
-                    background: challenge === opt.value ? "rgba(200,255,0,0.12)" : "rgba(255,255,255,0.04)",
+                    background: challenge === opt.value ? "rgba(94,205,161,0.12)" : "rgba(255,255,255,0.04)",
                     border: challenge === opt.value ? "2px solid " + LIME : "2px solid rgba(255,255,255,0.08)",
                     borderRadius: 16,
                     cursor: "pointer",
@@ -325,110 +322,6 @@ export default function MorningCheckin({ userName, onSubmit, suggestedFocus }: P
           </motion.div>
         )}
 
-        {/* Step 3: Focus (optional) + Submit */}
-        {step === 3 && (
-          <motion.div
-            key="focus"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            style={{ marginTop: 20 }}
-          >
-            <p
-              style={{
-                fontFamily: FONT_MONO,
-                fontSize: 13,
-                fontWeight: 500,
-                color: TEXT_MID,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase" as const,
-                margin: "0 0 12px",
-              }}
-            >
-              Focus area (optional)
-            </p>
-            {suggestedFocus && (
-              <button
-                type="button"
-                onClick={() => setFocus(suggestedFocus)}
-                style={{
-                  display: "inline-block",
-                  marginBottom: 10,
-                  padding: "8px 14px",
-                  background: focus === suggestedFocus ? "rgba(200,255,0,0.12)" : "rgba(255,255,255,0.04)",
-                  border: focus === suggestedFocus ? "1px solid " + LIME : "1px solid rgba(255,255,255,0.10)",
-                  borderRadius: 999,
-                  fontFamily: FONT_BODY,
-                  fontSize: 13,
-                  color: focus === suggestedFocus ? LIME : TEXT_HI,
-                  cursor: "pointer",
-                  WebkitTapHighlightColor: "transparent",
-                }}
-              >
-                {suggestedFocus}
-              </button>
-            )}
-            <input
-              type="text"
-              value={focus}
-              onChange={(e) => setFocus(e.target.value)}
-              placeholder="e.g., Nutrition, Studying, Outreach..."
-              style={{
-                width: "100%",
-                padding: "12px 14px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.10)",
-                borderRadius: 12,
-                fontFamily: FONT_BODY,
-                fontSize: 14,
-                color: TEXT_HI,
-                outline: "none",
-                boxSizing: "border-box" as const,
-              }}
-            />
-
-            <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                style={{
-                  padding: "14px 20px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: 14,
-                  cursor: "pointer",
-                  fontFamily: FONT_BODY,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: TEXT_HI,
-                }}
-              >
-                &larr;
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!canSubmit}
-                style={{
-                  flex: 1,
-                  padding: "14px 24px",
-                  background: canSubmit ? LIME : "rgba(200,255,0,0.3)",
-                  color: NAVY,
-                  border: "none",
-                  borderRadius: 14,
-                  fontFamily: FONT_HEADING,
-                  fontWeight: 800,
-                  fontSize: 16,
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase" as const,
-                  cursor: canSubmit ? "pointer" : "default",
-                }}
-              >
-                Build my day
-              </button>
-            </div>
-          </motion.div>
-        )}
       </AnimatePresence>
     </motion.div>
   );

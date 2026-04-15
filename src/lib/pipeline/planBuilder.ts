@@ -184,7 +184,8 @@ export async function buildPersonalizedPlan(
     userContext.dreamNarrative ||
     userContext.problems?.length ||
     userContext.archetype ||
-    userContext.obstacles?.length;
+    userContext.obstacles?.length ||
+    userContext.marketingIntent;
 
   if (!hasSubstantialData) {
     return buildTemplatePlan(goalRaw, goalKey, goalConfig, events, experts, userContext);
@@ -194,7 +195,7 @@ export async function buildPersonalizedPlan(
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 2500,
       system: SYSTEM_PROMPT,
       messages: [

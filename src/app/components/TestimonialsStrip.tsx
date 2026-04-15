@@ -1,12 +1,7 @@
 "use client";
 
 import Image from "next/image";
-
-const DARK = "rgba(235,242,255,0.92)";
-const MUTED = "rgba(120,155,195,0.68)";
-const CARD_BG = "rgba(255,255,255,0.07)";
-const CARD_BORDER = "rgba(255,255,255,0.14)";
-const LIME = "#C8FF00";
+import { ACCENT as LIME, TEXT_HI as DARK, TEXT_MID as MUTED, GLASS as CARD_BG, GLASS_BORDER as CARD_BORDER } from "@/app/theme";
 
 const TESTIMONIALS = [
   {

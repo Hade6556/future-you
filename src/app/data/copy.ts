@@ -159,7 +159,7 @@ export const BRAND = {
     headline: "Your 90-day forecast",
     lockedLabel: "UNLOCKED WITH PRO",
     lockedHook: "Behavio already knows what happens in week 8.",
-    freeDays: "3 days free",
+    freeDays: "7 days free",
   },
   paywall: {
     step1: {
@@ -182,7 +182,6 @@ export const BRAND = {
     step3: {
       headline: "Start free today",
       socialCount: "Join 43,219+ who found their path",
-      priceNote: "3 days free, then \u20ac44/year \u00b7 cancel anytime",
       trust: ["No charge today", "Cancel anytime", "Instant access"],
     },
   },

@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
 import { requireAuth } from "@/lib/auth";
-import type { DailyTasksRequest, DailyTasksResponse, GeneratedTask } from "../../../types/pipeline";
+import {
+  AMBITION_GOAL_MAP,
+  type DailyTasksRequest,
+  type DailyTasksResponse,
+  type GeneratedTask,
+} from "../../../types/pipeline";
 
 export const maxDuration = 30;
 
@@ -24,6 +29,21 @@ const ARCHETYPE_VOICE: Record<string, string> = {
 function buildSystemPrompt(req: DailyTasksRequest): string {
   const voice = req.archetype ? (ARCHETYPE_VOICE[req.archetype] ?? "") : "";
 
+  const goalPhrase =
+    req.ambitionType && AMBITION_GOAL_MAP[req.ambitionType]
+      ? AMBITION_GOAL_MAP[req.ambitionType]
+      : req.ambitionType ?? "personal growth";
+
+  const misalignedWarning =
+    req.planAlignedWithAmbition === false
+      ? `
+CRITICAL — PLAN / GOAL MISMATCH:
+The structured "CURRENT PLAN CONTEXT" below may describe an OLD goal (e.g. money, career) from a previous plan. The user's CURRENT focus is: "${goalPhrase}" (domain: ${req.ambitionType ?? "unknown"}).
+You MUST generate tasks ONLY for that current focus. Do NOT use tasks about finance, income, or unrelated domains unless they directly support "${goalPhrase}".
+Treat phase/step text below as UNTRUSTED if it conflicts with the current domain — prefer the domain "${goalPhrase}" and any USER CONTEXT / profile digest.
+`
+      : "";
+
   const maxTasks = req.energy === "low" ? 2 : req.timeAvailable <= 30 ? 3 : req.energy === "high" && req.timeAvailable >= 120 ? 5 : 4;
   const totalMinutesCap = req.timeAvailable;
 
@@ -42,7 +62,7 @@ function buildSystemPrompt(req: DailyTasksRequest): string {
   return `You are Behavio — an AI daily task generator for a personal development app. You create specific, actionable daily tasks that are directly tied to the user's 90-day plan.
 
 Archetype voice: ${voice || "Warm, direct, no fluff."}
-
+${misalignedWarning}
 CURRENT PLAN CONTEXT:
 - Day ${req.day} of ${req.totalDays} (${Math.round(req.overallProgress * 100)}% through the plan)
 - Phase: ${req.currentPhase?.phase_name ?? "unknown"} — "${req.currentPhase?.goal ?? "make progress"}"
@@ -139,15 +159,102 @@ const MOCK_RESPONSE: DailyTasksResponse = {
   adaptationNote: null,
 };
 
+function buildFallbackTasks(req: DailyTasksRequest): DailyTasksResponse {
+  const tasks: GeneratedTask[] = [];
+  const step = req.currentStep;
+  const phase = req.currentPhase;
+  const timeAvailable = req.timeAvailable ?? 60;
+
+  if (step) {
+    // Core task from the current plan step
+    const coreMinutes = Math.min(timeAvailable > 30 ? 30 : 15, timeAvailable);
+    tasks.push({
+      id: "gen-1",
+      label: step.title.length > 60 ? step.title.slice(0, 57) + "..." : step.title,
+      description: step.description || `Focus on this for ${coreMinutes} minutes.`,
+      category: "plan",
+      estimatedMinutes: coreMinutes,
+      priority: "must-do",
+      intensity: req.energy === "low" ? "routine" : "challenging",
+      planStepRef: step.step_number ?? 1,
+      source: "ai",
+      completed: false,
+      deferred: false,
+    });
+
+    // Second task from step resources or success metric
+    if (timeAvailable > 30) {
+      const secondLabel = step.success_metric
+        ? `Work toward: ${step.success_metric.length > 50 ? step.success_metric.slice(0, 47) + "..." : step.success_metric}`
+        : phase
+          ? `Progress on ${phase.phase_name}`
+          : "Review today's progress";
+      tasks.push({
+        id: "gen-2",
+        label: secondLabel,
+        description: step.success_metric
+          ? `Use this as your benchmark for today's work.`
+          : "Make measurable progress on your current phase.",
+        category: "plan",
+        estimatedMinutes: Math.min(15, timeAvailable - coreMinutes),
+        priority: "should-do",
+        intensity: "routine",
+        planStepRef: step.step_number ?? 1,
+        source: "ai",
+        completed: false,
+        deferred: false,
+      });
+    }
+  } else {
+    // No plan data at all — still better than "Complete today's plan action"
+    tasks.push({
+      id: "gen-1",
+      label: req.ambitionType
+        ? `Spend ${Math.min(30, timeAvailable)} min on your ${req.ambitionType} goal`
+        : `Spend ${Math.min(30, timeAvailable)} min on your main goal`,
+      description: "Dedicated focused time moves the needle more than anything else.",
+      category: "plan",
+      estimatedMinutes: Math.min(30, timeAvailable),
+      priority: "must-do",
+      intensity: "challenging",
+      planStepRef: null,
+      source: "ai",
+      completed: false,
+      deferred: false,
+    });
+  }
+
+  // Add recurring tasks
+  for (const rt of (req.recurringTasks ?? [])) {
+    tasks.push({
+      id: `recurring-${rt.id}`,
+      label: rt.label,
+      description: "Your recurring daily task.",
+      category: "habit",
+      estimatedMinutes: rt.estimatedMinutes,
+      priority: "should-do",
+      intensity: "routine",
+      planStepRef: null,
+      source: "recurring",
+      completed: false,
+      deferred: false,
+    });
+  }
+
+  const dayMsg = phase
+    ? `Day ${req.day} of ${req.totalDays}. You're in the "${phase.phase_name}" phase — keep pushing.`
+    : MOCK_RESPONSE.dayMessage;
+
+  return { tasks, dayMessage: dayMsg, adaptationNote: req.energy === "low" ? "Lighter day — conserve energy for what matters." : null };
+}
+
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
 
 export async function POST(request: Request) {
   const auth = await requireAuth();
   if (auth.error) {
-    // Fall back to mock tasks instead of blocking the user
-    console.warn("/api/daily-tasks/generate: auth failed, returning mock tasks");
-    return NextResponse.json(MOCK_RESPONSE);
+    console.warn("/api/daily-tasks/generate: auth failed, continuing without auth");
   }
 
   const limited = rateLimitResponse(request);
@@ -157,7 +264,7 @@ export async function POST(request: Request) {
     const body = (await request.json()) as DailyTasksRequest;
 
     if (!anthropic) {
-      return NextResponse.json(MOCK_RESPONSE);
+      return NextResponse.json(buildFallbackTasks(body));
     }
 
     const response = await anthropic.messages.create({
@@ -173,7 +280,7 @@ export async function POST(request: Request) {
     });
 
     const text = response.content[0]?.type === "text" ? response.content[0].text : null;
-    if (!text) return NextResponse.json(MOCK_RESPONSE);
+    if (!text) return NextResponse.json(buildFallbackTasks(body));
 
     try {
       const stripped = text.replace(/```(?:json)?\n?/g, "").trim();
@@ -181,7 +288,7 @@ export async function POST(request: Request) {
 
       // Validate and sanitize
       if (!Array.isArray(parsed.tasks) || parsed.tasks.length === 0) {
-        return NextResponse.json(MOCK_RESPONSE);
+        return NextResponse.json(buildFallbackTasks(body));
       }
 
       // Ensure all tasks have required fields
@@ -222,14 +329,14 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         tasks: sanitized,
-        dayMessage: parsed.dayMessage || MOCK_RESPONSE.dayMessage,
+        dayMessage: parsed.dayMessage || `Day ${body.day} of ${body.totalDays}. Keep building.`,
         adaptationNote: parsed.adaptationNote ?? null,
       });
     } catch {
-      return NextResponse.json(MOCK_RESPONSE);
+      return NextResponse.json(buildFallbackTasks(body));
     }
   } catch (error) {
     console.error("/api/daily-tasks/generate error", error);
-    return NextResponse.json(MOCK_RESPONSE);
+    return NextResponse.json(buildFallbackTasks({} as DailyTasksRequest));
   }
 }

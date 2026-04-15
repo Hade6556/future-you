@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
+import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID } from "@/app/theme";
 const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
 const FONT_BODY = "var(--font-apercu), sans-serif";
 
@@ -132,7 +128,7 @@ export default function AddRecurringSheet({ open, onClose, onAdd }: Props) {
                     style={{
                       flex: 1,
                       padding: "8px 0",
-                      background: active ? "rgba(200,255,0,0.12)" : "rgba(255,255,255,0.04)",
+                      background: active ? "rgba(94,205,161,0.12)" : "rgba(255,255,255,0.04)",
                       border: active ? "1.5px solid " + LIME : "1.5px solid rgba(255,255,255,0.08)",
                       borderRadius: 10,
                       cursor: "pointer",
@@ -156,7 +152,7 @@ export default function AddRecurringSheet({ open, onClose, onAdd }: Props) {
               style={{
                 width: "100%",
                 marginTop: 16,
-                background: canAdd ? LIME : "rgba(200,255,0,0.25)",
+                background: canAdd ? LIME : "rgba(94,205,161,0.25)",
                 color: NAVY,
                 border: "none",
                 borderRadius: 999,
@@ -167,7 +163,7 @@ export default function AddRecurringSheet({ open, onClose, onAdd }: Props) {
                 letterSpacing: "0.04em",
                 textTransform: "uppercase" as const,
                 cursor: canAdd ? "pointer" : "default",
-                boxShadow: canAdd ? "0 4px 16px rgba(200,255,0,0.25)" : "none",
+                boxShadow: canAdd ? "0 4px 16px rgba(94,205,161,0.25)" : "none",
               }}
             >
               Add recurring task

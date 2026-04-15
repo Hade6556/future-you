@@ -1,22 +1,23 @@
 "use client";
 
-import { OrbAvatar } from "./mascot/OrbAvatar";
+import { ACCENT, NAVY } from "@/app/theme";
+import { BehavioLogo } from "./BehavioLogo";
 
 export default function ActionLoader({ visible }: { visible: boolean }) {
   if (!visible) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[9998] flex flex-col items-center justify-center gap-6"
-      style={{ background: "#060912" }}
+      className="fixed inset-0 z-[9998] flex flex-col items-center justify-center gap-5"
+      style={{ background: NAVY }}
     >
-      <OrbAvatar emotion="excited" size={96} />
+      <BehavioLogo size={32} />
       <div className="flex gap-2">
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="h-2.5 w-2.5 rounded-full animate-pulse"
-            style={{ background: "#C8FF00", animationDelay: `${i * 200}ms` }}
+            className="h-2 w-2 rounded-full animate-pulse"
+            style={{ background: ACCENT, opacity: 0.7, animationDelay: `${i * 200}ms` }}
           />
         ))}
       </div>

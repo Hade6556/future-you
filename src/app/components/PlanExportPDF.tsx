@@ -2,9 +2,7 @@
 
 import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
 import type { GoalPlan } from "../types/pipeline";
-
-const LIME_HEX = "#C8FF00";
-const NAVY_HEX = "#060912";
+import { ACCENT as LIME_HEX, NAVY as NAVY_HEX } from "@/app/theme";
 const TEXT_COLOR = "#1a2a40";
 const TEXT_LIGHT = "#5a7090";
 const BORDER = "#e0e8f0";
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
   },
   stepMetric: {
     fontSize: 9,
-    color: LIME_HEX.replace("#C8FF00", "#2a8a00"),
+    color: "#0a5c3a",
     lineHeight: 1.4,
   },
   divider: {

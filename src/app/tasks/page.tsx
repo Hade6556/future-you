@@ -7,6 +7,7 @@ import { usePlanStore, todayISO } from "../state/planStore";
 import { computeDayInfo } from "../utils/dayEngine";
 import { computeCompletionRate7d, computeAvgScore7d, computeMustDoCompletionRate7d, detectMissedPatterns, getDayOfWeek, getDayOfWeekNumber } from "../utils/taskEngine";
 import { deriveCheckinStatus } from "../utils/taskEngine";
+import { planMatchesAmbition } from "../utils/planAmbitionAlignment";
 import { buildUserProfileDigest } from "@/lib/pipeline/profileDigest";
 import type { EnergyLevel, TimeAvailable, ChallengeLevel, GeneratedTask, DailyTasksRequest } from "../types/pipeline";
 import MorningCheckin from "../components/daily/MorningCheckin";
@@ -16,18 +17,14 @@ import EveningWrapup from "../components/daily/EveningWrapup";
 import AddRecurringSheet from "../components/daily/AddRecurringSheet";
 import SwapTaskSheet from "../components/daily/SwapTaskSheet";
 import { PlusIcon } from "@heroicons/react/24/outline";
-
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const GLASS = "rgba(255,255,255,0.07)";
-const GLASS_BORDER = "rgba(255,255,255,0.14)";
+import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID, GLASS, GLASS_BORDER } from "@/app/theme";
+import { usePremiumGuard } from "../hooks/usePremiumGuard";
 const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
 const FONT_BODY = "var(--font-apercu), sans-serif";
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 
 export default function TasksPage() {
+  const guardRedirecting = usePremiumGuard();
   const userName = usePlanStore((s) => s.userName);
   const archetype = usePlanStore((s) => s.dogArchetype);
   const ambitionType = usePlanStore((s) => s.ambitionType);
@@ -80,6 +77,7 @@ export default function TasksPage() {
   const setTodayStatus = usePlanStore((s) => s.setTodayStatus);
   const recalculateAndPersistScore = usePlanStore((s) => s.recalculateAndPersistScore);
 
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [generateError, setGenerateError] = useState(false);
   const [showAddCustom, setShowAddCustom] = useState(false);
@@ -88,8 +86,10 @@ export default function TasksPage() {
   const [newTaskLabel, setNewTaskLabel] = useState("");
   const [newTaskMinutes, setNewTaskMinutes] = useState("15");
 
-  // Compute day info from plan
-  const dayInfo = pipelinePlan && planStartDate ? computeDayInfo(pipelinePlan, planStartDate) : null;
+  // Compute day info from plan (only trust step text when plan matches current ambition)
+  const planAligned = planMatchesAmbition(pipelinePlan, ambitionType);
+  const dayInfo =
+    pipelinePlan && planStartDate && planAligned ? computeDayInfo(pipelinePlan, planStartDate) : null;
   const today = todayISO();
   const checkinDoneToday = morningCheckinDate === today;
   const tasksLoadedToday = todayTasksDate === today && todayTasks.length > 0;
@@ -97,6 +97,11 @@ export default function TasksPage() {
 
   // Determine journal sentiment for recommendations
   const lastSentiment: string | null = lastReflection ? null : null; // Would come from reflections table in full implementation
+
+  // Wait for client mount (prevents blank flash from SSR/hydration mismatch)
+  useEffect(() => { setMounted(true); }, []);
+
+  if (guardRedirecting) return null;
 
   // Auto-update checkin status based on task completion
   useEffect(() => {
@@ -192,6 +197,7 @@ export default function TasksPage() {
           userProfileDigest: profileDigest,
           challengeLevel,
           mustDoCompletionRate7d: mustDoRate,
+          planAlignedWithAmbition: planAligned,
         };
 
         const res = await fetch("/api/daily-tasks/generate", {
@@ -219,6 +225,7 @@ export default function TasksPage() {
       quizPrimaryGoal, quizPastAttempts, quizCurrentState, quizVision, quizAgeGroup,
       quizDream, quizGender, quizObstacles, quizTimeline, quizCommitment, quizSchedule,
       multiSelectAnswers, moodRating, sleepQuality, energyLevelQuiz, stressLevel,
+      pipelinePlan,
     ],
   );
 
@@ -266,7 +273,7 @@ export default function TasksPage() {
           Take the quiz first so Behavio can personalize your tasks.
         </p>
         <Link
-          href="/quiz"
+          href="/"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -375,8 +382,37 @@ export default function TasksPage() {
           )}
         </header>
 
+        {/* ─── Loading until client mount ───────────────────────────────── */}
+        {!mounted && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+              padding: "40px 24px",
+              textAlign: "center",
+            }}
+          >
+            <motion.div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                border: "3px solid rgba(94,205,161,0.2)",
+                borderTopColor: LIME,
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+            />
+            <p style={{ fontFamily: FONT_BODY, fontSize: 15, color: TEXT_MID }}>
+              Loading your tasks...
+            </p>
+          </div>
+        )}
+
         {/* ─── No plan yet (shown before check-in if no plan) ──────────── */}
-        {!pipelinePlan && !tasksLoadedToday && !loading && (
+        {mounted && !pipelinePlan && !tasksLoadedToday && !loading && (
           <div
             style={{
               display: "flex",
@@ -413,7 +449,7 @@ export default function TasksPage() {
         )}
 
         {/* ─── Morning Check-in (if not done today and plan exists) ───────── */}
-        {pipelinePlan && !checkinDoneToday && !tasksLoadedToday && (
+        {mounted && pipelinePlan && !checkinDoneToday && !tasksLoadedToday && (
           <MorningCheckin
             userName={userName}
             onSubmit={generateTasks}
@@ -440,7 +476,7 @@ export default function TasksPage() {
                 width: 48,
                 height: 48,
                 borderRadius: "50%",
-                border: "3px solid rgba(200,255,0,0.2)",
+                border: "3px solid rgba(94,205,161,0.2)",
                 borderTopColor: LIME,
               }}
               animate={{ rotate: 360 }}
@@ -453,7 +489,7 @@ export default function TasksPage() {
         )}
 
         {/* ─── Tasks loaded ────────────────────────────────────────────── */}
-        {tasksLoadedToday && !loading && (
+        {mounted && tasksLoadedToday && !loading && (
           <>
             {/* Day Context Banner */}
             {dayInfo && (
@@ -535,7 +571,7 @@ export default function TasksPage() {
                       borderRadius: 999,
                       background:
                         progressPct > 0
-                          ? `repeating-linear-gradient(-55deg, ${LIME}, ${LIME} 2px, rgba(200,255,0,0.55) 2px, rgba(200,255,0,0.55) 4px)`
+                          ? `repeating-linear-gradient(-55deg, ${LIME}, ${LIME} 2px, rgba(94,205,161,0.55) 2px, rgba(94,205,161,0.55) 4px)`
                           : "transparent",
                     }}
                     initial={false}
@@ -606,7 +642,7 @@ export default function TasksPage() {
         )}
 
         {/* ─── Generation failed or stuck — retry ────────────────────────── */}
-        {pipelinePlan && checkinDoneToday && !tasksLoadedToday && !loading && (
+        {mounted && pipelinePlan && checkinDoneToday && !tasksLoadedToday && !loading && (
           <div
             style={{
               display: "flex",
@@ -643,6 +679,7 @@ export default function TasksPage() {
             </button>
           </div>
         )}
+
 
       </div>
 
@@ -731,7 +768,7 @@ export default function TasksPage() {
                   onClick={handleAddCustom}
                   disabled={!newTaskLabel.trim()}
                   style={{
-                    background: newTaskLabel.trim() ? LIME : "rgba(200,255,0,0.25)",
+                    background: newTaskLabel.trim() ? LIME : "rgba(94,205,161,0.25)",
                     color: NAVY,
                     border: "none",
                     borderRadius: 999,
@@ -742,7 +779,7 @@ export default function TasksPage() {
                     letterSpacing: "0.04em",
                     textTransform: "uppercase" as const,
                     cursor: newTaskLabel.trim() ? "pointer" : "default",
-                    boxShadow: newTaskLabel.trim() ? "0 4px 16px rgba(200,255,0,0.25)" : "none",
+                    boxShadow: newTaskLabel.trim() ? "0 4px 16px rgba(94,205,161,0.25)" : "none",
                   }}
                 >
                   Add

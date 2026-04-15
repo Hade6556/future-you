@@ -1,10 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const LIME = "#C8FF00";
+import { ACCENT as LIME, TEXT_HI, TEXT_MID } from "@/app/theme";
 const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
 const FONT_BODY = "var(--font-apercu), sans-serif";
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
@@ -33,8 +30,8 @@ export default function DayContextBanner({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       style={{
-        background: "rgba(200,255,0,0.04)",
-        border: "1px solid rgba(200,255,0,0.12)",
+        background: "rgba(94,205,161,0.04)",
+        border: "1px solid rgba(94,205,161,0.12)",
         borderRadius: 18,
         padding: "16px 16px 14px",
       }}
@@ -131,10 +128,10 @@ export default function DayContextBanner({
           style={{
             fontFamily: FONT_MONO,
             fontSize: 13,
-            color: "rgba(200,255,0,0.7)",
+            color: "rgba(94,205,161,0.7)",
             marginTop: 8,
             padding: "6px 10px",
-            background: "rgba(200,255,0,0.06)",
+            background: "rgba(94,205,161,0.06)",
             borderRadius: 8,
             display: "inline-block",
           }}

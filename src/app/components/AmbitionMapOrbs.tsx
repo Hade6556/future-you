@@ -3,13 +3,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import type { AmbitionCategory } from "../state/planStore";
-
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const TEXT_LO = "rgba(120,155,195,0.40)";
-const LIME = "#C8FF00";
-const GLASS = "rgba(255,255,255,0.07)";
-const GLASS_BORDER = "rgba(255,255,255,0.14)";
+import { ACCENT as LIME, TEXT_HI, TEXT_MID, TEXT_LO, GLASS, GLASS_BORDER } from "@/app/theme";
 
 const FONT_HEADING: React.CSSProperties = {
   fontFamily: "var(--font-barlow-condensed), sans-serif",
@@ -425,7 +419,7 @@ export default function AmbitionMapOrbs({ categories }: Props) {
                   background:
                     delta !== 0
                       ? delta > 0
-                        ? "rgba(200,255,0,0.10)"
+                        ? "rgba(94,205,161,0.10)"
                         : "rgba(255,107,107,0.10)"
                       : "transparent",
                   borderRadius: 4,

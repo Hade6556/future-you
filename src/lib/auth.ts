@@ -3,7 +3,7 @@ import { hasSupabasePublicConfig } from "@/lib/supabase/env";
 import { NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 
-/** Synthetic user returned when Supabase is not configured. */
+/** Synthetic user returned when Supabase is not configured or user is anonymous. */
 const ANON_USER = {
   id: "anon-local",
   email: "local@behavio.dev",
@@ -18,7 +18,6 @@ const ANON_USER = {
 export async function requireAuth(): Promise<
   { user: User; error?: never } | { user?: never; error: NextResponse }
 > {
-  // If Supabase isn't configured, allow anonymous access
   if (!hasSupabasePublicConfig()) {
     return { user: ANON_USER };
   }
@@ -38,4 +37,23 @@ export async function requireAuth(): Promise<
   }
 
   return { user };
+}
+
+/**
+ * Optionally get the authenticated user. Never returns 401.
+ * Returns the real user if logged in, otherwise ANON_USER.
+ * Use for features that should work without login (voice dump, coach, etc.).
+ */
+export async function optionalAuth(): Promise<{ user: User }> {
+  if (!hasSupabasePublicConfig()) {
+    return { user: ANON_USER };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    return { user: user ?? ANON_USER };
+  } catch {
+    return { user: ANON_USER };
+  }
 }

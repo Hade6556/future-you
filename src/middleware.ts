@@ -2,6 +2,30 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAnonKey } from "@/lib/supabase/env";
 
+function isPublicPath(pathname: string): boolean {
+  if (pathname === "/") return true;
+  if (pathname.startsWith("/api/")) return true;
+  if (pathname.startsWith("/auth/")) return true;
+  if (pathname.startsWith("/signup")) return true;
+  if (pathname.startsWith("/quiz")) return true;
+  if (pathname.startsWith("/onboarding")) return true;
+  if (pathname.startsWith("/generating")) return true;
+  if (pathname.startsWith("/paywall")) return true;
+  if (pathname.startsWith("/forgot-password")) return true;
+  if (pathname === "/privacy" || pathname === "/terms") return true;
+  if (pathname === "/icon.svg") return true;
+  return false;
+}
+
+/** Routes that require an active premium subscription. */
+function isPremiumPath(pathname: string): boolean {
+  if (pathname.startsWith("/tasks")) return true;
+  if (pathname.startsWith("/plan")) return true;
+  if (pathname.startsWith("/journal")) return true;
+  if (pathname.startsWith("/explore")) return true;
+  return false;
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -29,8 +53,32 @@ export async function middleware(request: NextRequest) {
   });
 
   // Refresh session — do not remove this.
-  // Pages handle auth state client-side; API routes use requireAuth().
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  if (!user && !isPublicPath(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
+  // Premium gate: redirect non-premium users to the paywall
+  if (user && isPremiumPath(pathname)) {
+    const { data } = await supabase
+      .from("users")
+      .select("is_premium")
+      .eq("id", user.id)
+      .single();
+
+    if (!data?.is_premium) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/paywall";
+      return NextResponse.redirect(url);
+    }
+  }
 
   return supabaseResponse;
 }

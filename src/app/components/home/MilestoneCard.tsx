@@ -1,8 +1,9 @@
 "use client";
 
 import type { DayInfo } from "../../utils/dayEngine";
+import { milestoneCardGracePassLine } from "@/app/utils/streakCopy";
 
-const SHIELD_MILESTONES = [7, 14, 30];
+const GRACE_PASS_DAYS = [7, 14, 30];
 
 type Props = {
   streak: number;
@@ -12,10 +13,10 @@ type Props = {
 export function MilestoneCard({ streak, dayInfo }: Props) {
   const line = (() => {
     if (streak > 0) {
-      const next = SHIELD_MILESTONES.find((m) => m > streak);
+      const next = GRACE_PASS_DAYS.find((m) => m > streak);
       if (next && next - streak <= 5) {
         const gap = next - streak;
-        return `${gap} day${gap === 1 ? "" : "s"} to your next streak shield`;
+        return milestoneCardGracePassLine(gap, next);
       }
     }
 
@@ -51,7 +52,8 @@ export function MilestoneCard({ streak, dayInfo }: Props) {
           fontFamily: "var(--font-barlow-condensed), sans-serif",
           fontWeight: 700,
           fontSize: 14,
-          color: "rgba(200,255,0,0.55)",
+          color: "var(--accent-primary)",
+          opacity: 0.65,
           flexShrink: 0,
         }}
       >

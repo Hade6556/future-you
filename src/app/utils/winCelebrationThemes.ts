@@ -3,6 +3,8 @@
  * from `multiSelectAnswers` (q_goal_area, q_problems, plus fallbacks).
  */
 
+import { ACCENT } from "@/app/theme";
+
 export type DomainKey = "career" | "money" | "relationships" | "health" | "mindset" | "learning";
 
 export type WinCelebrationThemeLine = {
@@ -20,8 +22,8 @@ const RANK_POINTS: readonly [readonly number[], readonly number[], readonly numb
   [0.25, 0.3, 0.42, 0.58, 0.72],
 ];
 
-/** Primary = top line (lime); ranks 2–3 match previous chart hierarchy. */
-const LINE_COLORS = ["#C8FF00", "#2DD4C0", "#5B8DEF"] as const;
+/** Primary = top line (accent); ranks 2–3 match previous chart hierarchy. */
+const LINE_COLORS = [ACCENT, "#2DD4C0", "#5B8DEF"] as const;
 
 const DOMAIN_META: Record<
   DomainKey,

@@ -3,15 +3,16 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import Stripe from "stripe";
 
 /**
- * Cron route: runs daily to notify users whose 3-day trial ends tomorrow.
+ * Cron route: runs daily to notify users whose paid trial ends tomorrow.
+ *
+ * Window uses STRIPE_TRIAL_DAYS (default 7): we select users whose trial_started_at
+ * falls on the calendar day (trialDays - 1) days ago so the Stripe trial typically
+ * ends the next day.
  *
  * Setup:
  * 1. Add to vercel.json:
  *    { "crons": [{ "path": "/api/cron/trial-reminder", "schedule": "0 10 * * *" }] }
  * 2. Set CRON_SECRET env var to authenticate calls.
- *
- * This queries Supabase for users with trial_started_at ~2 days ago (trial ends
- * tomorrow), then sends a reminder email via Stripe's billing portal link.
  */
 
 function isAuthorized(request: Request): boolean {
@@ -30,17 +31,24 @@ export async function POST(request: Request) {
   const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
   const supabase = createAdminClient();
 
-  // Find users whose trial started ~2 days ago (trial ends in ~1 day)
+  const trialRaw = parseInt(process.env.STRIPE_TRIAL_DAYS ?? "7", 10);
+  const trialDays = Number.isFinite(trialRaw) ? Math.min(365, Math.max(0, trialRaw)) : 7;
+  const reminderOffsetDays = trialDays > 0 ? Math.max(1, trialDays - 1) : 0;
+
+  if (reminderOffsetDays === 0) {
+    return NextResponse.json({ sent: 0, message: "STRIPE_TRIAL_DAYS is 0 — no trial reminders" });
+  }
+
   const now = new Date();
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-  const twoDaysAgoStart = twoDaysAgo.toISOString().slice(0, 10) + "T00:00:00Z";
-  const twoDaysAgoEnd = twoDaysAgo.toISOString().slice(0, 10) + "T23:59:59Z";
+  const targetDay = new Date(now.getTime() - reminderOffsetDays * 24 * 60 * 60 * 1000);
+  const windowStart = targetDay.toISOString().slice(0, 10) + "T00:00:00Z";
+  const windowEnd = targetDay.toISOString().slice(0, 10) + "T23:59:59Z";
 
   const { data: users, error } = await supabase
     .from("users")
     .select("id, email, stripe_customer_id, trial_started_at")
-    .gte("trial_started_at", twoDaysAgoStart)
-    .lte("trial_started_at", twoDaysAgoEnd)
+    .gte("trial_started_at", windowStart)
+    .lte("trial_started_at", windowEnd)
     .eq("is_premium", true)
     .not("stripe_customer_id", "is", null);
 

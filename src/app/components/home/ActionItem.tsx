@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ACCENT, TEXT_HI, TEXT_MID } from "@/app/theme";
 
 export type ActionState = "active" | "done" | "overdue";
 
@@ -14,14 +15,14 @@ export function ActionItem({
   href: string;
 }) {
   const accent =
-    state === "active"  ? "#C8FF00"
+    state === "active"  ? ACCENT
     : state === "done"  ? "rgba(76,175,125,0.40)"
     : /* overdue */       "rgba(255,85,85,0.60)";
 
   const textColor =
-    state === "active"  ? "rgba(235,242,255,0.92)"
-    : state === "done"  ? "rgba(120,155,195,0.50)"
-    : /* overdue */       "rgba(120,155,195,0.75)";
+    state === "active"  ? TEXT_HI
+    : state === "done"  ? "rgba(160,180,210,0.50)"
+    : /* overdue */       TEXT_MID;
 
   return (
     <Link href={href} style={{ display: "block", textDecoration: "none" }}>

@@ -1,22 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
 import { BRAND } from "../data/copy";
-
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const TEXT_LO = "rgba(120,155,195,0.50)";
-const GLASS_BORDER = "rgba(255,255,255,0.10)";
+import { FunnelThemeShell } from "../components/funnel/FunnelThemeShell";
+import { PaywallPlanPicker } from "../components/paywall/PaywallPlanPicker";
+import { formatTrialPriceNote, PRICING, type SubscriptionPlanId } from "../data/pricing";
+import { useCheckoutOptions } from "../hooks/useCheckoutOptions";
+import { NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS_BORDER } from "@/app/theme";
 
 const heading: React.CSSProperties = {
-  fontFamily: "var(--font-barlow-condensed), sans-serif",
-  fontWeight: 900,
-  fontStyle: "italic",
+  fontFamily: "var(--font-apercu), sans-serif",
+  fontWeight: 700,
+  fontStyle: "normal",
   color: TEXT_HI,
   margin: 0,
 };
@@ -66,7 +64,7 @@ function BlurredPlanPreview() {
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: "50%",
-                background: LIME,
+                background: "var(--cta)",
                 color: NAVY,
                 fontFamily: "var(--font-barlow-condensed), sans-serif",
                 fontWeight: 800,
@@ -144,7 +142,7 @@ function BlurredPlanPreview() {
             display: "flex",
             alignItems: "center",
             gap: 6,
-            color: LIME,
+            color: "var(--cta)",
             fontFamily: "var(--font-barlow-condensed), sans-serif",
             fontWeight: 700,
             fontSize: 13,
@@ -166,11 +164,29 @@ function BlurredPlanPreview() {
 export default function PaywallPage() {
   const router = useRouter();
   const isPremium = usePlanStore((s) => s.isPremium);
+  const pipelinePlan = usePlanStore((s) => s.pipelinePlan);
   const startTrial = usePlanStore((s) => s.startTrial);
   const setPaywallSeen = usePlanStore((s) => s.setPaywallSeen);
   const userName = usePlanStore((s) => s.userName);
+  const marketingIntent = usePlanStore((s) => s.marketingIntent);
 
+  const checkoutOptions = useCheckoutOptions();
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanId>("pro_annual");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  // Guard: no plan generated yet → send back to onboarding
+  useEffect(() => {
+    if (!pipelinePlan && !isPremium) {
+      router.replace("/onboarding");
+    }
+  }, [pipelinePlan, isPremium, router]);
+
+  useEffect(() => {
+    if (!checkoutOptions) return;
+    if (selectedPlan === "pro_monthly" && !checkoutOptions.monthlyAvailable) {
+      setSelectedPlan("pro_annual");
+    }
+  }, [checkoutOptions, selectedPlan]);
 
   if (isPremium) {
     router.replace("/");
@@ -181,31 +197,43 @@ export default function PaywallPage() {
     setPaywallSeen();
     startTrial();
     setCheckoutLoading(true);
+
+    // Ensure user is authenticated before calling Stripe checkout
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setCheckoutLoading(false);
+        router.push("/signup?next=/paywall");
+        return;
+      }
+    } catch {
+      // Supabase not configured — continue to checkout (dev fallback below)
+    }
+
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "pro_annual" }),
+        body: JSON.stringify({ plan: selectedPlan }),
         credentials: "include",
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
         window.location.href = data.url;
       } else {
-        // Stripe not configured — grant access locally for dev
-        usePlanStore.getState().setPremium();
-        router.push("/");
+        setCheckoutLoading(false);
+        alert(data.error ?? "Payment is not available right now. Please try again later.");
       }
     } catch {
-      // Fallback for dev/offline
-      usePlanStore.getState().setPremium();
-      router.push("/");
-    } finally {
       setCheckoutLoading(false);
+      alert("Something went wrong. Please try again.");
     }
   };
 
   return (
+    <FunnelThemeShell intent={marketingIntent}>
     <div
       style={{
         minHeight: "100dvh",
@@ -222,7 +250,7 @@ export default function PaywallPage() {
           inset: 0,
           zIndex: 0,
           background: `
-            radial-gradient(ellipse 70% 55% at 50% 20%, rgba(200,255,0,0.08) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 55% at 50% 20%, rgba(94,205,161,0.08) 0%, transparent 60%),
             radial-gradient(ellipse 60% 50% at 10% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
             linear-gradient(170deg, #0f1e3a 0%, #060912 55%)
           `,
@@ -269,14 +297,14 @@ export default function PaywallPage() {
           <h1
             style={{
               ...heading,
-              fontSize: 42,
-              lineHeight: 1.05,
+              fontSize: 34,
+              lineHeight: 1.2,
               textAlign: "center",
               letterSpacing: "-0.02em",
             }}
           >
             {userName ? `${userName}, your` : "Your"}{" "}
-            <span style={{ color: LIME }}>plan is ready.</span>
+            <span style={{ color: "var(--cta)" }}>plan is ready.</span>
           </h1>
           <p
             style={{
@@ -301,6 +329,28 @@ export default function PaywallPage() {
             <BlurredPlanPreview />
           </motion.div>
 
+          <div style={{ width: "100%", maxWidth: 360, marginTop: 20 }}>
+            <PaywallPlanPicker
+              value={selectedPlan}
+              onChange={setSelectedPlan}
+              monthlyAvailable={checkoutOptions?.monthlyAvailable ?? false}
+              disabled={checkoutLoading}
+            />
+            {checkoutOptions?.monthlyAvailable && selectedPlan === "pro_annual" ? (
+              <p
+                style={{
+                  ...bodyText,
+                  fontSize: 12,
+                  color: TEXT_LO,
+                  marginTop: 8,
+                  textAlign: "center",
+                }}
+              >
+                {PRICING.annualSavingsHint}
+              </p>
+            ) : null}
+          </div>
+
           {/* CTA */}
           <button
             onClick={() => void handleStartFree()}
@@ -317,11 +367,11 @@ export default function PaywallPage() {
               fontSize: 17,
               letterSpacing: "0.10em",
               textTransform: "uppercase",
-              background: LIME,
+              background: "var(--cta)",
               color: NAVY,
               marginTop: 28,
               opacity: checkoutLoading ? 0.6 : 1,
-              boxShadow: "0 8px 32px rgba(200,255,0,0.20)",
+              boxShadow: "0 8px 32px var(--accent-primary-glow-strong, rgba(94,205,161,0.20))",
             }}
           >
             {checkoutLoading ? "Redirecting..." : "Start Free Now"}
@@ -337,7 +387,7 @@ export default function PaywallPage() {
               marginTop: 10,
             }}
           >
-            {BRAND.paywall.step3.priceNote}
+            {formatTrialPriceNote(checkoutOptions?.trialDays ?? 7, selectedPlan)}
           </p>
 
           {/* Trust badges */}
@@ -359,5 +409,6 @@ export default function PaywallPage() {
         </motion.div>
       </div>
     </div>
+    </FunnelThemeShell>
   );
 }

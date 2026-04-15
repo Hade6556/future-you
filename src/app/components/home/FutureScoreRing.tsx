@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
-import { ARCHETYPES } from "../../data/archetypes";
 
 const RADIUS = 80;
 const STROKE_WIDTH = 14;
@@ -29,7 +28,7 @@ function getArcColor(score: number): string {
 export function FutureScoreRing() {
   const futureScore = usePlanStore((s) => s.futureScore);
   const archetype = usePlanStore((s) => s.dogArchetype);
-  const arch = archetype ? ARCHETYPES.find((a) => a.id === archetype) : null;
+  const arch = null;
 
   const [displayScore, setDisplayScore] = useState(0);
   const [taglineIdx, setTaglineIdx] = useState(0);
@@ -37,7 +36,7 @@ export function FutureScoreRing() {
   const taglines = [
     getScoreMessage(futureScore),
     "Your future self is watching.",
-    arch?.tagline ?? "One day at a time.",
+    "One day at a time.",
     "Progress, not perfection.",
   ];
 

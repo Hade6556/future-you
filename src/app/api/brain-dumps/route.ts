@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth";
+import { optionalAuth } from "@/lib/auth";
 import { hasSupabasePublicConfig } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/route-handler";
 
 const hasSupabase = hasSupabasePublicConfig();
 
 export async function GET() {
-  const auth = await requireAuth();
-  if (auth.error) return auth.error;
+  const { user } = await optionalAuth();
 
   if (!hasSupabase) {
     return NextResponse.json({ dumps: [] });
@@ -17,7 +16,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from("reflections")
     .select("id, date, content, coach_response, sentiment, created_at")
-    .eq("user_id", auth.user.id)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -46,8 +45,7 @@ interface PostBody {
 }
 
 export async function POST(req: Request) {
-  const auth = await requireAuth();
-  if (auth.error) return auth.error;
+  const { user } = await optionalAuth();
 
   try {
     const body = (await req.json()) as PostBody;
@@ -68,7 +66,7 @@ export async function POST(req: Request) {
     const { data, error } = await supabase
       .from("reflections")
       .insert({
-        user_id: auth.user.id,
+        user_id: user.id,
         content: content.trim(),
         coach_response,
         sentiment,

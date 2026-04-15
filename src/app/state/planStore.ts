@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import type { AmbitionDomain, ArchetypeId } from "../types/plan";
-import type { CheckinStatus, GoalPlan, PipelineStatus, PipelineStep, GeneratedTask, RecurringTask, EnergyLevel, TimeAvailable, ChallengeLevel } from "../types/pipeline";
+import type { MarketingIntent } from "../types/marketingIntent";
+import type { CheckinStatus, GoalPlan, PipelineStatus, PipelineStep, PipelineEvent, GeneratedTask, RecurringTask, EnergyLevel, TimeAvailable, ChallengeLevel } from "../types/pipeline";
 import type { DailyScoreEntry } from "../utils/scoreEngine";
 import { recordScoringAction, computeFutureScore, backfillMissedDays } from "../utils/scoreEngine";
+import { planMatchesAmbition } from "../utils/planAmbitionAlignment";
 
 const PIPELINE_SESSION_KEY = "behavio-pipeline";
 const OLD_PIPELINE_SESSION_KEY = "future-you-pipeline";
@@ -24,6 +26,9 @@ if (typeof window !== "undefined") {
   migrateStorageKey(OLD_PIPELINE_SESSION_KEY, PIPELINE_SESSION_KEY);
   migrateStorageKey(OLD_STORAGE_KEY, STORAGE_KEY);
 }
+
+/** Pause `/api/sync` retries briefly after 401 (invalid/expired session vs server). */
+let syncPausedUntilMs = 0;
 
 function getStoredPipelinePlan(): GoalPlan | null {
   if (typeof window === "undefined") return null;
@@ -99,6 +104,8 @@ type Persisted = {
   bestStreak: number;
   /** Earned shields that protect the streak from resetting once. */
   streakShields: number;
+  /** Marketing funnel entry (universal landing) — synced inside quiz_data */
+  marketingIntent: MarketingIntent | null;
   /** Quiz context for plan personalization */
   quizTimeline: string | null;
   quizCommitment: string | null;
@@ -165,6 +172,8 @@ type Persisted = {
   planRefreshSummary: string | null;
   /** Whether the user has dismissed the plan refresh notification. */
   planRefreshSeen: boolean;
+  /** Narrative text from onboarding — persisted so /generating survives page reloads. */
+  pendingNarrative: string | null;
   /** Mental health / wellness assessment from onboarding quiz */
 } & MentalHealthFields;
 
@@ -192,6 +201,7 @@ function getDefaultPersisted(): Persisted {
     quizCommitment: null,
     quizSchedule: null,
     quizObstacles: [],
+    marketingIntent: null,
     activeStepIndex: 0,
     planStartDate: null,
     todayStatus: "pending",
@@ -243,6 +253,7 @@ function getDefaultPersisted(): Persisted {
     planLastRefreshedAt: null,
     planRefreshSummary: null,
     planRefreshSeen: false,
+    pendingNarrative: null,
   };
 }
 
@@ -373,6 +384,7 @@ type PlanState = {
   userName: string;
   dogArchetype: ArchetypeId | null;
   ambitionType: AmbitionDomain | null;
+  marketingIntent: MarketingIntent | null;
   quizComplete: boolean;
   email: string;
   onboardingComplete: boolean;
@@ -417,6 +429,7 @@ type PlanState = {
 
   bestStreak: number;
   streakShields: number;
+  pendingNarrative: string | null;
 
   setIdentityComplete: (v: boolean) => void;
   setPlanReady: (planId: string) => void;
@@ -430,10 +443,12 @@ type PlanState = {
   setUserName: (name: string) => void;
   setArchetype: (id: ArchetypeId) => void;
   setAmbitionType: (t: AmbitionDomain) => void;
+  setMarketingIntent: (intent: MarketingIntent | null) => void;
   completeQuiz: (archetype: ArchetypeId, ambition: AmbitionDomain) => void;
   setEmail: (email: string) => void;
   setGender: (g: string) => void;
   setLocation: (loc: string) => void;
+  setPendingNarrative: (narrative: string | null) => void;
   setQuizContext: (ctx: { timeline?: string; commitment?: string; schedule?: string; obstacles?: string[] }) => void;
   incrementActiveStep: () => void;
   getCurrentStep: () => PipelineStep | null;
@@ -456,6 +471,11 @@ type PlanState = {
   pipelineStatus: PipelineStatus;
   setPipelinePlan: (plan: GoalPlan) => void;
   setPipelineStatus: (s: PipelineStatus) => void;
+
+  // Cached events (runtime-only, not persisted) — avoids re-scraping on every page visit
+  cachedEvents: PipelineEvent[];
+  eventsFetchedAt: number | null;
+  setCachedEvents: (events: PipelineEvent[]) => void;
 
   // Google Calendar
   googleCalendarConnected: boolean;
@@ -521,6 +541,24 @@ type PlanState = {
   hydrateFromServer: () => Promise<void>;
 };
 
+/** Drop cached 90-day plan when it was built for a different ambition (e.g. finance vs weight loss). */
+function clearPipelineIfAmbitionMismatch(
+  get: () => PlanState,
+  set: (partial: Partial<PlanState>) => void,
+  ambition: AmbitionDomain | null,
+) {
+  const { pipelinePlan } = get();
+  if (!pipelinePlan || !ambition || planMatchesAmbition(pipelinePlan, ambition)) return;
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(PIPELINE_SESSION_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+  set({ pipelinePlan: null, pipelineStatus: "idle" });
+}
+
 export const usePlanStore = create<PlanState>((set, get) => {
   const raw = typeof window !== "undefined" ? getPersisted() : getDefaultPersisted();
   const persisted = typeof window !== "undefined" ? applyStreakResetOnLoad(raw) : raw;
@@ -528,10 +566,23 @@ export const usePlanStore = create<PlanState>((set, get) => {
     setPersisted(persisted);
   }
   const storedPlan = typeof window !== "undefined" ? getStoredPipelinePlan() : null;
-  const hasCachedPlan = !!storedPlan && (storedPlan.recommended_events?.length ?? 0) > 0;
+  const planAligns =
+    !storedPlan ||
+    persisted.ambitionType == null ||
+    planMatchesAmbition(storedPlan, persisted.ambitionType);
+  const hasCachedPlan = !!storedPlan && Array.isArray(storedPlan.phases) && storedPlan.phases.length > 0 && planAligns;
+  if (typeof window !== "undefined" && storedPlan && persisted.ambitionType && !planMatchesAmbition(storedPlan, persisted.ambitionType)) {
+    try {
+      localStorage.removeItem(PIPELINE_SESSION_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
   return {
     pipelinePlan: hasCachedPlan ? storedPlan : null,
     pipelineStatus: hasCachedPlan ? "ready" : "idle",
+    cachedEvents: [],
+    eventsFetchedAt: null,
 
     identityComplete: false,
     planReady: !!persisted.planId,
@@ -542,12 +593,14 @@ export const usePlanStore = create<PlanState>((set, get) => {
     streakLostShownForDate: persisted.streakLostShownForDate ?? null,
     bestStreak: persisted.bestStreak ?? 0,
     streakShields: persisted.streakShields ?? 0,
+    pendingNarrative: persisted.pendingNarrative ?? null,
     futureScore: Math.min(100, Math.max(0, persisted.futureScore)),
     acceptedPlanAt: null,
     homeAssistantOpen: false,
     userName: persisted.userName || "",
     dogArchetype: persisted.dogArchetype,
     ambitionType: persisted.ambitionType,
+    marketingIntent: persisted.marketingIntent ?? null,
     quizComplete: persisted.quizComplete,
     email: persisted.email || "",
     onboardingComplete: persisted.onboardingComplete,
@@ -684,11 +737,18 @@ export const usePlanStore = create<PlanState>((set, get) => {
     },
 
     setAmbitionType: (t) => {
+      clearPipelineIfAmbitionMismatch(get, set, t);
       setPersisted({ ambitionType: t });
       set({ ambitionType: t });
     },
 
+    setMarketingIntent: (intent) => {
+      setPersisted({ marketingIntent: intent });
+      set({ marketingIntent: intent });
+    },
+
     completeQuiz: (archetype, ambition) => {
+      clearPipelineIfAmbitionMismatch(get, set, ambition);
       setPersisted({ dogArchetype: archetype, ambitionType: ambition, quizComplete: true });
       set({ dogArchetype: archetype, ambitionType: ambition, quizComplete: true });
     },
@@ -706,6 +766,11 @@ export const usePlanStore = create<PlanState>((set, get) => {
     setLocation: (loc) => {
       setPersisted({ location: loc });
       set({ location: loc });
+    },
+
+    setPendingNarrative: (narrative) => {
+      setPersisted({ pendingNarrative: narrative });
+      set({ pendingNarrative: narrative });
     },
 
     setQuizContext: (ctx) => {
@@ -996,7 +1061,29 @@ export const usePlanStore = create<PlanState>((set, get) => {
     synced: false,
 
     syncToServer: async () => {
+      if (typeof window === "undefined") return;
+      if (Date.now() < syncPausedUntilMs) return;
       try {
+        const { hasSupabasePublicConfig } = await import("@/lib/supabase/env");
+        if (!hasSupabasePublicConfig()) {
+          syncPausedUntilMs = Date.now() + 60_000;
+          return;
+        }
+
+        let hasUser = false;
+        try {
+          const { createClient } = await import("@/lib/supabase/client");
+          const supabase = createClient();
+          const { data: { user }, error: userErr } = await supabase.auth.getUser();
+          hasUser = !userErr && !!user;
+        } catch {
+          hasUser = false;
+        }
+        if (!hasUser) {
+          syncPausedUntilMs = Date.now() + 60_000;
+          return;
+        }
+
         const state = get();
         const res = await fetch("/api/sync", {
           method: "POST",
@@ -1012,6 +1099,7 @@ export const usePlanStore = create<PlanState>((set, get) => {
             ambitionType: state.ambitionType,
             onboardingComplete: state.onboardingComplete,
             quizData: {
+              marketingIntent: state.marketingIntent,
               quizGender: state.quizGender,
               quizTimeline: state.quizTimeline,
               quizCommitment: state.quizCommitment,
@@ -1035,7 +1123,12 @@ export const usePlanStore = create<PlanState>((set, get) => {
           }),
           credentials: "include",
         });
+        if (res.status === 401) {
+          syncPausedUntilMs = Date.now() + 30_000;
+          return;
+        }
         if (!res.ok) return;
+        syncPausedUntilMs = 0;
         const data = await res.json();
         // Apply authoritative server state
         const derivedQuizComplete = Boolean(
@@ -1074,6 +1167,7 @@ export const usePlanStore = create<PlanState>((set, get) => {
           quizComplete: patch.quizComplete ?? false,
           synced: true,
         });
+        clearPipelineIfAmbitionMismatch(get, set, get().ambitionType);
       } catch {
         // Sync failed silently — localStorage stays as fallback
       }
@@ -1095,6 +1189,10 @@ export const usePlanStore = create<PlanState>((set, get) => {
       set({ pipelineStatus: s });
     },
 
+    setCachedEvents: (events) => {
+      set({ cachedEvents: events, eventsFetchedAt: Date.now() });
+    },
+
     resetForDemo: () => {
       setPersisted(getDefaultPersisted());
       set({
@@ -1109,6 +1207,7 @@ export const usePlanStore = create<PlanState>((set, get) => {
         acceptedPlanAt: null,
         dogArchetype: null,
         ambitionType: null,
+        marketingIntent: null,
         quizComplete: false,
         email: "",
         onboardingComplete: false,
@@ -1183,6 +1282,7 @@ if (typeof window !== "undefined") {
     futureScore: p.futureScore,
     dogArchetype: p.dogArchetype,
     ambitionType: p.ambitionType,
+    marketingIntent: p.marketingIntent ?? null,
     quizComplete: p.quizComplete,
     email: p.email,
     onboardingComplete: p.onboardingComplete,

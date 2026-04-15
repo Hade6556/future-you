@@ -4,16 +4,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ClockIcon, ArrowPathIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import type { GeneratedTask } from "../../types/pipeline";
-
-const LIME = "#C8FF00";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
+import { ACCENT, ACCENT as LIME, TEXT_HI, TEXT_MID } from "@/app/theme";
 const FONT_BODY = "var(--font-apercu), sans-serif";
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 
 const CATEGORY_COLORS: Record<string, string> = {
   plan: "#6B8AFF",
-  habit: "#C8FF00",
+  habit: ACCENT,
   wellbeing: "#FF8AD8",
   custom: "rgba(255,255,255,0.5)",
 };
@@ -143,103 +140,105 @@ export default function TaskCard({ task, onToggle, onDefer, onSwap }: Props) {
         </div>
       </button>
 
-      {/* Expandable description + actions */}
-      <div style={{ padding: "0 14px" }}>
-        <button
-          type="button"
-          onClick={() => setExpanded(!expanded)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontFamily: FONT_MONO,
-            fontSize: 13,
-            color: TEXT_MID,
-            padding: "0 0 10px",
-            letterSpacing: "0.04em",
-            textTransform: "uppercase" as const,
-          }}
-        >
-          {expanded ? "Hide details" : "Details"}
-        </button>
-
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            style={{ overflow: "hidden", paddingBottom: 12 }}
+      {/* Quick actions — always visible for incomplete tasks */}
+      {!task.completed && (
+        <div style={{ display: "flex", gap: 6, padding: "0 14px 8px", marginTop: -4 }}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSwap();
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              padding: "5px 10px",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontFamily: FONT_BODY,
+              fontSize: 11,
+              fontWeight: 500,
+              color: TEXT_MID,
+              WebkitTapHighlightColor: "transparent",
+            }}
           >
-            {task.description && (
+            <ArrowPathIcon style={{ width: 11, height: 11 }} aria-hidden />
+            Swap
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDefer();
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              padding: "5px 10px",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontFamily: FONT_BODY,
+              fontSize: 11,
+              fontWeight: 500,
+              color: TEXT_MID,
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            <ArrowRightIcon style={{ width: 11, height: 11 }} aria-hidden />
+            Tomorrow
+          </button>
+        </div>
+      )}
+
+      {/* Expandable description */}
+      {task.description && (
+        <div style={{ padding: "0 14px" }}>
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: FONT_MONO,
+              fontSize: 13,
+              color: TEXT_MID,
+              padding: "0 0 10px",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase" as const,
+            }}
+          >
+            {expanded ? "Hide details" : "Details"}
+          </button>
+
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              style={{ overflow: "hidden", paddingBottom: 12 }}
+            >
               <p
                 style={{
                   fontFamily: FONT_BODY,
                   fontSize: 13,
                   color: TEXT_MID,
                   lineHeight: 1.55,
-                  margin: "0 0 10px",
+                  margin: 0,
                 }}
               >
                 {task.description}
               </p>
-            )}
-
-            {/* Action buttons */}
-            {!task.completed && (
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSwap();
-                  }}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                    padding: "6px 12px",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.10)",
-                    borderRadius: 10,
-                    cursor: "pointer",
-                    fontFamily: FONT_BODY,
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: TEXT_MID,
-                  }}
-                >
-                  <ArrowPathIcon style={{ width: 12, height: 12 }} aria-hidden />
-                  Swap
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDefer();
-                  }}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                    padding: "6px 12px",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.10)",
-                    borderRadius: 10,
-                    cursor: "pointer",
-                    fontFamily: FONT_BODY,
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: TEXT_MID,
-                  }}
-                >
-                  <ArrowRightIcon style={{ width: 12, height: 12 }} aria-hidden />
-                  Tomorrow
-                </button>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </div>
+            </motion.div>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }

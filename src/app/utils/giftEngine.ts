@@ -6,11 +6,11 @@ export type GiftReward = {
 };
 
 export const REWARD_POOL: GiftReward[] = [
-  { type: "score_boost",  icon: "⚡", title: "+5 Behavio Score Boost",  desc: "Today's effort counts double." },
-  { type: "shield",       icon: "🛡️", title: "Streak Shield Earned",   desc: "You've got a safety net for tomorrow." },
-  { type: "power_day",    icon: "🔥", title: "Power Day Unlocked",     desc: "Your momentum multiplies tomorrow." },
-  { type: "insight",      icon: "💡", title: "Archetype Insight",      desc: "Steady builders who stay consistent unlock their full potential in the next phase." },
-  { type: "social_proof", icon: "🏆", title: "You're Ahead",           desc: "You're moving faster than 78% of users who started this week." },
+  { type: "score_boost",  icon: "·", title: "Extra credit today",       desc: "Today’s check-in counts a little more toward your plan." },
+  { type: "shield",       icon: "·", title: "Grace pass earned",        desc: "One missed day won’t reset your streak." },
+  { type: "power_day",    icon: "·", title: "Strong day ahead",         desc: "Tomorrow’s focus block is slightly larger—use it deliberately." },
+  { type: "insight",      icon: "·", title: "Pattern note",             desc: "People who stay consistent for two weeks tend to see the clearest shift in week three." },
+  { type: "social_proof", icon: "·", title: "You’re on pace",           desc: "You’re ahead of most people who started the same week." },
 ];
 
 /** Deterministic pick based on planId + day number so the gift is consistent all day. */

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
-import { requireAuth } from "@/lib/auth";
+import { optionalAuth } from "@/lib/auth";
 
 export const maxDuration = 30;
 
@@ -122,8 +122,7 @@ const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
 
 export async function POST(request: Request) {
-  const auth = await requireAuth();
-  if (auth.error) return auth.error;
+  await optionalAuth();
 
   const limited = rateLimitResponse(request);
   if (limited) return limited;
@@ -185,7 +184,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("/api/coach error", error);
     return NextResponse.json(
-      { error: "Coach is unavailable right now. Try again in a moment." },
+      { error: "Coach is temporarily busy. Your reflection was still saved." },
       { status: 500 }
     );
   }

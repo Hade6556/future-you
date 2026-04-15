@@ -3,11 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { GeneratedTask } from "../../types/pipeline";
-
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
+import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID } from "@/app/theme";
 const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
 const FONT_BODY = "var(--font-apercu), sans-serif";
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
@@ -36,8 +32,8 @@ export default function EveningWrapup({ tasks, journaledToday, tomorrowStepTitle
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       style={{
-        background: "rgba(200,255,0,0.04)",
-        border: "1px solid rgba(200,255,0,0.14)",
+        background: "rgba(94,205,161,0.04)",
+        border: "1px solid rgba(94,205,161,0.14)",
         borderRadius: 20,
         padding: "20px 16px",
       }}

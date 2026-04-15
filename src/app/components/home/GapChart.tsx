@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { ACCENT } from "@/app/theme";
 import { usePlanStore } from "../../state/planStore";
 import { buildChartData } from "../../utils/scoreEngine";
 
@@ -66,7 +67,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
 
     // ── 100% goal line (dashed, prominent) ──
     const goalY = toY(1.0);
-    ctx.strokeStyle = "rgba(200,255,0,0.25)";
+    ctx.strokeStyle = "rgba(94,205,161,0.25)";
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -75,7 +76,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = "rgba(200,255,0,0.40)";
+    ctx.fillStyle = "rgba(94,205,161,0.40)";
     ctx.font = `600 7px 'JetBrains Mono', monospace`;
     ctx.textAlign = "left";
     ctx.fillText("GOAL", PAD_L + chartW + 6, goalY + 3);
@@ -119,21 +120,21 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
 
       // Glow
       const glow = ctx.createRadialGradient(todayX, todayY, 0, todayX, todayY, 10);
-      glow.addColorStop(0, "rgba(200,255,0,0.35)");
-      glow.addColorStop(1, "rgba(200,255,0,0)");
+      glow.addColorStop(0, "rgba(94,205,161,0.35)");
+      glow.addColorStop(1, "rgba(94,205,161,0)");
       ctx.fillStyle = glow;
       ctx.fillRect(todayX - 10, todayY - 10, 20, 20);
 
       ctx.beginPath();
       ctx.arc(todayX, todayY, 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = "#C8FF00";
+      ctx.fillStyle = ACCENT;
       ctx.fill();
       ctx.strokeStyle = "#060912";
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
       // "TODAY" label above dot
-      ctx.fillStyle = "rgba(200,255,0,0.60)";
+      ctx.fillStyle = "rgba(94,205,161,0.60)";
       ctx.font = `600 6px 'JetBrains Mono', monospace`;
       ctx.textAlign = "center";
       ctx.fillText("TODAY", todayX, todayY - 10);
@@ -145,7 +146,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
           const dy = toY(0) + 8;
           ctx.beginPath();
           ctx.arc(dx, dy, d.isToday ? 2.5 : 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = d.isToday ? "rgba(200,255,0,0.70)" : "rgba(45,212,192,0.40)";
+          ctx.fillStyle = d.isToday ? "rgba(94,205,161,0.70)" : "rgba(45,212,192,0.40)";
           ctx.fill();
         }
       });
@@ -157,7 +158,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
     const projEndIdx = totalDays - 1;
 
     if (projStartIdx < projEndIdx) {
-      ctx.strokeStyle = "rgba(200,255,0,0.20)";
+      ctx.strokeStyle = "rgba(94,205,161,0.20)";
       ctx.lineWidth = 1.25;
       ctx.setLineDash([3, 5]);
       ctx.beginPath();
@@ -177,7 +178,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
       const goalX = toX(projEndIdx);
       ctx.beginPath();
       ctx.arc(goalX, goalY, 3, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(200,255,0,0.50)";
+      ctx.fillStyle = "rgba(94,205,161,0.50)";
       ctx.fill();
     }
 
@@ -249,7 +250,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
               fontWeight: 700,
               fontSize: 28,
               lineHeight: 1,
-              color: "#C8FF00",
+              color: ACCENT,
               letterSpacing: "-0.03em",
             }}
           >
@@ -274,7 +275,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
               fontSize: 7,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
-              color: "rgba(120,155,195,0.40)",
+              color: "rgba(130,155,195,0.45)",
               display: "block",
               marginBottom: 2,
             }}
@@ -308,7 +309,7 @@ export function GapChart({ planStartDate, totalDays, currentDay }: GapChartProps
           style={{
             width: `${progressPct}%`,
             height: "100%",
-            background: "linear-gradient(90deg, rgba(45,212,192,0.8), #C8FF00)",
+            background: `linear-gradient(90deg, rgba(45,212,192,0.8), ${ACCENT})`,
             borderRadius: 2,
             transition: "width 0.6s ease",
           }}

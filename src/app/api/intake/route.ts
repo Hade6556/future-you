@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
+import { INTENT_COPY } from "@/app/data/intentConfig";
+import { parseMarketingIntentParam } from "@/app/types/marketingIntent";
 
 export const maxDuration = 30;
 
 interface IntakeRequestBody {
   narrative: string;
   tone?: string;
+  marketingIntent?: string | null;
 }
+
 
 interface IntakePath {
   name: string;
@@ -97,16 +101,26 @@ export async function POST(request: Request) {
       return NextResponse.json(MOCK_RESPONSE);
     }
 
+    const intent = parseMarketingIntentParam(
+      typeof body.marketingIntent === "string" ? body.marketingIntent : null,
+    );
+    const tone =
+      intent != null ? INTENT_COPY[intent].intakeTone : (body.tone ?? "Life Coach");
+    const intentBlock =
+      intent != null
+        ? `\n\nFunnel context (honour this in values, roles, and path framing):\n${INTENT_COPY[intent].planContext}`
+        : "";
+
     const userMessage = `Turn the narrative below into the JSON structure requested.
 
-Preferred tone: ${body.tone ?? "Life Coach"}
-Narrative: ${narrative}`;
+Preferred tone: ${tone}
+Narrative: ${narrative}${intentBlock}`;
 
     let textOutput: string | null = null;
 
     try {
       const message = await anthropic.messages.create({
-        model: "claude-sonnet-4-6",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 1024,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
@@ -114,13 +128,17 @@ Narrative: ${narrative}`;
       textOutput = message.content[0]?.type === "text" ? message.content[0].text : null;
     } catch {
       // Retry once on failure
-      const retry = await anthropic.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1024,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userMessage }],
-      });
-      textOutput = retry.content[0]?.type === "text" ? retry.content[0].text : null;
+      try {
+        const retry = await anthropic.messages.create({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 1024,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: "user", content: userMessage }],
+        });
+        textOutput = retry.content[0]?.type === "text" ? retry.content[0].text : null;
+      } catch {
+        return NextResponse.json(MOCK_RESPONSE);
+      }
     }
 
     if (!textOutput) {

@@ -5,11 +5,11 @@ import { usePlanStore, getCurrentWeekDates, todayISO } from "../../state/planSto
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 function getWeeklyCopy(count: number): string {
-  if (count === 7) return "Perfect week 🏆";
-  if (count >= 5) return "Incredible week 🔥";
-  if (count >= 3) return "Building momentum";
-  if (count >= 1) return "Just getting started";
-  return "Start strong today";
+  if (count === 7) return "Full week logged.";
+  if (count >= 5) return "Strong week so far.";
+  if (count >= 3) return "Steady progress.";
+  if (count >= 1) return "Good start this week.";
+  return "Log today to begin.";
 }
 
 export function WeeklyMomentum() {

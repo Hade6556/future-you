@@ -6,34 +6,66 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
 import type { GoalPlan } from "../types/pipeline";
 import type { IntakeResponse } from "../types/plan";
+import { BEHAVIO_INTAKE_SAVED_EVENT } from "@/lib/behavio-intake-event";
 import { AMBITION_GOAL_MAP } from "../types/pipeline";
+import { INTENT_COPY } from "../data/intentConfig";
+import { FunnelThemeShell } from "../components/funnel/FunnelThemeShell";
+import { NAVY_PANEL as NAVY, TEXT_HI, TEXT_MID, TEXT_LO } from "@/app/theme";
 
 const PENDING_NARRATIVE_KEY = "behavio-pending-narrative";
 const STORAGE_KEY_PREFIX = "behavio-plan-";
-
-const LIME = "#C8FF00";
-const NAVY = "#0A1628";
-const TEXT_HI = "rgba(235,242,255,0.92)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const TEXT_LO = "rgba(120,155,195,0.40)";
 
 const STAGES = [
   { id: 0, label: "Understanding your vision" },
   { id: 1, label: "Mapping your 90-day journey" },
   { id: 2, label: "Setting your milestones" },
-  { id: 3, label: "Curating your resources" },
 ];
 
-const STAGE_DURATION = 1400;
+/** Staggered checklist is cosmetic only — we leave as soon as `/api/plan` returns (intake continues in background). */
+const STAGE_DURATION = 220;
+const MIN_SCREEN_MS = 0;
 
 function generatePlanId() {
   return `plan-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+function persistIntakePayload(planId: string, data: IntakeResponse) {
+  const payload = JSON.stringify(data);
+  try {
+    sessionStorage.setItem(`${STORAGE_KEY_PREFIX}${planId}`, payload);
+  } catch {
+    /* private mode */
+  }
+  try {
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}${planId}`, payload);
+  } catch {
+    /* quota */
+  }
+}
+
+/** Shown until `/api/intake` finishes; plan page swaps in real analysis when we dispatch the event. */
+function stubIntakeFromNarrative(narrative: string): IntakeResponse {
+  const clip = narrative.trim().slice(0, 200);
+  return {
+    values: ["Focus", "Growth", "Momentum"],
+    roles: ["Builder"],
+    paths: [
+      {
+        name: "Your roadmap",
+        description:
+          clip ||
+          "We’re tailoring paths from what you shared — richer detail appears in a moment.",
+        timeHorizon: "90 days",
+        tradeoffs: "",
+      },
+    ],
+  };
+}
+
 function CheckCircle() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="12" fill={LIME} />
+      <circle cx="12" cy="12" r="12" fill="var(--cta)" />
       <path d="M7 12.5l3 3 7-7" stroke={NAVY} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -49,7 +81,7 @@ function SpinnerCircle() {
         height: 22,
         borderRadius: "50%",
         border: "2px solid rgba(255,255,255,0.10)",
-        borderTopColor: LIME,
+        borderTopColor: "var(--cta)",
       }}
     />
   );
@@ -62,10 +94,8 @@ export default function GeneratingPage() {
   const setPlanReady = usePlanStore((s) => s.setPlanReady);
   const ambitionType = usePlanStore((s) => s.ambitionType);
   const location = usePlanStore((s) => s.location);
-  const quizTimeline = usePlanStore((s) => s.quizTimeline);
-  const quizCommitment = usePlanStore((s) => s.quizCommitment);
-  const quizSchedule = usePlanStore((s) => s.quizSchedule);
-  const quizObstacles = usePlanStore((s) => s.quizObstacles);
+  const dogArchetype = usePlanStore((s) => s.dogArchetype);
+  const marketingIntent = usePlanStore((s) => s.marketingIntent);
 
   const [currentStage, setCurrentStage] = useState(0);
   const [completedStages, setCompletedStages] = useState<number[]>([]);
@@ -73,28 +103,43 @@ export default function GeneratingPage() {
   const [error, setError] = useState<string | null>(null);
 
   const apiDone = useRef(false);
-  const stagesDone = useRef(false);
   const navigated = useRef(false);
+  const fetchStarted = useRef(false);
+  const screenStartedAt = useRef(0);
 
   const maybeNavigate = () => {
-    if (apiDone.current && stagesDone.current && !navigated.current) {
+    if (!apiDone.current || navigated.current) return;
+
+    const go = () => {
+      if (navigated.current) return;
       navigated.current = true;
       setProgress(100);
-      setTimeout(() => {
-        const premium = usePlanStore.getState().isPremium;
-        router.push(premium ? "/" : "/paywall");
-      }, 350);
-    }
+      const premium = usePlanStore.getState().isPremium;
+      router.push(premium ? "/" : "/paywall");
+    };
+
+    const elapsed = Date.now() - screenStartedAt.current;
+    const remaining = Math.max(0, MIN_SCREEN_MS - elapsed);
+    if (remaining === 0) go();
+    else setTimeout(go, remaining);
   };
 
   useEffect(() => {
+    screenStartedAt.current = Date.now();
+  }, []);
+
+  useEffect(() => {
     const start = Date.now();
-    const total = STAGES.length * STAGE_DURATION + 800;
+    const total = STAGES.length * STAGE_DURATION + 300;
     let frame: number;
     const tick = () => {
-      const pct = Math.min(95, Math.round(((Date.now() - start) / total) * 100));
+      if (apiDone.current) {
+        setProgress(100);
+        return;
+      }
+      const pct = Math.min(90, Math.round(((Date.now() - start) / total) * 90));
       setProgress(pct);
-      if (pct < 95) frame = requestAnimationFrame(tick);
+      if (pct < 90) frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
@@ -109,10 +154,6 @@ export default function GeneratingPage() {
         if (cancelled) return;
         setCurrentStage(Math.min(i + 1, STAGES.length - 1));
         setCompletedStages((prev) => [...prev, i]);
-        if (i === STAGES.length - 1) {
-          stagesDone.current = true;
-          maybeNavigate();
-        }
       }, (i + 1) * STAGE_DURATION);
       timers.push(t);
     });
@@ -121,84 +162,103 @@ export default function GeneratingPage() {
       cancelled = true;
       timers.forEach(clearTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    if (fetchStarted.current) return;
+    fetchStarted.current = true;
+
     let narrative = "";
     try {
       narrative = sessionStorage.getItem(PENDING_NARRATIVE_KEY) ?? "";
     } catch {
       // ignore private mode
     }
+    if (!narrative) {
+      narrative = usePlanStore.getState().pendingNarrative ?? "";
+    }
 
     if (!narrative) {
-      router.replace("/intake");
+      router.replace("/onboarding");
       return;
     }
 
-    // Run intake analysis and plan pipeline in parallel
-    const goalString = AMBITION_GOAL_MAP[ambitionType ?? ""] || narrative.slice(0, 100);
+    const goalString = AMBITION_GOAL_MAP[ambitionType ?? "wellness"] || narrative.slice(0, 100);
 
+    const userContext = {
+      dreamNarrative: narrative,
+      archetype: dogArchetype ?? undefined,
+      ambitionDomain: ambitionType ?? undefined,
+      marketingIntent: marketingIntent ?? undefined,
+    };
+
+    const intakeTone = marketingIntent ? INTENT_COPY[marketingIntent].intakeTone : "Life Coach";
+
+    // Intake can be slower than the plan — don’t block the user on both.
     const intakePromise = fetch("/api/intake", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ narrative, tone: "Life Coach" }),
+      body: JSON.stringify({
+        narrative,
+        tone: intakeTone,
+        marketingIntent: marketingIntent ?? undefined,
+      }),
       credentials: "include",
-    }).then((res) => {
-      if (!res.ok)
-        return res
-          .json()
-          .then((b: { error?: string }) =>
-            Promise.reject(new Error(b?.error || "Something went wrong")),
-          );
-      return res.json() as Promise<IntakeResponse>;
-    });
+    })
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json() as Promise<IntakeResponse>;
+      })
+      .catch(() => null);
 
-    const planPromise = fetch("/api/plan", {
+    fetch("/api/plan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         goal: goalString,
         location: location || null,
-        userContext: {
-          timeline: quizTimeline,
-          commitment: quizCommitment,
-          schedule: quizSchedule,
-          obstacles: quizObstacles,
-        },
+        userContext,
       }),
       credentials: "include",
-    }).then((res) => {
-      if (!res.ok) {
-        console.error(`[generating] /api/plan returned ${res.status}`);
-        return null;
-      }
-      return res.json() as Promise<GoalPlan>;
-    });
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error(`[generating] /api/plan returned ${res.status}`);
+          return null;
+        }
+        return res.json() as Promise<GoalPlan>;
+      })
+      .then((planData) => {
+        if (!planData || !Array.isArray(planData.phases) || planData.phases.length === 0) {
+          setError("We couldn’t generate your plan. Please try again.");
+          return;
+        }
 
-    Promise.all([intakePromise, planPromise])
-      .then(([intakeData, planData]) => {
-        setIdentityComplete(true);
         const planId = generatePlanId();
+        persistIntakePayload(planId, stubIntakeFromNarrative(narrative));
 
-        // Store intake response for the plan page
-        const payload = JSON.stringify(intakeData);
-        sessionStorage.setItem(`${STORAGE_KEY_PREFIX}${planId}`, payload);
-        try {
-          localStorage.setItem(`${STORAGE_KEY_PREFIX}${planId}`, payload);
-        } catch {
-          /* quota */
-        }
+        setIdentityComplete(true);
         setPlanReady(planId);
+        setPipelinePlan(planData);
 
-        // Set the pipeline plan (with phases/steps) for dayEngine
-        if (planData && "phases" in planData) {
-          setPipelinePlan(planData);
-        }
+        // Clear pending narrative now that plan is generated
+        usePlanStore.getState().setPendingNarrative(null);
+        try { sessionStorage.removeItem(PENDING_NARRATIVE_KEY); } catch { /* ignore */ }
 
         apiDone.current = true;
+        setCompletedStages(STAGES.map((s) => s.id));
+        setCurrentStage(STAGES.length - 1);
         maybeNavigate();
+
+        void intakePromise.then((intakeData) => {
+          if (!intakeData) return;
+          persistIntakePayload(planId, intakeData);
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(
+              new CustomEvent(BEHAVIO_INTAKE_SAVED_EVENT, { detail: { planId } }),
+            );
+          }
+        });
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : "Something went wrong");
@@ -208,6 +268,7 @@ export default function GeneratingPage() {
 
   if (error) {
     return (
+      <FunnelThemeShell intent={marketingIntent}>
       <div
         style={{
           minHeight: "100dvh",
@@ -231,12 +292,12 @@ export default function GeneratingPage() {
           {error}
         </p>
         <button
-          onClick={() => router.push("/intake")}
+          onClick={() => router.push("/onboarding")}
           style={{
             fontFamily: "var(--font-apercu), sans-serif",
             fontSize: 14,
             fontWeight: 600,
-            color: LIME,
+            color: "var(--cta)",
             background: "none",
             border: "none",
             textDecoration: "underline",
@@ -246,11 +307,16 @@ export default function GeneratingPage() {
           Try again
         </button>
       </div>
+      </FunnelThemeShell>
     );
   }
 
   return (
-    <div
+    <FunnelThemeShell intent={marketingIntent}>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       style={{
         minHeight: "100dvh",
         display: "flex",
@@ -271,7 +337,7 @@ export default function GeneratingPage() {
           inset: 0,
           zIndex: 0,
           background: `
-            radial-gradient(ellipse 70% 55% at 50% 20%, rgba(200,255,0,0.08) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 55% at 50% 20%, rgba(94,205,161,0.08) 0%, transparent 60%),
             radial-gradient(ellipse 60% 50% at 10% 90%, rgba(15,40,110,0.40) 0%, transparent 55%),
             linear-gradient(170deg, #0f1e3a 0%, #060912 55%)
           `,
@@ -301,12 +367,12 @@ export default function GeneratingPage() {
               width: 80,
               height: 80,
               borderRadius: "50%",
-              background: `radial-gradient(circle at 40% 35%, rgba(200,255,0,0.25), rgba(200,255,0,0.05) 70%)`,
-              border: "1px solid rgba(200,255,0,0.15)",
+              background: `radial-gradient(circle at 40% 35%, rgba(94,205,161,0.25), rgba(94,205,161,0.05) 70%)`,
+              border: "1px solid rgba(94,205,161,0.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 0 40px rgba(200,255,0,0.10)",
+              boxShadow: "0 0 40px rgba(94,205,161,0.10)",
             }}
           >
             <motion.div
@@ -316,8 +382,8 @@ export default function GeneratingPage() {
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                border: "2px solid rgba(200,255,0,0.30)",
-                borderTopColor: LIME,
+                border: "2px solid rgba(94,205,161,0.30)",
+                borderTopColor: "var(--cta)",
               }}
             />
           </motion.div>
@@ -452,13 +518,14 @@ export default function GeneratingPage() {
             style={{
               height: "100%",
               borderRadius: 999,
-              background: LIME,
+              background: "var(--cta)",
             }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.4, ease: "easeOut" }}
           />
         </div>
       </div>
-    </div>
+    </motion.div>
+    </FunnelThemeShell>
   );
 }

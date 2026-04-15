@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { PlusIcon, TrophyIcon, MicrophoneIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import React from "react";
+import { motion } from "framer-motion";
+import { MicrophoneIcon } from "@heroicons/react/24/outline";
+import { ACCENT } from "@/app/theme";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
 function HomeIcon({ active }: { active: boolean }) {
-  const c = active ? "#C8FF00" : "rgba(120,155,195,0.50)";
+  const c = active ? ACCENT : "rgba(160,180,210,0.50)";
   return (
     <svg width="20" height="20" viewBox="188 535 22 22" fill="none" aria-hidden>
       <path d="M190 544L196.172 537.828C197.734 536.266 200.266 536.266 201.828 537.828L208 544"
@@ -22,7 +23,7 @@ function HomeIcon({ active }: { active: boolean }) {
 }
 
 function ChatIcon({ active }: { active: boolean }) {
-  const c = active ? "#C8FF00" : "rgba(120,155,195,0.50)";
+  const c = active ? ACCENT : "rgba(160,180,210,0.50)";
   return (
     <svg width="20" height="20" viewBox="255 534 24 22" fill="none" aria-hidden>
       <path d="M276 544C276 540.134 272.866 537 269 537H265C261.134 537 258 540.134 258 544V550.172C258 551.953 260.154 552.846 261.414 551.586L261.868 551.132C261.953 551.047 262.067 551 262.186 551H269C272.866 551 276 547.866 276 544Z"
@@ -34,22 +35,8 @@ function ChatIcon({ active }: { active: boolean }) {
   );
 }
 
-function StatsIcon({ active }: { active: boolean }) {
-  const c = active ? "#C8FF00" : "rgba(120,155,195,0.50)";
-  return (
-    <svg width="20" height="20" viewBox="415 536 22 22" fill="none" aria-hidden>
-      <path d="M421 552V549C421 547.895 420.105 547 419 547C417.895 547 417 547.895 417 549V552C417 553.105 417.895 554 419 554C420.105 554 421 553.105 421 552Z"
-        stroke={c} strokeWidth="2" strokeLinejoin="round" />
-      <path d="M428 552V540C428 538.895 427.105 538 426 538C424.895 538 424 538.895 424 540V552C424 553.105 424.895 554 426 554C427.105 554 428 553.105 428 552Z"
-        stroke={c} strokeWidth="2" strokeLinejoin="round" />
-      <path d="M435 552V545C435 543.895 434.105 543 433 543C431.895 543 431 543.895 431 545V552C431 553.105 431.895 554 433 554C434.105 554 435 553.105 435 552Z"
-        stroke={c} strokeWidth="2" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 function ProfileIcon({ active }: { active: boolean }) {
-  const c = active ? "#C8FF00" : "rgba(120,155,195,0.50)";
+  const c = active ? ACCENT : "rgba(160,180,210,0.50)";
   return (
     <svg width="20" height="20" viewBox="484 536 22 22" fill="none" aria-hidden>
       <rect x="490" y="539" width="8" height="8" rx="4" stroke={c} strokeWidth="2" strokeLinejoin="round" />
@@ -59,20 +46,26 @@ function ProfileIcon({ active }: { active: boolean }) {
   );
 }
 
+function ExploreIcon({ active }: { active: boolean }) {
+  const c = active ? ACCENT : "rgba(160,180,210,0.50)";
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+      <circle cx="10" cy="10" r="8" stroke={c} strokeWidth="1.5" />
+      <path d="M12.5 7.5l-1.8 3.2-3.2 1.8 1.8-3.2 3.2-1.8z" fill={c} />
+    </svg>
+  );
+}
+
 const leftItems = [
-  { href: "/",     label: "Today",   Icon: HomeIcon  },
-  { href: "/plan", label: "My Plan", Icon: ChatIcon  },
+  { href: "/",        label: "Today",   Icon: HomeIcon    },
+  { href: "/explore", label: "Explore", Icon: ExploreIcon },
 ];
 const rightItems = [
-  { href: "/explore", label: "Explore", Icon: StatsIcon   },
-  { href: "/journal", label: "Journal", Icon: ProfileIcon },
+  { href: "/plan",    label: "Plan",    Icon: ChatIcon    },
+  { href: "/account", label: "Account", Icon: ProfileIcon },
 ];
 
-const FAB_ACTIONS = [
-  { label: "Log a Win",   href: "/journal/new", Icon: TrophyIcon,     offsetX: -76, offsetY: -92 },
-  { label: "Reflect",     href: "/structure",   Icon: MicrophoneIcon, offsetX:   0, offsetY: -108 },
-  { label: "Adjust Goal", href: "/plan",        Icon: ArrowPathIcon,  offsetX:  76, offsetY: -92 },
-];
+const FAB_HREF = "/journal/new";
 
 const NAV_H = 72;
 const NAV_BG = "rgba(10,22,40,0.96)";
@@ -85,15 +78,9 @@ const CRADLE_HALF_W = FAB_SIZE / 2 + CRADLE_GAP;
 export function NavBar() {
   const pathname = usePathname();
   const router   = useRouter();
-  const [fabOpen, setFabOpen] = useState(false);
 
   const isActive = (href: string) =>
     pathname === href || (href !== "/" && pathname.startsWith(href));
-
-  function handleActionClick(href: string) {
-    setFabOpen(false);
-    router.push(href);
-  }
 
   const navItemStyle = (active: boolean): React.CSSProperties => ({
     flex: 1,
@@ -111,26 +98,12 @@ export function NavBar() {
     fontSize: 12,
     letterSpacing: "0.10em",
     textTransform: "uppercase",
-    color: active ? "#C8FF00" : "rgba(120,155,195,0.50)",
+    color: active ? ACCENT : "rgba(160,180,210,0.50)",
     lineHeight: 1,
   });
 
   return (
     <>
-      {/* Backdrop */}
-      <AnimatePresence>
-        {fabOpen && (
-          <motion.div
-            className="fixed inset-0 z-30"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setFabOpen(false)}
-            style={{ background: "rgba(6,9,18,0.60)", backdropFilter: "blur(4px)" }}
-          />
-        )}
-      </AnimatePresence>
-
       <nav
         className="app-fixed-phone z-40"
         style={{ bottom: 0 }}
@@ -242,72 +215,25 @@ export function NavBar() {
             zIndex: 50,
           }}
         >
-          {/* Radial action items */}
-          <AnimatePresence>
-            {fabOpen && FAB_ACTIONS.map((action, i) => (
-              <motion.div
-                key={action.label}
-                style={{ position: "absolute", top: FAB_SIZE / 2 - 20, left: FAB_SIZE / 2 - 20, zIndex: 49 }}
-                initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
-                animate={{ x: action.offsetX, y: action.offsetY, opacity: 1, scale: 1 }}
-                exit={{ x: 0, y: 0, opacity: 0, scale: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 26, delay: i * 0.04 }}
-              >
-                <button
-                  onClick={() => handleActionClick(action.href)}
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer" }}
-                  aria-label={action.label}
-                >
-                  <div style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.08)",
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(255,255,255,0.18)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}>
-                    <action.Icon style={{ width: 20, height: 20, color: "rgba(235,242,255,0.92)" }} aria-hidden />
-                  </div>
-                  <span style={{
-                    fontFamily: "var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif",
-                    fontWeight: 700,
-                    fontSize: 12,
-                    letterSpacing: "0.10em",
-                    textTransform: "uppercase",
-                    color: "rgba(235,242,255,0.70)",
-                    textAlign: "center",
-                    maxWidth: 52,
-                  }}>
-                    {action.label}
-                  </span>
-                </button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-
-          {/* FAB button */}
+          {/* FAB — direct link to voice journal */}
           <motion.button
-            onClick={() => setFabOpen((v) => !v)}
+            onClick={() => router.push(FAB_HREF)}
+            whileTap={{ scale: 0.92 }}
             style={{
               width: FAB_SIZE,
               height: FAB_SIZE,
               borderRadius: "50%",
-              backgroundColor: "#C8FF00",
+              backgroundColor: ACCENT,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               border: "none",
               cursor: "pointer",
-              boxShadow: "0 4px 16px rgba(200,255,0,0.40), 0 8px 32px rgba(200,255,0,0.20)",
+              boxShadow: "0 4px 16px rgba(94,205,161,0.40), 0 8px 32px rgba(94,205,161,0.20)",
             }}
-            animate={{ rotate: fabOpen ? 45 : 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 22 }}
-            aria-label={fabOpen ? "Close menu" : "Quick actions"}
+            aria-label="Voice journal"
           >
-            <PlusIcon style={{ width: 22, height: 22, color: "#0A1628" }} aria-hidden />
+            <MicrophoneIcon style={{ width: 22, height: 22, color: "#0A1628" }} aria-hidden />
           </motion.button>
         </div>
       </nav>

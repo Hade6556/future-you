@@ -13,8 +13,8 @@ interface Props {
 const STATUS_CONFIG = {
   done:    { label: "Done",    bg: "#4CAF7D", text: "#ffffff" },
   partial: { label: "Partial", bg: "#F5A623", text: "#060912" },
-  skipped: { label: "Skipped", bg: "rgba(120,155,195,0.25)", text: "rgba(235,242,255,0.92)" },
-  pending: { label: "Pending", bg: "rgba(255,255,255,0.07)", text: "rgba(120,155,195,0.75)" },
+  skipped: { label: "Skipped", bg: "rgba(120,155,195,0.25)", text: "rgba(255,255,255,0.95)" },
+  pending: { label: "Pending", bg: "rgba(255,255,255,0.07)", text: "rgba(160,180,210,0.75)" },
 };
 
 export function TodaySummaryDrawer({ open, onClose }: Props) {
@@ -71,9 +71,9 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
               <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
                 <div>
                   <p className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Streak</p>
-                  <p className="text-[28px] font-extrabold leading-none" style={{ color: "rgba(235,242,255,0.92)" }}>
+                  <p className="text-[28px] font-extrabold leading-none" style={{ color: "rgba(255,255,255,0.95)" }}>
                     {streak}
-                    <span className="ml-1 text-[13px] font-semibold" style={{ color: "rgba(120,155,195,0.75)" }}>days</span>
+                    <span className="ml-1 text-[13px] font-semibold" style={{ color: "rgba(160,180,210,0.75)" }}>days</span>
                   </p>
                 </div>
                 <span className="text-3xl" aria-hidden>🔥</span>
@@ -95,9 +95,9 @@ export function TodaySummaryDrawer({ open, onClose }: Props) {
                 <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.07)" }}>
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Plan progress</p>
-                    <p className="text-[13px] font-bold" style={{ color: "rgba(235,242,255,0.92)" }}>
+                    <p className="text-[13px] font-bold" style={{ color: "rgba(255,255,255,0.95)" }}>
                       Day {dayInfo.currentDay}
-                      <span className="font-normal" style={{ color: "rgba(120,155,195,0.75)" }}> / {dayInfo.totalDays}</span>
+                      <span className="font-normal" style={{ color: "rgba(160,180,210,0.75)" }}> / {dayInfo.totalDays}</span>
                     </p>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.14)" }}>

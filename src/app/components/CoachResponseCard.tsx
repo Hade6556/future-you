@@ -1,12 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const LIME = "#C8FF00";
-const GLASS = "rgba(255,255,255,0.07)";
-const GLASS_BORDER = "rgba(255,255,255,0.14)";
+import { ACCENT as LIME, TEXT_HI, TEXT_MID, GLASS, GLASS_BORDER } from "@/app/theme";
 
 const FONT_BODY: React.CSSProperties = {
   fontFamily: "var(--font-apercu), sans-serif",

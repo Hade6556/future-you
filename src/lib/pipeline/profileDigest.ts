@@ -1,4 +1,6 @@
 import type { UserContext } from "@/app/types/pipeline";
+import { INTENT_COPY } from "@/app/data/intentConfig";
+import type { MarketingIntent } from "@/app/types/marketingIntent";
 
 const ARCHETYPE_LABELS: Record<string, string> = {
   steady: "Steady Builder (consistency, team energy, long-term thinking)",
@@ -174,6 +176,14 @@ export function buildUserProfileDigest(ctx: UserContext): string {
   const lines: string[] = [];
 
   lines.push("## User Profile");
+
+  if (ctx.marketingIntent) {
+    const mi = ctx.marketingIntent as MarketingIntent;
+    const copy = INTENT_COPY[mi];
+    if (copy) {
+      lines.push(`- Marketing entry path: ${copy.planContext}`);
+    }
+  }
 
   // Demographics
   const demoParts = [ctx.gender, ctx.ageGroup].filter(Boolean);

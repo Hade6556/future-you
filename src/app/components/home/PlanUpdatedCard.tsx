@@ -2,10 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-
-const LIME = "#C8FF00";
-const TEXT_HI = "rgba(235,242,255,0.92)";
-const TEXT_LO = "rgba(120,155,195,0.50)";
+import { ACCENT as LIME, TEXT_HI, TEXT_LO } from "@/app/theme";
 
 type Props = {
   summary: string;
@@ -21,8 +18,8 @@ export function PlanUpdatedCard({ summary, onDismiss }: Props) {
       transition={{ duration: 0.3 }}
       style={{
         position: "relative",
-        background: "rgba(200,255,0,0.04)",
-        border: "1px solid rgba(200,255,0,0.16)",
+        background: "rgba(94,205,161,0.04)",
+        border: "1px solid rgba(94,205,161,0.16)",
         borderRadius: 16,
         padding: "16px 18px",
         display: "flex",
@@ -36,7 +33,7 @@ export function PlanUpdatedCard({ summary, onDismiss }: Props) {
           width: 32,
           height: 32,
           borderRadius: 10,
-          background: "rgba(200,255,0,0.10)",
+          background: "rgba(94,205,161,0.10)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

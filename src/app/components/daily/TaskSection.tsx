@@ -2,9 +2,7 @@
 
 import type { GeneratedTask } from "../../types/pipeline";
 import TaskCard from "./TaskCard";
-
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const LIME = "#C8FF00";
+import { ACCENT as LIME, TEXT_MID } from "@/app/theme";
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 
 const PRIORITY_CONFIG: Record<string, { label: string; accent: string }> = {

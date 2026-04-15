@@ -3,11 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GeneratedTask, PipelineStep } from "../../types/pipeline";
-
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
+import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID } from "@/app/theme";
 const FONT_HEADING = "var(--font-barlow-condensed), sans-serif";
 const FONT_BODY = "var(--font-apercu), sans-serif";
 
@@ -116,7 +112,7 @@ export default function SwapTaskSheet({ task, currentStep, ambitionType, energy,
             style={{
               flex: 1,
               padding: "14px 20px",
-              background: loading ? "rgba(200,255,0,0.4)" : LIME,
+              background: loading ? "rgba(94,205,161,0.4)" : LIME,
               color: NAVY,
               border: "none",
               borderRadius: 14,

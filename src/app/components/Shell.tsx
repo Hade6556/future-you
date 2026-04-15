@@ -1,20 +1,21 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { NavBar } from "./NavBar";
-import SplashScreen from "./SplashScreen";
 import { usePlanStore } from "../state/planStore";
 
-const hideNav = ["/signup", "/quiz", "/quiz/analyzing", "/quiz/result", "/intake", "/generating"];
+const hideNav = ["/signup", "/onboarding", "/generating", "/journal/new", "/quiz"];
 
 export default function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const quizComplete = usePlanStore((s) => s.quizComplete);
   const onboardingComplete = usePlanStore((s) => s.onboardingComplete);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const canAccessMainApp = quizComplete && onboardingComplete;
-  const showNav = canAccessMainApp && !hideNav.includes(pathname);
+  const showNav = mounted && canAccessMainApp && !hideNav.includes(pathname);
 
   return (
     <div className="app-shell">
@@ -34,8 +35,50 @@ export default function Shell({ children }: { children: ReactNode }) {
             pointerEvents: "none",
           }}
         />
-
-        <SplashScreen />
+        {/* Very subtle texture — kept well below notice */}
+        <svg
+          aria-hidden
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+            opacity: 0.028,
+            pointerEvents: "none",
+          }}
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <defs>
+            <pattern
+              id="shellHexGrid"
+              width="56"
+              height="97.98"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M28 0 L52 14 v28 L28 56 L4 42 V14 Z"
+                fill="none"
+                stroke="rgba(180,200,240,0.55)"
+                strokeWidth="0.65"
+              />
+              <path
+                d="M28 56 L52 70 v28 L28 112 L4 98 V70 Z"
+                fill="none"
+                stroke="rgba(180,200,240,0.55)"
+                strokeWidth="0.65"
+              />
+              <path
+                d="M52 14 L80 28 v28 L52 70 L24 56 V28 Z"
+                fill="none"
+                stroke="rgba(180,200,240,0.55)"
+                strokeWidth="0.65"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#shellHexGrid)" />
+        </svg>
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.main
@@ -48,10 +91,10 @@ export default function Shell({ children }: { children: ReactNode }) {
                 ? "calc(96px + env(safe-area-inset-bottom, 0px))"
                 : undefined,
             }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
           >
             {children}
           </motion.main>

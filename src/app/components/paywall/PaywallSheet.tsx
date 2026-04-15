@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
 import { BRAND } from "../../data/copy";
+import { formatTrialPriceNote, PRICING, type SubscriptionPlanId } from "../../data/pricing";
+import { useCheckoutOptions } from "../../hooks/useCheckoutOptions";
+import { PaywallPlanPicker } from "./PaywallPlanPicker";
+import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS_BORDER } from "@/app/theme";
 
 type Props = {
   open: boolean;
@@ -12,13 +16,7 @@ type Props = {
   variant?: "onboarding" | "session";
 };
 
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const TEXT_LO = "rgba(120,155,195,0.50)";
 const GLASS = "rgba(15,32,64,0.92)";
-const GLASS_BORDER = "rgba(255,255,255,0.10)";
 
 function ProgressRing({ size = 56 }: { size?: number }) {
   const r = (size - 6) / 2;
@@ -82,10 +80,19 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
   const maxStep = variant === "onboarding" ? 3 : 2;
   const [step, setStep] = useState(1);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const checkoutOptions = useCheckoutOptions();
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanId>("pro_annual");
 
   useEffect(() => {
     if (open) setStep(1);
   }, [open]);
+
+  useEffect(() => {
+    if (!checkoutOptions) return;
+    if (selectedPlan === "pro_monthly" && !checkoutOptions.monthlyAvailable) {
+      setSelectedPlan("pro_annual");
+    }
+  }, [checkoutOptions, selectedPlan]);
 
   const handleStartFree = async () => {
     setPaywallSeen();
@@ -95,7 +102,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "pro_annual" }),
+        body: JSON.stringify({ plan: selectedPlan }),
         credentials: "include",
       });
       const data = (await res.json()) as { url?: string; error?: string };
@@ -355,14 +362,36 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                     {BRAND.paywall.step3.socialCount}
                   </p>
 
+                  <div style={{ width: "100%", marginTop: 20 }}>
+                    <PaywallPlanPicker
+                      value={selectedPlan}
+                      onChange={setSelectedPlan}
+                      monthlyAvailable={checkoutOptions?.monthlyAvailable ?? false}
+                      disabled={checkoutLoading}
+                    />
+                    {checkoutOptions?.monthlyAvailable && selectedPlan === "pro_annual" ? (
+                      <p
+                        style={{
+                          ...bodyText,
+                          fontSize: 12,
+                          color: TEXT_LO,
+                          marginTop: 8,
+                          textAlign: "center",
+                        }}
+                      >
+                        {PRICING.annualSavingsHint}
+                      </p>
+                    ) : null}
+                  </div>
+
                   <button
                     onClick={() => void handleStartFree()}
                     disabled={checkoutLoading}
                     style={{
                       ...ctaButton,
-                      marginTop: 28,
+                      marginTop: 20,
                       opacity: checkoutLoading ? 0.6 : 1,
-                      boxShadow: "0 8px 32px rgba(200,255,0,0.20)",
+                      boxShadow: "0 8px 32px rgba(94,205,161,0.20)",
                     }}
                   >
                     {checkoutLoading ? "Redirecting..." : "Start Free Now"}
@@ -377,7 +406,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                       marginTop: 10,
                     }}
                   >
-                    {BRAND.paywall.step3.priceNote}
+                    {formatTrialPriceNote(checkoutOptions?.trialDays ?? 7, selectedPlan)}
                   </p>
 
                   <div

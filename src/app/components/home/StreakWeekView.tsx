@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { streakWeekMilestoneMessage } from "@/app/utils/streakCopy";
 
 const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
@@ -12,12 +13,7 @@ export function StreakWeekView({ streak }: Props) {
   const today = new Date().getDay();
   const todayIdx = today === 0 ? 6 : today - 1;
 
-  const milestoneMsg =
-    streak === 7
-      ? "7-day streak! You're on fire."
-      : streak === 30
-        ? "30-day streak! Unstoppable."
-        : null;
+  const milestoneMsg = streakWeekMilestoneMessage(streak);
 
   return (
     <div className="flex flex-col items-center py-4">
@@ -76,9 +72,9 @@ export function StreakWeekView({ streak }: Props) {
         {milestoneMsg && (
           <motion.p
             className="mt-3 text-center text-sm font-medium text-foreground"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             exit={{ opacity: 0 }}
           >
             {milestoneMsg}

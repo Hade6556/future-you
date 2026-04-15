@@ -1,6 +1,8 @@
 "use client";
 
 import { usePlanStore, getCurrentWeekDates, todayISO } from "../../state/planStore";
+import { ACCENT, GLASS, GLASS_BORDER, accentRgba } from "@/app/theme";
+import { streakMomentumContextLine } from "@/app/utils/streakCopy";
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -12,22 +14,16 @@ export function StreakMomentumCard() {
   const weekDates = getCurrentWeekDates();
   const today = todayISO();
 
-  const contextLine = (() => {
-    if (streak <= 0) return "Start your streak today.";
-    if (streak >= bestStreak && bestStreak > 0) return "New personal best!";
-    const gap = bestStreak - streak;
-    if (gap <= 5) return `${gap} day${gap === 1 ? "" : "s"} from your best streak.`;
-    return `Best: ${bestStreak} days`;
-  })();
+  const contextLine = streakMomentumContextLine(streak, bestStreak);
 
   return (
     <section
       style={{
         position: "relative",
-        background: "rgba(255,255,255,0.07)",
+        background: GLASS,
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid rgba(255,255,255,0.14)",
+        border: `1px solid ${GLASS_BORDER}`,
         borderRadius: 16,
         padding: "14px 16px",
         overflow: "hidden",
@@ -49,7 +45,7 @@ export function StreakMomentumCard() {
             fontWeight: 900,
             fontSize: 36,
             lineHeight: 1,
-            color: streak > 0 ? "#C8FF00" : "rgba(120,155,195,0.40)",
+            color: streak > 0 ? ACCENT : "rgba(130,155,195,0.45)",
             letterSpacing: "-0.03em",
           }}
         >
@@ -88,15 +84,15 @@ export function StreakMomentumCard() {
                   alignItems: "center",
                   justifyContent: "center",
                   background: completed
-                    ? "rgba(200,255,0,0.18)"
+                    ? accentRgba(0.16)
                     : "rgba(255,255,255,0.04)",
                   border: isToday
-                    ? "2px solid #C8FF00"
+                    ? `2px solid ${ACCENT}`
                     : completed
-                      ? "1.5px solid rgba(200,255,0,0.35)"
+                      ? `1.5px solid ${accentRgba(0.32)}`
                       : "1.5px solid rgba(255,255,255,0.08)",
                   boxShadow: isToday && !completed
-                    ? "0 0 0 3px rgba(200,255,0,0.12)"
+                    ? `0 0 0 3px ${accentRgba(0.1)}`
                     : "none",
                   opacity: isFuture ? 0.35 : 1,
                   transition: "all 0.2s ease",
@@ -108,7 +104,7 @@ export function StreakMomentumCard() {
                       width: 10,
                       height: 10,
                       borderRadius: "50%",
-                      background: "#C8FF00",
+                      background: ACCENT,
                     }}
                   />
                 )}
@@ -119,7 +115,7 @@ export function StreakMomentumCard() {
                   fontSize: 12,
                   letterSpacing: "0.06em",
                   color: isToday
-                    ? "rgba(200,255,0,0.70)"
+                    ? accentRgba(0.72)
                     : "rgba(120,155,195,0.35)",
                   fontWeight: isToday ? 600 : 400,
                 }}
@@ -137,8 +133,8 @@ export function StreakMomentumCard() {
           fontFamily: "var(--font-apercu), sans-serif",
           fontSize: 12,
           color: streak >= bestStreak && streak > 0
-            ? "#C8FF00"
-            : "rgba(120,155,195,0.55)",
+            ? ACCENT
+            : "rgba(160,180,210,0.55)",
           marginTop: 8,
           marginBottom: 0,
           textAlign: "center",

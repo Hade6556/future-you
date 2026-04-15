@@ -4,14 +4,7 @@ import { useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePlanStore } from "@/app/state/planStore";
-
-const LIME = "#C8FF00";
-const NAVY = "#060912";
-const TEXT_HI = "rgba(235,242,255,0.95)";
-const TEXT_MID = "rgba(120,155,195,0.75)";
-const TEXT_LO = "rgba(120,155,195,0.40)";
-const GLASS = "rgba(255,255,255,0.07)";
-const GLASS_BORDER = "rgba(255,255,255,0.14)";
+import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS, GLASS_BORDER } from "@/app/theme";
 const DANGER = "#FF5555";
 
 const heading: CSSProperties = {
@@ -204,12 +197,12 @@ export default function AccountPage() {
               width: 64,
               height: 64,
               borderRadius: "50%",
-              background: `linear-gradient(135deg, ${LIME}, rgba(200,255,0,0.50))`,
+              background: `linear-gradient(135deg, ${LIME}, rgba(94,205,161,0.50))`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
-              boxShadow: "0 4px 20px rgba(200,255,0,0.25)",
+              boxShadow: "0 4px 20px rgba(94,205,161,0.25)",
             }}
           >
             <span
@@ -296,7 +289,7 @@ export default function AccountPage() {
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 fontFamily: "var(--font-jetbrains-mono), monospace",
-                background: isPremium ? "rgba(200,255,0,0.12)" : "rgba(255,255,255,0.06)",
+                background: isPremium ? "rgba(94,205,161,0.12)" : "rgba(255,255,255,0.06)",
                 color: isPremium ? LIME : TEXT_LO,
               }}
             >
