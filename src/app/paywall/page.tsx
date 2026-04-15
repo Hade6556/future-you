@@ -197,17 +197,17 @@ export default function PaywallPage() {
     setCheckoutLoading(true);
 
     try {
-      const { ensureAnonymousSession } = await import("@/lib/supabase/ensure-anonymous-session");
-      await ensureAnonymousSession();
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setCheckoutLoading(false);
-        alert(
-          "Could not start a browser session for checkout. In Supabase: Authentication → Providers → enable Anonymous (and keep Email on if you still want optional email accounts).",
+      const { hasSupabasePublicConfig } = await import("@/lib/supabase/env");
+      if (hasSupabasePublicConfig()) {
+        const { ensureAnonymousSession, formatCheckoutSessionError } = await import(
+          "@/lib/supabase/ensure-anonymous-session"
         );
-        return;
+        const { user, errorMessage } = await ensureAnonymousSession();
+        if (!user) {
+          setCheckoutLoading(false);
+          alert(formatCheckoutSessionError(errorMessage));
+          return;
+        }
       }
     } catch {
       /* Supabase not configured — continue to billing session (local-only dev) */
