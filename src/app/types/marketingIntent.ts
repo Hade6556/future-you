@@ -1,4 +1,5 @@
 import type { AmbitionDomain } from "./plan";
+import type { GoalArea } from "@/app/quiz/store/quizStore";
 
 /** Stable marketing funnel entry — URLs, analytics, persisted state */
 export type MarketingIntent = "health_weight" | "relationships" | "money_stability";
@@ -35,7 +36,7 @@ export function parseMarketingIntentParam(raw: string | null): MarketingIntent |
 }
 
 /** Map quiz goal area → marketing intent for theming + API bias (no extra user screen). */
-export function inferMarketingIntentFromQuizGoalArea(goalArea: string | null | undefined): MarketingIntent {
+export function inferMarketingIntentFromQuizGoalArea(goalArea: GoalArea | null | undefined): MarketingIntent {
   if (!goalArea) return "money_stability";
   if (goalArea.includes("Health") || goalArea.includes("Energy")) return "health_weight";
   if (goalArea.includes("Relationship")) return "relationships";

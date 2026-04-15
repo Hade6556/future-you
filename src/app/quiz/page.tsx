@@ -120,7 +120,7 @@ export default function QuizPage() {
     if (answers.email) store.setEmail(answers.email);
     const fromUrl = store.marketingIntent;
     store.setMarketingIntent(
-      fromUrl ?? inferMarketingIntentFromQuizGoalArea(answers.goalArea),
+      fromUrl ?? inferMarketingIntentFromQuizGoalArea(answers.goalArea ?? undefined),
     );
     store.completeQuiz(archetype, ambition);
     store.completeOnboarding();
