@@ -33,10 +33,14 @@ export default function Reveal({
   className,
   style,
   delay = 0,
-  offset = 10,
+  offset = 6,
   blur = "3px",
   duration = 0.45,
-  direction = "down",
+  // Default to "up" — elements start *below* their final position and rise
+  // into place. This matches the natural scroll-down motion; the previous
+  // "down" default made elements fall downward while scrolling down, which
+  // felt like resistance fighting the scroll.
+  direction = "up",
   inViewMargin = "-12%",
   ...rest
 }: RevealProps) {
