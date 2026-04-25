@@ -85,7 +85,6 @@ export default function OnboardingPage() {
     });
   }, [marketingIntent]);
   const [locationInput, setLocationInput] = useState("");
-  const [narrative, setNarrative] = useState("");
   const [nameInput, setNameInput] = useState(userName || "");
 
   function handleNext() {
@@ -96,31 +95,32 @@ export default function OnboardingPage() {
       setAmbitionType(selectedGoal);
       setStep(2);
     } else if (step === 2 && locationInput.trim()) {
+      // Final step — synthesize a narrative from goal area + location.
+      // (The free-text narrative now lives in the quiz; users who reach
+      // /onboarding directly haven't taken the quiz, so we generate one.)
       setLocation(locationInput.trim());
-      setStep(3);
-    } else if (step === 3 && narrative.trim().length >= 20) {
-      // Complete onboarding
       completeQuiz("steady", selectedGoal!);
       completeOnboarding();
-      const trimmed = narrative.trim();
-      setPendingNarrative(trimmed);
+
+      const ambition = selectedGoal!;
+      const synthesizedNarrative = `I want to focus on ${ambition.replace(/_/g, " ")}.`;
+      setPendingNarrative(synthesizedNarrative);
       try {
-        sessionStorage.setItem(PENDING_NARRATIVE_KEY, trimmed);
+        sessionStorage.setItem(PENDING_NARRATIVE_KEY, synthesizedNarrative);
       } catch { /* ignore */ }
 
       // ── Instant plan: ship a starter, fire AI upgrade in background ─────
-      const ambition = selectedGoal!;
-      const starter = buildStarterPlan({ ambition, narrative: trimmed });
+      const starter = buildStarterPlan({ ambition, narrative: synthesizedNarrative });
       const store = usePlanStore.getState();
       store.setPipelinePlan(starter);
       store.setPlanReady(starter.plan_id);
       store.setIdentityComplete(true);
-      persistStarterIntake(starter.plan_id, trimmed);
+      persistStarterIntake(starter.plan_id, synthesizedNarrative);
 
       const intakeTone = marketingIntent ? INTENT_COPY[marketingIntent].intakeTone : "Life Coach";
       triggerBackgroundUpgrade({
         ambition,
-        narrative: trimmed,
+        narrative: synthesizedNarrative,
         location: locationInput.trim() || null,
         archetypeId: store.dogArchetype ?? null,
         marketingIntent: marketingIntent ?? null,
@@ -138,8 +138,7 @@ export default function OnboardingPage() {
   const canProceed =
     (step === 0 && nameInput.trim().length > 0) ||
     (step === 1 && selectedGoal !== null) ||
-    (step === 2 && locationInput.trim().length > 0) ||
-    (step === 3 && narrative.trim().length >= 20);
+    (step === 2 && locationInput.trim().length > 0);
 
   const intentCopy = marketingIntent ? INTENT_COPY[marketingIntent] : null;
   const cta = "var(--cta)";
@@ -188,7 +187,7 @@ export default function OnboardingPage() {
       >
         {/* Progress dots */}
         <div style={{ display: "flex", gap: 6, marginBottom: 44 }}>
-          {[0, 1, 2, 3].map((i) => (
+          {[0, 1, 2].map((i) => (
             <div
               key={i}
               style={{
@@ -319,41 +318,6 @@ export default function OnboardingPage() {
             </motion.div>
           )}
 
-          {step === 3 && (
-            <motion.div
-              key="narrative"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
-              style={{ flex: 1, display: "flex", flexDirection: "column" }}
-            >
-              <p style={ONBOARDING_EYEBROW}>↳ Step 04</p>
-              <h1 style={ONBOARDING_H1}>
-                Describe your <span style={{ fontStyle: "italic", color: ACCENT }}>goal.</span>
-              </h1>
-              <p style={ONBOARDING_SUB}>
-                Be specific — what does success look like in 90 days?
-              </p>
-              <textarea
-                value={narrative}
-                onChange={(e) => setNarrative(e.target.value)}
-                placeholder={intentCopy?.narrativePlaceholder ?? "e.g. I want to save €5,000 for a down payment by cutting unnecessary spending and finding a side income..."}
-                autoFocus
-                style={{
-                  ...ONBOARDING_INPUT,
-                  flex: 1,
-                  minHeight: 140,
-                  fontSize: 15,
-                  lineHeight: 1.6,
-                  resize: "none",
-                }}
-              />
-              <p style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: TEXT_LO, marginTop: 10 }}>
-                {narrative.trim().length}/20 characters
-              </p>
-            </motion.div>
-          )}
         </AnimatePresence>
 
         {/* Navigation */}
@@ -413,7 +377,7 @@ export default function OnboardingPage() {
               gap: 8,
             }}
           >
-            {step === 3 ? "Build my plan" : "Continue"}
+            {step === 2 ? "Build my plan" : "Continue"}
             {canProceed && (
               <span aria-hidden style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: 12 }}>→</span>
             )}

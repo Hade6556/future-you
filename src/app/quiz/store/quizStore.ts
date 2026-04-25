@@ -18,6 +18,8 @@ export type Archetype =
 export interface QuizAnswers {
   goalArea: GoalArea | null;
   specificGoals: string[];
+  /** Free-text "what success looks like in 90 days" — used as the narrative for plan generation. */
+  goalNarrative: string;
   gender: string | null;
   ageRange: string | null;
   problems: string[];
@@ -35,6 +37,7 @@ interface QuizStore {
   setStep: (step: number) => void;
   setGoalArea: (v: GoalArea) => void;
   setSpecificGoals: (v: string[]) => void;
+  setGoalNarrative: (v: string) => void;
   setGender: (v: string) => void;
   setAgeRange: (v: string) => void;
   setProblems: (v: string[]) => void;
@@ -50,6 +53,7 @@ interface QuizStore {
 const initialAnswers: QuizAnswers = {
   goalArea: null,
   specificGoals: [],
+  goalNarrative: "",
   gender: null,
   ageRange: null,
   problems: [],
@@ -67,6 +71,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
   setStep: (step) => set({ step }),
   setGoalArea: (v) => set((s) => ({ answers: { ...s.answers, goalArea: v } })),
   setSpecificGoals: (v) => set((s) => ({ answers: { ...s.answers, specificGoals: v } })),
+  setGoalNarrative: (v) => set((s) => ({ answers: { ...s.answers, goalNarrative: v } })),
   setGender: (v) => set((s) => ({ answers: { ...s.answers, gender: v } })),
   setAgeRange: (v) => set((s) => ({ answers: { ...s.answers, ageRange: v } })),
   setProblems: (v) => set((s) => ({ answers: { ...s.answers, problems: v } })),

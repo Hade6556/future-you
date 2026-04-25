@@ -1,7 +1,7 @@
 "use client";
 
 import { ACCENT } from "@/app/theme";
-const TOTAL_STEPS = 17;
+const TOTAL_STEPS = 19;
 
 export default function ProgressBar({ step }: { step: number }) {
   const pct = Math.min(100, Math.round((step / TOTAL_STEPS) * 100));

@@ -29,6 +29,7 @@ const ARCHETYPE_TO_ID: Record<string, ArchetypeId> = {
 
 import GoalAreaScreen from "./screens/GoalAreaScreen";
 import SpecificGoalsScreen from "./screens/SpecificGoalsScreen";
+import GoalNarrativeScreen from "./screens/GoalNarrativeScreen";
 import GenderScreen from "./screens/GenderScreen";
 import AgeScreen from "./screens/AgeScreen";
 import ProblemsScreen from "./screens/ProblemsScreen";
@@ -46,25 +47,28 @@ import EmailCaptureScreen from "./screens/EmailCaptureScreen";
 import ArchetypeRevealScreen from "./screens/ArchetypeRevealScreen";
 import WinCelebrationScreen from "./screens/WinCelebrationScreen";
 
+// Yes-ladder funnel: zero-friction taps first (gender, age), then framing,
+// then escalating pain questions after the user is committed.
 const SCREEN_NAMES = [
-  "goal_area",
-  "specific_goals",
-  "gender",
-  "age",
-  "problems",
-  "empathy",
-  "current_state",
-  "social_proof",
-  "insight_research",
-  "bad_habits",
-  "past_attempts",
-  "insight_why_failed",
-  "problem_breakdown",
-  "time_per_day",
-  "timeline_insight",
-  "email_capture",
-  "archetype_reveal",
-  "win_celebration",
+  "gender",            // 0  — one tap
+  "age",               // 1  — one tap
+  "goal_area",         // 2  — direction
+  "specific_goals",    // 3  — concrete goals
+  "goal_narrative",    // 4  — free-text goal in their words (powers AI plan)
+  "social_proof",      // 5  — first reward (uses goal_area only)
+  "current_state",     // 6  — light self-assessment
+  "insight_research",  // 7  — authority pause
+  "problems",          // 8  — escalating pain begins
+  "empathy",           // 9  — conditional: only if burnout/stress
+  "bad_habits",        // 10
+  "past_attempts",     // 11
+  "insight_why_failed",// 12 — validation insight
+  "problem_breakdown", // 13 — diagnostic
+  "time_per_day",      // 14 — commitment ask (after they've invested)
+  "timeline_insight",  // 15 — 69 days lost / 127 reclaimed
+  "email_capture",     // 16
+  "archetype_reveal",  // 17 — climax
+  "win_celebration",   // 18
 ];
 
 export default function QuizPage() {
@@ -80,11 +84,12 @@ export default function QuizPage() {
   }, [step]);
 
   const next = useCallback(() => {
-    // After Problems (step 4): show Empathy only if burnout/stress selected
-    if (step === 4) {
+    // After Problems (step 8): show Empathy (step 9) only if burnout/stress
+    // selected; otherwise skip straight to BadHabits (step 10).
+    if (step === 8) {
       const showEmpathy =
         problems.includes("Burnout") || problems.includes("Chronic stress");
-      setStep(showEmpathy ? 5 : 6);
+      setStep(showEmpathy ? 9 : 10);
       return;
     }
     setStep(step + 1);
@@ -92,10 +97,11 @@ export default function QuizPage() {
 
   const back = useCallback(() => {
     if (step === 0) return;
-    if (step === 6) {
+    // Going back from BadHabits (step 10): skip over Empathy if it wasn't shown
+    if (step === 10) {
       const showEmpathy =
         problems.includes("Burnout") || problems.includes("Chronic stress");
-      setStep(showEmpathy ? 5 : 4);
+      setStep(showEmpathy ? 9 : 8);
       return;
     }
     setStep(step - 1);
@@ -109,11 +115,17 @@ export default function QuizPage() {
     const ambition = GOAL_AREA_TO_AMBITION[answers.goalArea ?? ""] ?? "confidence";
     const archetype = ARCHETYPE_TO_ID[answers.archetype ?? ""] ?? "steady";
 
-    // Build a narrative from quiz answers for plan generation
+    // Prefer the user's free-text narrative (from GoalNarrativeScreen) — it's
+    // in their own voice and gives the AI plan far better personalization.
+    // Fall back to a synthesized narrative when they skipped that step.
+    const typedNarrative = answers.goalNarrative?.trim() ?? "";
     const goals = answers.specificGoals.join(", ");
-    const narrative = goals
-      ? `My goal area is ${answers.goalArea}. Specifically, I want to: ${goals}.`
-      : `I want to focus on ${answers.goalArea ?? "personal growth"}.`;
+    const narrative =
+      typedNarrative.length >= 20
+        ? typedNarrative
+        : goals
+          ? `My goal area is ${answers.goalArea}. Specifically, I want to: ${goals}.`
+          : `I want to focus on ${answers.goalArea ?? "personal growth"}.`;
 
     if (answers.email) store.setEmail(answers.email);
     const fromUrl = store.marketingIntent;
@@ -142,7 +154,7 @@ export default function QuizPage() {
     return () => window.removeEventListener("popstate", onPopState);
   }, [step, back]);
 
-  const showProgress = step >= 0 && step < 17;
+  const showProgress = step >= 0 && step < 18;
 
   return (
     <div
@@ -225,24 +237,25 @@ export default function QuizPage() {
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <AnimatePresence mode="wait">
-            {step === 0 && <GoalAreaScreen key="goal" onNext={next} />}
-            {step === 1 && <SpecificGoalsScreen key="specific" onNext={next} />}
-            {step === 2 && <GenderScreen key="gender" onNext={next} />}
-            {step === 3 && <AgeScreen key="age" onNext={next} />}
-            {step === 4 && <ProblemsScreen key="problems" onNext={next} />}
-            {step === 5 && <EmpathyScreen key="empathy" onNext={next} />}
-            {step === 6 && <CurrentStateScreen key="state" onNext={next} />}
-            {step === 7 && <SocialProofScreen key="social" onNext={next} />}
-            {step === 8 && <InsightResearchScreen key="research" onNext={next} />}
-            {step === 9 && <BadHabitsScreen key="habits" onNext={next} />}
-            {step === 10 && <PastAttemptsScreen key="past" onNext={next} />}
-            {step === 11 && <InsightWhyFailedScreen key="whyfailed" onNext={next} />}
-            {step === 12 && <ProblemBreakdownScreen key="breakdown" onNext={next} />}
-            {step === 13 && <TimePerDayScreen key="time" onNext={next} />}
-            {step === 14 && <TimelineInsightScreen key="timeline" onNext={next} />}
-            {step === 15 && <EmailCaptureScreen key="email" onNext={next} />}
-            {step === 16 && <ArchetypeRevealScreen key="archetype" onNext={next} />}
-            {step === 17 && (
+            {step === 0  && <GenderScreen          key="gender"     onNext={next} />}
+            {step === 1  && <AgeScreen             key="age"        onNext={next} />}
+            {step === 2  && <GoalAreaScreen        key="goal"       onNext={next} />}
+            {step === 3  && <SpecificGoalsScreen   key="specific"   onNext={next} />}
+            {step === 4  && <GoalNarrativeScreen   key="narrative"  onNext={next} />}
+            {step === 5  && <SocialProofScreen     key="social"     onNext={next} />}
+            {step === 6  && <CurrentStateScreen    key="state"      onNext={next} />}
+            {step === 7  && <InsightResearchScreen key="research"   onNext={next} />}
+            {step === 8  && <ProblemsScreen        key="problems"   onNext={next} />}
+            {step === 9  && <EmpathyScreen         key="empathy"    onNext={next} />}
+            {step === 10 && <BadHabitsScreen       key="habits"     onNext={next} />}
+            {step === 11 && <PastAttemptsScreen    key="past"       onNext={next} />}
+            {step === 12 && <InsightWhyFailedScreen key="whyfailed" onNext={next} />}
+            {step === 13 && <ProblemBreakdownScreen key="breakdown" onNext={next} />}
+            {step === 14 && <TimePerDayScreen      key="time"       onNext={next} />}
+            {step === 15 && <TimelineInsightScreen key="timeline"   onNext={next} />}
+            {step === 16 && <EmailCaptureScreen    key="email"      onNext={next} />}
+            {step === 17 && <ArchetypeRevealScreen key="archetype"  onNext={next} />}
+            {step === 18 && (
               <WinCelebrationScreen key="win" onFinish={handleFinish} />
             )}
           </AnimatePresence>
