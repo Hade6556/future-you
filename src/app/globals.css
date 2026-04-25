@@ -606,7 +606,10 @@ body {
 .landing-root::before,
 .landing-root::after {
   content: "";
-  position: absolute;
+  /* Fixed (not absolute) so the aurora layer is sized to the viewport, not
+     the full document height. Blurring a thousands-of-pixels-tall layer
+     made scrolling jank and feel like resistance. */
+  position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: -1;
