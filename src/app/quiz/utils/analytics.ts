@@ -24,7 +24,10 @@ const STANDARD_EVENT_MAP: Record<
   paywall_cta_clicked: { meta: "InitiateCheckout", tiktok: "InitiateCheckout" },
   email_captured: { meta: "Lead", tiktok: "SubmitForm" },
   quiz_completed: { meta: "CompleteRegistration", tiktok: "CompleteRegistration" },
-  purchase: { meta: "Purchase", tiktok: "CompletePayment", ga: "purchase" },
+  // Stripe checkout completion — paired with server-side CAPI StartTrial via eventID.
+  // The actual paid conversion (`Subscribe`) is server-only via invoice.payment_succeeded
+  // since the user isn't on a page when the trial converts 3 days later.
+  start_trial: { meta: "StartTrial", tiktok: "StartTrial" },
 };
 
 function getWin(): Win | null {
@@ -70,22 +73,55 @@ export function trackAnswerSelected(
   trackEvent("answer_selected", { screen: screenName, answer });
 }
 
-/** Fire once per checkout success. Idempotent via localStorage dedupe key. */
+/**
+ * Fire once per checkout success. Idempotent via localStorage dedupe key.
+ *
+ * Sends the Meta StartTrial event with an explicit `eventID` (the Stripe
+ * checkout session id) so it deduplicates against the server-side CAPI
+ * StartTrial fired from the Stripe webhook. The dataLayer + ttq pushes go
+ * through the standard fan-out.
+ */
+export function trackStartTrial(params: {
+  value: number;
+  currency: string;
+  plan: string;
+  /** Stripe checkout session id — MUST match the server-side eventId for dedup. */
+  transactionId?: string;
+}) {
+  const w = getWin();
+  if (!w) return;
+
+  try {
+    const key = `behavio_start_trial_${params.transactionId ?? params.plan}`;
+    if (w.localStorage?.getItem(key)) return;
+    w.localStorage?.setItem(key, "1");
+  } catch {}
+
+  // Direct fbq call with eventID for dedup; the standard fan-out doesn't
+  // know how to attach eventID per event so we bypass it for the meta side.
+  try {
+    if (w.fbq) {
+      w.fbq(
+        "track",
+        "StartTrial",
+        { value: params.value, currency: params.currency, content_ids: [params.plan] },
+        params.transactionId ? { eventID: params.transactionId } : undefined,
+      );
+    }
+  } catch {}
+
+  // Also push to dataLayer / tiktok / ga via the standard mapping.
+  trackEvent("start_trial", params);
+}
+
+/** @deprecated Use trackStartTrial — kept for backwards compatibility. */
 export function trackPurchase(params: {
   value: number;
   currency: string;
   plan: string;
   transactionId?: string;
 }) {
-  const w = getWin();
-  if (!w) return;
-  try {
-    const key = `behavio_purchase_${params.transactionId ?? params.plan}`;
-    if (w.localStorage?.getItem(key)) return;
-    w.localStorage?.setItem(key, "1");
-  } catch {}
-
-  trackEvent("purchase", params);
+  trackStartTrial(params);
 }
 
 export function trackLead(email: string) {

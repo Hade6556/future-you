@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useFunnelResume } from "@/app/state/useFunnelResume";
 import { usePlanStore } from "@/app/state/planStore";
 import { parseMarketingIntentParam } from "@/app/types/marketingIntent";
-import { trackEvent, trackPurchase } from "@/app/quiz/utils/analytics";
+import { trackEvent, trackStartTrial } from "@/app/quiz/utils/analytics";
 
 import LandingNav from "./LandingNav";
 import ResumeBanner from "./ResumeBanner";
@@ -92,13 +92,17 @@ export default function LandingPage() {
       await hydrateFromServer();
       if (usePlanStore.getState().isPremium || attempts >= maxAttempts) {
         clearInterval(poll);
+        // StartTrial fires here (client-side); the matching server-side CAPI
+        // StartTrial fires from the Stripe webhook with the same eventID
+        // (Stripe checkout session id). Real paid Subscribe is server-only.
         const value = planFromUrl === "pro_monthly" ? 9.99 : 44;
-        trackPurchase({
-          value,
+        trackStartTrial({
+          value: 0, // trial start has no charged amount; predictedLtv is sent server-side
           currency: "EUR",
           plan: planFromUrl,
           transactionId: sessionId,
         });
+        trackEvent("trial_started_value", { value, currency: "EUR", plan: planFromUrl });
       }
     }, 2000);
     return () => clearInterval(poll);
