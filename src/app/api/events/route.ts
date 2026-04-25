@@ -24,12 +24,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const location = body.location;
+  const location = body.location ?? "";
   const goalRaw = body.goalRaw ?? body.goal;
-  if (!goalRaw || !location) {
+  if (!goalRaw) {
     return NextResponse.json(
       {
-        error: "Missing required fields: goalRaw (or goal), location",
+        error: "Missing required field: goalRaw",
         meta: { serpConfigured: isSerpEventsConfigured() },
       },
       { status: 400 }

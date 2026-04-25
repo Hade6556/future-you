@@ -114,8 +114,8 @@ export default function GeneratingPage() {
       if (navigated.current) return;
       navigated.current = true;
       setProgress(100);
-      const premium = usePlanStore.getState().isPremium;
-      router.push(premium ? "/" : "/paywall");
+      // Payments disabled — always go home
+      router.push("/");
     };
 
     const elapsed = Date.now() - screenStartedAt.current;

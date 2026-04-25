@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { usePlanStore } from "../state/planStore";
 import { BRAND } from "../data/copy";
 import { FunnelThemeShell } from "../components/funnel/FunnelThemeShell";
 import { PaywallPlanPicker } from "../components/paywall/PaywallPlanPicker";
-import { formatTrialPriceNote, PRICING, type SubscriptionPlanId } from "../data/pricing";
+import { PaywallProofStack } from "../components/paywall/PaywallProofStack";
+import { PaywallReassurance } from "../components/paywall/PaywallReassurance";
+import { resolvePaywallVariant, type PaywallVariant } from "../components/paywall/paywallExperiment";
+import { paywallCheckoutFootnote, PRICING, type SubscriptionPlanId } from "../data/pricing";
 import { useCheckoutOptions } from "../hooks/useCheckoutOptions";
+import { trackEvent } from "../quiz/utils/analytics";
 import { NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS_BORDER } from "@/app/theme";
 
 const heading: React.CSSProperties = {
@@ -173,8 +177,26 @@ export default function PaywallPage() {
   const checkoutOptions = useCheckoutOptions();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanId>("pro_annual");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [variant, setVariant] = useState<PaywallVariant>("proof");
+  const proofSeenTracked = useRef(false);
 
   // Guard: no plan generated yet → send back to onboarding
+  useEffect(() => {
+    const assigned = resolvePaywallVariant();
+    setVariant(assigned);
+    trackEvent("paywall_viewed", { surface: "page", variant: assigned });
+  }, []);
+
+  useEffect(() => {
+    if (variant !== "proof" || proofSeenTracked.current) return;
+    proofSeenTracked.current = true;
+    trackEvent("paywall_proof_seen", { surface: "page", variant });
+  }, [variant]);
+
+  useEffect(() => {
+    trackEvent("paywall_plan_selected", { surface: "page", variant, plan: selectedPlan });
+  }, [selectedPlan, variant]);
+
   useEffect(() => {
     if (!pipelinePlan && !isPremium) {
       router.replace("/onboarding");
@@ -194,6 +216,7 @@ export default function PaywallPage() {
   }
 
   const handleStartFree = async () => {
+    trackEvent("paywall_cta_clicked", { surface: "page", variant, plan: selectedPlan });
     setCheckoutLoading(true);
 
     try {
@@ -213,23 +236,41 @@ export default function PaywallPage() {
       /* Supabase not configured — continue to billing session (local-only dev) */
     }
 
+    let attribution: Record<string, string> = {};
+    try {
+      attribution = JSON.parse(window.sessionStorage.getItem("behavio_attribution") ?? "{}");
+    } catch {}
+
     try {
       const res = await fetch("/api/billing/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: selectedPlan }),
+        body: JSON.stringify({ plan: selectedPlan, attribution }),
         credentials: "include",
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
+        trackEvent("paywall_checkout_redirect_success", { surface: "page", variant, plan: selectedPlan });
         setPaywallSeen();
         startTrial();
         window.location.href = data.url;
         return;
       }
+      trackEvent("paywall_checkout_redirect_failed", {
+        surface: "page",
+        variant,
+        plan: selectedPlan,
+        reason: data.error ?? "no_url",
+      });
       setCheckoutLoading(false);
       alert(data.error ?? "Payment is not available right now. Please try again later.");
     } catch {
+      trackEvent("paywall_checkout_redirect_failed", {
+        surface: "page",
+        variant,
+        plan: selectedPlan,
+        reason: "request_failed",
+      });
       setCheckoutLoading(false);
       alert("Something went wrong. Please try again.");
     }
@@ -322,14 +363,14 @@ export default function PaywallPage() {
             Start free. Full access. No commitment.
           </p>
 
-          {/* Blurred plan preview */}
+          {/* A/B: control keeps blurred preview, variant shows proof stack */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.35 }}
             style={{ width: "100%", marginTop: 28 }}
           >
-            <BlurredPlanPreview />
+            {variant === "proof" ? <PaywallProofStack /> : <BlurredPlanPreview />}
           </motion.div>
 
           <div style={{ width: "100%", maxWidth: 360, marginTop: 20 }}>
@@ -337,6 +378,7 @@ export default function PaywallPage() {
               value={selectedPlan}
               onChange={setSelectedPlan}
               monthlyAvailable={checkoutOptions?.monthlyAvailable !== false}
+              trialDays={checkoutOptions?.trialDays ?? 3}
               disabled={checkoutLoading}
             />
             {checkoutOptions?.monthlyAvailable !== false && selectedPlan === "pro_annual" ? (
@@ -370,11 +412,13 @@ export default function PaywallPage() {
               fontSize: 17,
               letterSpacing: "0.10em",
               textTransform: "uppercase",
-              background: "var(--cta)",
+              background:
+                "linear-gradient(115deg, color-mix(in srgb, var(--cta) 88%, #ffffff) 0%, var(--cta) 50%, color-mix(in srgb, var(--cta) 72%, #c5fff0) 100%)",
               color: NAVY,
               marginTop: 28,
               opacity: checkoutLoading ? 0.6 : 1,
-              boxShadow: "0 8px 32px var(--accent-primary-glow-strong, rgba(94,205,161,0.20))",
+              boxShadow:
+                "0 12px 44px color-mix(in srgb, var(--cta) 32%, transparent), 0 0 0 1px color-mix(in srgb, var(--cta) 28%, transparent)",
             }}
           >
             {checkoutLoading ? "Redirecting..." : "Start Free Now"}
@@ -390,21 +434,24 @@ export default function PaywallPage() {
               marginTop: 10,
             }}
           >
-            {formatTrialPriceNote(checkoutOptions?.trialDays ?? 7, selectedPlan)}
+            {paywallCheckoutFootnote()}
           </p>
+
+          <PaywallReassurance />
 
           {/* Trust badges */}
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 20,
+              width: "100%",
+              maxWidth: 360,
+              display: "grid",
+              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+              columnGap: 10,
               marginTop: 16,
             }}
           >
             {BRAND.paywall.step3.trust.map((t) => (
-              <span key={t} style={{ ...eyebrow }}>
+              <span key={t} style={{ ...eyebrow, textAlign: "center", lineHeight: 1.35, display: "block" }}>
                 {t}
               </span>
             ))}

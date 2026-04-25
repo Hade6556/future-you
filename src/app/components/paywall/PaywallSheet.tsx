@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanStore } from "../../state/planStore";
 import { BRAND } from "../../data/copy";
-import { formatTrialPriceNote, PRICING, type SubscriptionPlanId } from "../../data/pricing";
+import { paywallCheckoutFootnote, PRICING, type SubscriptionPlanId } from "../../data/pricing";
 import { useCheckoutOptions } from "../../hooks/useCheckoutOptions";
 import { PaywallPlanPicker } from "./PaywallPlanPicker";
+import { PaywallProofStack } from "./PaywallProofStack";
+import { resolvePaywallVariant, type PaywallVariant } from "./paywallExperiment";
+import { trackEvent } from "../../quiz/utils/analytics";
 import { ACCENT as LIME, NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS_BORDER } from "@/app/theme";
 
 type Props = {
@@ -72,18 +75,41 @@ function ProgressRing({ size = 56 }: { size?: number }) {
   );
 }
 
-export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
+export function PaywallSheet({ open, onClose, variant: flowVariant = "onboarding" }: Props) {
   const startTrial = usePlanStore((s) => s.startTrial);
   const setPaywallSeen = usePlanStore((s) => s.setPaywallSeen);
-  const maxStep = variant === "onboarding" ? 3 : 2;
+  const maxStep = flowVariant === "onboarding" ? 3 : 2;
   const [step, setStep] = useState(1);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const checkoutOptions = useCheckoutOptions();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanId>("pro_annual");
+  const [variant, setVariant] = useState<PaywallVariant>("proof");
+  const proofSeenTracked = useRef(false);
+  const showPriceStep = step === maxStep;
 
   useEffect(() => {
     if (open) setStep(1);
   }, [open]);
+
+  useEffect(() => {
+    setVariant(resolvePaywallVariant());
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    trackEvent("paywall_viewed", { surface: "sheet", variant });
+  }, [open, variant]);
+
+  useEffect(() => {
+    if (!open || !showPriceStep || variant !== "proof" || proofSeenTracked.current) return;
+    proofSeenTracked.current = true;
+    trackEvent("paywall_proof_seen", { surface: "sheet", variant });
+  }, [open, showPriceStep, variant]);
+
+  useEffect(() => {
+    if (!open || !showPriceStep) return;
+    trackEvent("paywall_plan_selected", { surface: "sheet", variant, plan: selectedPlan });
+  }, [open, showPriceStep, selectedPlan, variant]);
 
   useEffect(() => {
     if (!checkoutOptions) return;
@@ -93,6 +119,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
   }, [checkoutOptions, selectedPlan]);
 
   const handleStartFree = async () => {
+    trackEvent("paywall_cta_clicked", { surface: "sheet", variant, plan: selectedPlan });
     setCheckoutLoading(true);
 
     try {
@@ -121,20 +148,31 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
+        trackEvent("paywall_checkout_redirect_success", { surface: "sheet", variant, plan: selectedPlan });
         setPaywallSeen();
         startTrial();
         window.location.href = data.url;
         return;
       }
+      trackEvent("paywall_checkout_redirect_failed", {
+        surface: "sheet",
+        variant,
+        plan: selectedPlan,
+        reason: data.error ?? "no_url",
+      });
       setCheckoutLoading(false);
       alert(data.error ?? "Payment is not available right now. Please try again later.");
     } catch {
+      trackEvent("paywall_checkout_redirect_failed", {
+        surface: "sheet",
+        variant,
+        plan: selectedPlan,
+        reason: "request_failed",
+      });
       setCheckoutLoading(false);
       alert("Something went wrong. Please try again.");
     }
   };
-
-  const showPriceStep = step === maxStep;
 
   const heading: React.CSSProperties = {
     fontFamily: "var(--font-barlow-condensed), sans-serif",
@@ -260,7 +298,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                   </p>
 
                   <button
-                    onClick={() => setStep(variant === "onboarding" ? 2 : maxStep)}
+                    onClick={() => setStep(flowVariant === "onboarding" ? 2 : maxStep)}
                     style={{ ...ctaButton, marginTop: 28 }}
                   >
                     {BRAND.paywall.step1.cta}
@@ -269,7 +307,7 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
               )}
 
               {/* Step 2 — Features (onboarding only) */}
-              {variant === "onboarding" && step === 2 && (
+              {flowVariant === "onboarding" && step === 2 && (
                 <motion.div
                   key="step2"
                   initial={{ opacity: 0, x: 12 }}
@@ -375,11 +413,18 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                     {BRAND.paywall.step3.socialCount}
                   </p>
 
+                  {variant === "proof" ? (
+                    <div style={{ width: "100%", marginTop: 14 }}>
+                      <PaywallProofStack compact />
+                    </div>
+                  ) : null}
+
                   <div style={{ width: "100%", marginTop: 20 }}>
                     <PaywallPlanPicker
                       value={selectedPlan}
                       onChange={setSelectedPlan}
                       monthlyAvailable={checkoutOptions?.monthlyAvailable !== false}
+                      trialDays={checkoutOptions?.trialDays ?? 3}
                       disabled={checkoutLoading}
                     />
                     {checkoutOptions?.monthlyAvailable !== false && selectedPlan === "pro_annual" ? (
@@ -404,7 +449,10 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                       ...ctaButton,
                       marginTop: 20,
                       opacity: checkoutLoading ? 0.6 : 1,
-                      boxShadow: "0 8px 32px rgba(94,205,161,0.20)",
+                      background:
+                        "linear-gradient(115deg, color-mix(in srgb, var(--cta) 88%, #ffffff) 0%, var(--cta) 50%, color-mix(in srgb, var(--cta) 72%, #c5fff0) 100%)",
+                      boxShadow:
+                        "0 12px 44px color-mix(in srgb, var(--cta) 32%, transparent), 0 0 0 1px color-mix(in srgb, var(--cta) 28%, transparent)",
                     }}
                   >
                     {checkoutLoading ? "Redirecting..." : "Start Free Now"}
@@ -419,20 +467,23 @@ export function PaywallSheet({ open, onClose, variant = "onboarding" }: Props) {
                       marginTop: 10,
                     }}
                   >
-                    {formatTrialPriceNote(checkoutOptions?.trialDays ?? 7, selectedPlan)}
+                    {paywallCheckoutFootnote()}
                   </p>
 
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 16,
+                      width: "100%",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                      columnGap: 10,
                       marginTop: 16,
                     }}
                   >
                     {BRAND.paywall.step3.trust.map((t) => (
-                      <span key={t} style={{ ...eyebrow, fontSize: 12 }}>
+                      <span
+                        key={t}
+                        style={{ ...eyebrow, fontSize: 12, textAlign: "center", lineHeight: 1.35, display: "block" }}
+                      >
                         {t}
                       </span>
                     ))}

@@ -159,7 +159,7 @@ export const BRAND = {
     headline: "Your 90-day forecast",
     lockedLabel: "UNLOCKED WITH PRO",
     lockedHook: "Behavio already knows what happens in week 8.",
-    freeDays: "7 days free",
+    freeDays: "3 days free",
   },
   paywall: {
     step1: {
@@ -183,6 +183,27 @@ export const BRAND = {
       headline: "Start free today",
       socialCount: "Join 43,219+ who found their path",
       trust: ["No charge today", "Cancel anytime", "Instant access"],
+      proofHeadline: "You do not need more motivation. You need a system that catches you.",
+      proofMetrics: [
+        { label: "Users who stay consistent by week 2", value: "68%", detail: "with daily coaching nudges" },
+      ],
+      proofQuotes: [
+        {
+          quote: "This is the first app that made me follow through when life got messy.",
+          author: "Nina K. · Founder",
+          avatarUrl: "https://i.pravatar.cc/120?img=47",
+        },
+        {
+          quote: "I stopped restarting every Monday. I just kept going.",
+          author: "Marcus T. · Student",
+          avatarUrl: "https://i.pravatar.cc/120?img=12",
+        },
+      ],
+      whyItWorks: [
+        "One next step each day",
+        "Auto-scheduled into your real calendar",
+        "Weekly course-correction before you drift",
+      ],
     },
   },
   dashboard: {

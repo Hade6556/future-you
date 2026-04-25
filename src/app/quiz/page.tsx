@@ -27,7 +27,6 @@ const ARCHETYPE_TO_ID: Record<string, ArchetypeId> = {
   "Explorer": "explorer",
 };
 
-import SplashScreen from "./screens/SplashScreen";
 import GoalAreaScreen from "./screens/GoalAreaScreen";
 import SpecificGoalsScreen from "./screens/SpecificGoalsScreen";
 import GenderScreen from "./screens/GenderScreen";
@@ -48,7 +47,6 @@ import ArchetypeRevealScreen from "./screens/ArchetypeRevealScreen";
 import WinCelebrationScreen from "./screens/WinCelebrationScreen";
 
 const SCREEN_NAMES = [
-  "splash",
   "goal_area",
   "specific_goals",
   "gender",
@@ -82,11 +80,11 @@ export default function QuizPage() {
   }, [step]);
 
   const next = useCallback(() => {
-    // After Problems (step 5): show Empathy only if burnout/stress selected
-    if (step === 5) {
+    // After Problems (step 4): show Empathy only if burnout/stress selected
+    if (step === 4) {
       const showEmpathy =
         problems.includes("Burnout") || problems.includes("Chronic stress");
-      setStep(showEmpathy ? 6 : 7);
+      setStep(showEmpathy ? 5 : 6);
       return;
     }
     setStep(step + 1);
@@ -94,10 +92,10 @@ export default function QuizPage() {
 
   const back = useCallback(() => {
     if (step === 0) return;
-    if (step === 7) {
+    if (step === 6) {
       const showEmpathy =
         problems.includes("Burnout") || problems.includes("Chronic stress");
-      setStep(showEmpathy ? 6 : 5);
+      setStep(showEmpathy ? 5 : 4);
       return;
     }
     setStep(step - 1);
@@ -132,23 +130,19 @@ export default function QuizPage() {
     router.push("/generating");
   }
 
-  // Browser back button handling + exit intent on splash
+  // Browser back button: on step 0 the user falls through to the landing page;
+  // on later steps we step back through the quiz instead of leaving the page.
   useEffect(() => {
     function onPopState() {
-      if (step === 0) {
-        if (!confirm("Are you sure? Your plan is almost ready.")) {
-          window.history.pushState(null, "", window.location.href);
-        }
-      } else {
-        back();
-      }
+      if (step === 0) return; // let the browser navigate back to /
+      back();
     }
     window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, [step, back]);
 
-  const showProgress = step > 0 && step < 18;
+  const showProgress = step >= 0 && step < 17;
 
   return (
     <div
@@ -231,25 +225,24 @@ export default function QuizPage() {
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <AnimatePresence mode="wait">
-            {step === 0 && <SplashScreen key="splash" onNext={next} />}
-            {step === 1 && <GoalAreaScreen key="goal" onNext={next} />}
-            {step === 2 && <SpecificGoalsScreen key="specific" onNext={next} />}
-            {step === 3 && <GenderScreen key="gender" onNext={next} />}
-            {step === 4 && <AgeScreen key="age" onNext={next} />}
-            {step === 5 && <ProblemsScreen key="problems" onNext={next} />}
-            {step === 6 && <EmpathyScreen key="empathy" onNext={next} />}
-            {step === 7 && <CurrentStateScreen key="state" onNext={next} />}
-            {step === 8 && <SocialProofScreen key="social" onNext={next} />}
-            {step === 9 && <InsightResearchScreen key="research" onNext={next} />}
-            {step === 10 && <BadHabitsScreen key="habits" onNext={next} />}
-            {step === 11 && <PastAttemptsScreen key="past" onNext={next} />}
-            {step === 12 && <InsightWhyFailedScreen key="whyfailed" onNext={next} />}
-            {step === 13 && <ProblemBreakdownScreen key="breakdown" onNext={next} />}
-            {step === 14 && <TimePerDayScreen key="time" onNext={next} />}
-            {step === 15 && <TimelineInsightScreen key="timeline" onNext={next} />}
-            {step === 16 && <EmailCaptureScreen key="email" onNext={next} />}
-            {step === 17 && <ArchetypeRevealScreen key="archetype" onNext={next} />}
-            {step === 18 && (
+            {step === 0 && <GoalAreaScreen key="goal" onNext={next} />}
+            {step === 1 && <SpecificGoalsScreen key="specific" onNext={next} />}
+            {step === 2 && <GenderScreen key="gender" onNext={next} />}
+            {step === 3 && <AgeScreen key="age" onNext={next} />}
+            {step === 4 && <ProblemsScreen key="problems" onNext={next} />}
+            {step === 5 && <EmpathyScreen key="empathy" onNext={next} />}
+            {step === 6 && <CurrentStateScreen key="state" onNext={next} />}
+            {step === 7 && <SocialProofScreen key="social" onNext={next} />}
+            {step === 8 && <InsightResearchScreen key="research" onNext={next} />}
+            {step === 9 && <BadHabitsScreen key="habits" onNext={next} />}
+            {step === 10 && <PastAttemptsScreen key="past" onNext={next} />}
+            {step === 11 && <InsightWhyFailedScreen key="whyfailed" onNext={next} />}
+            {step === 12 && <ProblemBreakdownScreen key="breakdown" onNext={next} />}
+            {step === 13 && <TimePerDayScreen key="time" onNext={next} />}
+            {step === 14 && <TimelineInsightScreen key="timeline" onNext={next} />}
+            {step === 15 && <EmailCaptureScreen key="email" onNext={next} />}
+            {step === 16 && <ArchetypeRevealScreen key="archetype" onNext={next} />}
+            {step === 17 && (
               <WinCelebrationScreen key="win" onFinish={handleFinish} />
             )}
           </AnimatePresence>

@@ -78,19 +78,13 @@ async function scoreEventsWithAI(
 Score each event's relevance to THIS SPECIFIC GOAL on 0-100.
 Return ONLY a JSON array of objects with "i" (index) and "s" (score 0-100).
 
-Scoring rules — be STRICT:
-- 80-100: Directly helps achieve the goal (e.g. business meetup for "make money", running race for "lose weight")
-- 50-79: Clearly related skill/topic (e.g. networking event for "make money", cooking class for "eat healthy")
-- 30-49: Tangentially related, user might benefit
-- 0-29: NOT relevant — different topic entirely
+Scoring guide:
+- 80-100: Directly helps achieve the goal
+- 50-79: Clearly related skill/topic or community
+- 30-49: Tangentially related — user might still benefit (networking, adjacent skills, motivation)
+- 0-29: Unrelated topic entirely
 
-IMPORTANT: Score 0-20 for events that are clearly unrelated to the goal, even if they sound professional or interesting. Examples of what should score LOW for "make money / business":
-- Food festivals, gastro summits, cooking events (unless the goal is cooking/food business)
-- Martial arts seminars, sports tournaments, fitness events (unless the goal is fitness)
-- Cultural festivals, art exhibitions, music concerts (unless the goal is creative arts)
-- Random conferences on unrelated topics (diversity, environment, etc. unless directly tied to the goal)
-
-Only score 50+ if the event DIRECTLY helps with "${goalRaw}".
+Lean toward inclusion for adjacent topics. A user pursuing "${goalRaw}" benefits from communities, networking, and adjacent skills, not only events whose title literally restates the goal.
 
 Events: ${JSON.stringify(eventSummaries)}`,
         },
@@ -101,13 +95,16 @@ Events: ${JSON.stringify(eventSummaries)}`,
     const match = text.match(/\[[\s\S]*?\]/);
     if (match) {
       const scores = JSON.parse(match[0]) as Array<{ i: number; s: number }>;
-      const relevant = scores
-        .filter((s) => s.i >= 0 && s.i < events.length && s.s >= 45)
-        .sort((a, b) => b.s - a.s);
+      const valid = scores.filter((s) => s.i >= 0 && s.i < events.length);
+      const sorted = valid.slice().sort((a, b) => b.s - a.s);
 
-      console.log(`[eventMatcher] Scores: ${JSON.stringify(scores.sort((a, b) => b.s - a.s).map(s => ({ i: s.i, s: s.s, t: events[s.i]?.title?.slice(0, 40) })))}`);
+      console.log(`[eventMatcher] Scores: ${JSON.stringify(sorted.map(s => ({ i: s.i, s: s.s, t: events[s.i]?.title?.slice(0, 40) })))}`);
 
-      return relevant.map((s) => ({ ...events[s.i], relevanceScore: s.s }));
+      const strict = sorted.filter((s) => s.s >= 30);
+      // If strict filter drops everything, surface the top candidates anyway —
+      // showing the model's best guesses is better than an empty list.
+      const chosen = strict.length > 0 ? strict : sorted.slice(0, 6);
+      return chosen.map((s) => ({ ...events[s.i], relevanceScore: s.s }));
     }
   } catch (err) {
     console.warn("[eventMatcher] AI scoring failed, returning all events:", err);
@@ -159,8 +156,29 @@ export async function findRelevantEvents(
     console.log(`[eventMatcher] Using AI-generated queries: ${JSON.stringify(queries)}`);
   }
 
-  const rawEvents = await fetchEventsFromApis(queries, location);
+  let rawEvents = await fetchEventsFromApis(queries, location);
   console.log(`[eventMatcher] Fetched ${rawEvents.length} raw events`);
+
+  // If curated queries returned nothing, retry with broader AI-generated queries
+  // before giving up. The keyword DB can be too niche for some cities.
+  let broadQueries: string[] | null = null;
+  if (rawEvents.length === 0 && ctx.searchQueries.length > 0) {
+    broadQueries = await generateSearchQueries(ctx.goalRaw, location);
+    console.log(`[eventMatcher] Retrying with broader queries: ${JSON.stringify(broadQueries)}`);
+    rawEvents = await fetchEventsFromApis(broadQueries, location);
+    console.log(`[eventMatcher] Broad-query retry fetched ${rawEvents.length} raw events`);
+  }
+
+  // Final fallback for low-coverage cities (e.g. Vilnius): drop the location and
+  // search globally for online/virtual events on the same topic. Force virtual:true
+  // so the UI shows them as online.
+  if (rawEvents.length === 0) {
+    const noLocQueries = broadQueries ?? (await generateSearchQueries(ctx.goalRaw, location));
+    console.log(`[eventMatcher] No-location retry: ${JSON.stringify(noLocQueries)}`);
+    const onlineEvents = await fetchEventsFromApis(noLocQueries, location, false);
+    console.log(`[eventMatcher] No-location retry fetched ${onlineEvents.length} raw events`);
+    rawEvents = onlineEvents.map((e) => ({ ...e, virtual: true }));
+  }
 
   if (rawEvents.length === 0) return [];
 

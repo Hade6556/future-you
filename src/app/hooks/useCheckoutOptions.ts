@@ -9,7 +9,7 @@ export type CheckoutOptions = {
 };
 
 const fallbackOnError: CheckoutOptions = {
-  trialDays: 7,
+  trialDays: 3,
   /** If the plans request fails (network, ad blockers), still show both rows; POST will validate. */
   monthlyAvailable: true,
   annualAvailable: true,

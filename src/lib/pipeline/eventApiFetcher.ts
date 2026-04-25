@@ -151,7 +151,8 @@ async function fetchSerpGoogleEventsOnce(
 
 async function fetchSerpApiEvents(
   queries: string[],
-  location: string
+  location: string,
+  appendLocation: boolean = true
 ): Promise<ApiEvent[]> {
   const apiKey = getSerpApiKey();
   if (!apiKey) {
@@ -188,8 +189,8 @@ async function fetchSerpApiEvents(
 
   for (const query of queries) {
     if (budget <= 0) break;
-    const fullQ = normLoc ? `${query} ${normLoc}` : query;
-    await runQuery(fullQ, "goal query");
+    const fullQ = appendLocation && normLoc ? `${query} ${normLoc}` : query;
+    await runQuery(fullQ, appendLocation ? "goal query" : "no-location");
   }
 
   // No generic fallback — showing random local events (concerts, festivals)
@@ -278,11 +279,12 @@ function extractSourceName(url: string): string {
 
 export async function fetchEventsFromApis(
   queries: string[],
-  location: string
+  location: string,
+  appendLocation: boolean = true
 ): Promise<ApiEvent[]> {
   const [serpResults, eventbriteResults] = await Promise.all([
-    fetchSerpApiEvents(queries, location),
-    fetchEventbriteEvents(queries, location),
+    fetchSerpApiEvents(queries, location, appendLocation),
+    appendLocation ? fetchEventbriteEvents(queries, location) : Promise.resolve([]),
   ]);
 
   const all = [...serpResults, ...eventbriteResults];

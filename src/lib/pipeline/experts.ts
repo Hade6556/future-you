@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
-import type { PipelineExpert } from "@/app/types/pipeline";
+import type { PipelineExpert, UserContext } from "@/app/types/pipeline";
+import type { GoalConfig } from "./goalParser";
 
 type ExpertRaw = Omit<PipelineExpert, "resource_id">;
 
@@ -583,10 +584,205 @@ function makeId(name: string, url: string): string {
     .slice(0, 16);
 }
 
+/**
+ * Direct mapping from every SpecificGoalsScreen option (case-insensitive
+ * substring match, emoji-tolerant) to the right CURATED mentor key.
+ *
+ * Source: src/app/quiz/screens/SpecificGoalsScreen.tsx GOAL_OPTIONS.
+ * Keep these in sync if you add new quiz options.
+ */
+const SPECIFIC_GOAL_TO_KEY: Array<[string, string]> = [
+  // Career & Purpose
+  ["get promoted", "career"],
+  ["start something of my own", "entrepreneurship"],
+  ["find meaningful work", "career"],
+  ["change industries", "career"],
+  ["recognised for my skills", "career"],
+  // Money & Financial Freedom — earning routes to entrepreneurship,
+  // saving/investing routes to finance.
+  ["build an emergency fund", "finance"],
+  ["pay off debt", "finance"],
+  ["start investing", "finance"],
+  ["increase my income", "entrepreneurship"],
+  ["financial independence", "entrepreneurship"],
+  // Health & Energy
+  ["lose weight", "fitness_weight_loss"],
+  ["build consistent exercise", "athletics"],
+  ["sleep better", "wellness"],
+  ["reduce stress", "wellness"],
+  ["improve nutrition", "fitness_weight_loss"],
+  // Mindset & Personal Growth
+  ["stop procrastinating", "productivity"],
+  ["build confidence", "confidence"],
+  ["manage anxiety", "wellness"],
+  ["break bad habits", "wellness"],
+  ["think more clearly", "mindfulness"],
+  // Relationships & Connection
+  ["improve my communication", "relationships"],
+  ["build deeper friendships", "relationships"],
+  ["find a partner", "relationships"],
+  ["fix a strained relationship", "relationships"],
+  ["set better boundaries", "relationships"],
+];
+
+/**
+ * Returns the curated mentor key implied by any text containing one of the
+ * 25 quiz specific-goal phrases. `goal_raw` from a generated plan looks like
+ * "My goal area is X. Specifically, I want to: 💡 Start something of my own."
+ * — substring matching handles the emoji prefix.
+ */
+export function goalKeyFromText(text: string | null | undefined): string | null {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  for (const [phrase, key] of SPECIFIC_GOAL_TO_KEY) {
+    if (lower.includes(phrase)) return key;
+  }
+  return null;
+}
+
+/** Quiz `ambitionType` slug → CURATED key. Keep in sync with AmbitionDomain. */
+const AMBITION_TO_GOAL_KEY: Record<string, string> = {
+  entrepreneur: "entrepreneurship",
+  athlete: "athletics",
+  weight_loss: "fitness_weight_loss",
+  creative: "creative",
+  student: "student",
+  wellness: "wellness",
+  career: "career",
+  finance: "finance",
+  language: "language",
+  travel: "travel",
+  relationships: "relationships",
+  productivity: "productivity",
+  mindfulness: "mindfulness",
+  confidence: "confidence",
+};
+
+export function ambitionToGoalKey(ambitionType: string | null | undefined): string | null {
+  if (!ambitionType) return null;
+  return AMBITION_TO_GOAL_KEY[ambitionType] ?? null;
+}
+
 export function getCuratedExperts(goalKey: string): PipelineExpert[] {
   const list = CURATED[goalKey] ?? [];
   return list.map((e) => ({
     ...e,
     resource_id: makeId(e.name, e.url),
   }));
+}
+
+const STRUCTURED_SIGNALS = ["coach", "certified", "program", "mentor", "structured", "course", "training", "school"];
+const CASUAL_SIGNALS = ["app", "free", "community", "podcast", "beginner", "guide", "newsletter", "blog"];
+const QUICK_SIGNALS = ["app", "tool", "quick", "beginner", "tracker"];
+const DEEP_SIGNALS = ["evidence-based", "mentor", "program", "certified", "phd", "research", "expert"];
+
+function tokenize(s: string): string[] {
+  return s.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length >= 3);
+}
+
+function expertText(e: PipelineExpert): string {
+  return `${e.role} ${e.specialty} ${e.bio_snippet} ${e.tags.join(" ")}`.toLowerCase();
+}
+
+function tagOverlap(expertTags: string[], targets: string[]): number {
+  const haystack = new Set(expertTags.map((t) => t.toLowerCase()));
+  let hits = 0;
+  for (const t of targets) {
+    const lower = t.toLowerCase();
+    if (haystack.has(lower)) {
+      hits++;
+      continue;
+    }
+    for (const h of haystack) {
+      if (h.includes(lower) || lower.includes(h)) {
+        hits++;
+        break;
+      }
+    }
+  }
+  return hits;
+}
+
+function userInterestTokens(ctx: UserContext): string[] {
+  const parts: string[] = [];
+  for (const g of ctx.specificGoals ?? []) parts.push(...tokenize(g));
+  for (const o of ctx.obstacles ?? []) parts.push(...tokenize(o));
+  for (const h of ctx.badHabits ?? []) parts.push(...tokenize(h));
+  for (const m of ctx.motivations ?? []) parts.push(...tokenize(m));
+  if (ctx.vision) parts.push(...tokenize(ctx.vision));
+  if (ctx.primaryGoal) parts.push(...tokenize(ctx.primaryGoal));
+  return Array.from(new Set(parts));
+}
+
+function commitmentLevel(ctx: UserContext): "high" | "low" | "neutral" {
+  const c = (ctx.commitment ?? "").toLowerCase();
+  if (c.includes("all in") || c.includes("serious")) return "high";
+  if (c.includes("curious") || c.includes("exploring")) return "low";
+  return "neutral";
+}
+
+function timelineUrgency(ctx: UserContext): "fast" | "slow" | "neutral" {
+  const t = (ctx.timeline ?? "").toLowerCase();
+  if (t.includes("week") || t.includes("now")) return "fast";
+  if (t.includes("month") || t.includes("no rush") || t.includes("3 month")) return "slow";
+  return "neutral";
+}
+
+function scoreExpert(
+  expert: PipelineExpert,
+  goalConfig: GoalConfig,
+  ctx: UserContext
+): number {
+  let score = 0;
+  const text = expertText(expert);
+
+  score += tagOverlap(expert.tags, goalConfig.expert_tags) * 3;
+  score += tagOverlap(expert.tags, goalConfig.keywords) * 1;
+
+  const interests = userInterestTokens(ctx);
+  if (interests.length > 0) score += tagOverlap(expert.tags, interests) * 2;
+
+  const commitment = commitmentLevel(ctx);
+  if (commitment === "high") {
+    for (const sig of STRUCTURED_SIGNALS) if (text.includes(sig)) score += 2;
+    for (const sig of CASUAL_SIGNALS) if (text.includes(sig)) score -= 1;
+  } else if (commitment === "low") {
+    for (const sig of CASUAL_SIGNALS) if (text.includes(sig)) score += 2;
+    for (const sig of STRUCTURED_SIGNALS) if (text.includes(sig)) score -= 1;
+  }
+
+  const urgency = timelineUrgency(ctx);
+  if (urgency === "fast") {
+    for (const sig of QUICK_SIGNALS) if (text.includes(sig)) score += 1;
+  } else if (urgency === "slow") {
+    for (const sig of DEEP_SIGNALS) if (text.includes(sig)) score += 1;
+  }
+
+  if (expert.verified) score += 1;
+
+  return score;
+}
+
+/**
+ * Rank curated experts for a goal using the user's quiz/intake context.
+ * Returns at most `limit` experts, ordered by relevance to this user.
+ * Falls back to the unranked curated order when no context is provided.
+ */
+export function getRankedExperts(
+  goalKey: string,
+  goalConfig: GoalConfig,
+  userContext?: UserContext,
+  limit = 4
+): PipelineExpert[] {
+  const all = getCuratedExperts(goalKey);
+  if (!userContext || all.length <= limit) return all.slice(0, limit);
+
+  const indexed = all.map((expert, idx) => ({
+    expert,
+    idx,
+    score: scoreExpert(expert, goalConfig, userContext),
+  }));
+
+  indexed.sort((a, b) => (b.score - a.score) || (a.idx - b.idx));
+  return indexed.slice(0, limit).map((x) => x.expert);
 }

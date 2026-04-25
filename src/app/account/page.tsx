@@ -90,20 +90,32 @@ export default function AccountPage() {
   const userName = usePlanStore((s) => s.userName);
   const email = usePlanStore((s) => s.email);
   const isPremium = usePlanStore((s) => s.isPremium);
+  const location = usePlanStore((s) => s.location);
   const setUserName = usePlanStore((s) => s.setUserName);
+  const setLocation = usePlanStore((s) => s.setLocation);
   const resetStore = usePlanStore((s) => s.resetForDemo);
 
   const [editName, setEditName] = useState(userName || "");
   const [nameSaved, setNameSaved] = useState(false);
+  const [editLocation, setEditLocation] = useState(location || "");
+  const [locationSaved, setLocationSaved] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const nameChanged = editName.trim().length > 0 && editName !== userName;
+  const locationChanged = editLocation.trim() !== (location || "").trim();
 
   function handleSaveName() {
     if (!nameChanged) return;
     setUserName(editName.trim());
     setNameSaved(true);
     setTimeout(() => setNameSaved(false), 2500);
+  }
+
+  function handleSaveLocation() {
+    if (!locationChanged) return;
+    setLocation(editLocation.trim());
+    setLocationSaved(true);
+    setTimeout(() => setLocationSaved(false), 2500);
   }
 
   function handleSignOut() {
@@ -270,6 +282,53 @@ export default function AccountPage() {
                 }}
               >
                 {nameSaved ? "Saved!" : "Save"}
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <label
+              htmlFor="location"
+              style={{ ...body, fontSize: 13, fontWeight: 600, color: TEXT_HI }}
+            >
+              Location
+            </label>
+            <p style={{ ...body, fontSize: 12, color: TEXT_LO, margin: 0 }}>
+              Used to find events near you. City, country.
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <input
+                id="location"
+                type="text"
+                value={editLocation}
+                onChange={(e) => setEditLocation(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSaveLocation()}
+                maxLength={80}
+                placeholder="e.g. Vilnius, Lithuania"
+                style={inputStyle}
+              />
+              <button
+                type="button"
+                onClick={handleSaveLocation}
+                disabled={!locationChanged}
+                style={{
+                  flexShrink: 0,
+                  background: locationChanged ? LIME : "rgba(255,255,255,0.06)",
+                  color: locationChanged ? NAVY : TEXT_LO,
+                  border: "none",
+                  borderRadius: 12,
+                  padding: "0 20px",
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 800,
+                  fontSize: 14,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                  cursor: locationChanged ? "pointer" : "default",
+                  opacity: locationChanged ? 1 : 0.4,
+                  transition: "all 0.15s",
+                }}
+              >
+                {locationSaved ? "Saved!" : "Save"}
               </button>
             </div>
           </div>

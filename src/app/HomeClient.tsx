@@ -8,8 +8,7 @@ import { computeDayInfo } from "./utils/dayEngine";
 import { DailyCoachingSection } from "./components/DailyCoachingSection";
 import { StreakMomentumCard } from "./components/home/StreakMomentumCard";
 import { GapChart } from "./components/home/GapChart";
-import type { PipelineEvent } from "./types/pipeline";
-import { ACCENT } from "@/app/theme";
+import { ACCENT, ACCENT_HOVER, ON_ACCENT, accentRgba } from "@/app/theme";
 
 function formatHeaderDate(): string {
   return new Date().toLocaleDateString("en-US", {
@@ -29,13 +28,11 @@ export default function HomeClient() {
   const planReady          = usePlanStore((s) => s.planReady);
   const todayStatus        = usePlanStore((s) => s.todayStatus);
   const hydrateFromServer  = usePlanStore((s) => s.hydrateFromServer);
-  const location           = usePlanStore((s) => s.location);
 
   const todayTasks         = usePlanStore((s) => s.todayTasks);
   const todayTasksDate     = usePlanStore((s) => s.todayTasksDate);
   const toggleDailyTask    = usePlanStore((s) => s.toggleDailyTask);
 
-  const cachedEvents = usePlanStore((s) => s.cachedEvents);
   const [mounted, setMounted] = useState(false);
 
   const dayInfo = useMemo(
@@ -59,8 +56,6 @@ export default function HomeClient() {
 
   const onboardingReady = quizComplete && onboardingComplete && pipelinePlan;
 
-  const events: PipelineEvent[] = cachedEvents;
-
   if (!mounted || !onboardingReady) {
     return null;
   }
@@ -70,6 +65,8 @@ export default function HomeClient() {
   const tasksReady = todayTasksDate === today && todayTasks.length > 0;
   const activeTasks = todayTasks.filter((t) => !t.deferred);
   const doneCount = activeTasks.filter((t) => t.completed).length;
+  const allDone = tasksReady && doneCount === activeTasks.length;
+  const goalText = pipelinePlan?.goal_raw?.trim() ?? "";
 
   const greetingText = (() => {
     if (todayStatus === "done") return `You closed the gap today, ${firstName || "you"}.`;
@@ -149,6 +146,25 @@ export default function HomeClient() {
                 {formatHeaderDate()}
                 {dayInfo && ` · Day ${dayInfo.currentDay} of ${dayInfo.totalDays}`}
               </p>
+              {goalText && (
+                <p
+                  style={{
+                    fontFamily: "var(--font-apercu), sans-serif",
+                    fontSize: 13,
+                    color: "rgba(200,220,245,0.80)",
+                    margin: "8px 0 0",
+                    lineHeight: 1.4,
+                    overflow: "hidden",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical" as const,
+                  }}
+                  title={goalText}
+                >
+                  <span aria-hidden style={{ color: ACCENT, marginRight: 6 }}>↳</span>
+                  {goalText}
+                </p>
+              )}
             </div>
             <Link
               href="/account"
@@ -175,13 +191,11 @@ export default function HomeClient() {
             </Link>
           </header>
 
-          {/* Daily Coaching — visible when pending */}
-          {todayStatus === "pending" && <DailyCoachingSection />}
-
-          {/* Streak + Momentum */}
-          <StreakMomentumCard />
-
-          {/* Today's Tasks */}
+          {/*
+           * Today — single primary card, always at the top of the home screen.
+           * Three internal states (start / in-progress / all-done) keep the focal
+           * point in the same place every day, so the layout doesn't shape-shift.
+           */}
           <section
             style={{
               position: "relative",
@@ -201,14 +215,140 @@ export default function HomeClient() {
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
                 color: "rgba(140,170,210,0.50)",
-                marginBottom: 8,
+                marginBottom: 10,
               }}
             >
-              Today&apos;s tasks
+              Today
             </p>
 
-            {tasksReady ? (
+            {!tasksReady ? (
+              // STATE A — no tasks yet today: big primary CTA → /tasks (morning check-in lives there)
+              <Link
+                href="/tasks"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  padding: "18px 20px",
+                  borderRadius: 14,
+                  background: `linear-gradient(145deg, ${ACCENT}, ${ACCENT_HOVER})`,
+                  color: ON_ACCENT,
+                  textDecoration: "none",
+                  boxShadow: `0 0 24px ${accentRgba(0.28)}, 0 2px 8px rgba(0,0,0,0.32)`,
+                }}
+              >
+                <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontWeight: 800,
+                      fontSize: 17,
+                      letterSpacing: "0.02em",
+                      textTransform: "uppercase",
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    Start today&apos;s plan
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-apercu), sans-serif",
+                      fontWeight: 500,
+                      fontSize: 12.5,
+                      lineHeight: 1.3,
+                      opacity: 0.78,
+                    }}
+                  >
+                    3-min check-in &rarr; today&apos;s mission
+                  </span>
+                </div>
+                <span aria-hidden style={{ fontSize: 22, lineHeight: 1, fontWeight: 700, flexShrink: 0 }}>→</span>
+              </Link>
+            ) : allDone ? (
+              // STATE C — all tasks done: celebration + nudge to come back tomorrow
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "14px 16px",
+                  borderRadius: 14,
+                  background: accentRgba(0.10),
+                  border: `1px solid ${accentRgba(0.30)}`,
+                }}
+              >
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                    background: ACCENT,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12.5L10 17.5L19.5 7" stroke={ON_ACCENT} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontWeight: 800,
+                      fontSize: 16,
+                      letterSpacing: "0.02em",
+                      textTransform: "uppercase",
+                      color: ACCENT,
+                      margin: 0,
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    Today closed.
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-apercu), sans-serif",
+                      fontSize: 12.5,
+                      color: "rgba(200,220,245,0.70)",
+                      margin: "4px 0 0",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    Plan adjusts overnight. Come back tomorrow.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              // STATE B — tasks ready, in progress: top 3 tasks + progress + see-all
               <>
+                {/* Progress bar */}
+                <div
+                  aria-hidden
+                  style={{
+                    width: "100%",
+                    height: 4,
+                    borderRadius: 2,
+                    background: "rgba(255,255,255,0.06)",
+                    overflow: "hidden",
+                    marginBottom: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${activeTasks.length > 0 ? (doneCount / activeTasks.length) * 100 : 0}%`,
+                      height: "100%",
+                      background: ACCENT,
+                      borderRadius: 2,
+                      transition: "width 0.4s ease",
+                      boxShadow: `0 0 8px ${accentRgba(0.4)}`,
+                    }}
+                  />
+                </div>
+
                 <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   {activeTasks.slice(0, 3).map((task) => (
                     <button
@@ -297,131 +437,22 @@ export default function HomeClient() {
                       fontSize: 13,
                       letterSpacing: "0.10em",
                       textTransform: "uppercase",
-                      color: doneCount === activeTasks.length && activeTasks.length > 0 ? "#4CAF7D" : ACCENT,
+                      color: ACCENT,
                       textDecoration: "none",
                     }}
                   >
-                    {doneCount === activeTasks.length && activeTasks.length > 0 ? "All done" : "See all"}
+                    See all
                   </Link>
                 </div>
               </>
-            ) : (
-              <Link
-                href="/tasks"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "14px 16px",
-                  background: "rgba(94,205,161,0.06)",
-                  border: "1px solid rgba(94,205,161,0.18)",
-                  borderRadius: 14,
-                  textDecoration: "none",
-                }}
-              >
-                <span style={{ fontFamily: "var(--font-apercu), sans-serif", fontSize: 14, color: "rgba(235,242,255,0.80)" }}>
-                  Check in to generate today&apos;s tasks
-                </span>
-                <span style={{ fontFamily: "var(--font-barlow-condensed), sans-serif", fontWeight: 700, fontSize: 12, color: ACCENT }}>
-                  Go
-                </span>
-              </Link>
             )}
           </section>
 
-          {/* Events for You — async loaded */}
-          <section
-            style={{
-              position: "relative",
-              background: "rgba(255,255,255,0.07)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              borderRadius: 16,
-              padding: "14px 16px",
-              overflow: "hidden",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 700,
-                fontSize: 12,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "rgba(140,170,210,0.50)",
-                marginBottom: 8,
-              }}
-            >
-              Events for you
-            </p>
+          {/* Daily mentor message — secondary, kept below the always-stable Today card */}
+          {todayStatus === "pending" && <DailyCoachingSection />}
 
-            {events.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {events.slice(0, 3).map((evt) => (
-                  <a
-                    key={evt.event_id}
-                    href={evt.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "flex",
-                      gap: 12,
-                      padding: "10px 12px",
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: 12,
-                      textDecoration: "none",
-                      transition: "background 0.15s",
-                    }}
-                  >
-                    {evt.image_url && (
-                      <img
-                        src={evt.image_url}
-                        alt=""
-                        style={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 8,
-                          objectFit: "cover",
-                          flexShrink: 0,
-                        }}
-                      />
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p
-                        style={{
-                          fontFamily: "var(--font-apercu), sans-serif",
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: "rgba(240,245,255,0.90)",
-                          margin: 0,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {evt.title}
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "var(--font-jetbrains-mono), monospace",
-                          fontSize: 11,
-                          color: "rgba(160,180,210,0.55)",
-                          margin: "2px 0 0",
-                        }}
-                      >
-                        {[evt.start_date, evt.location, evt.price_label].filter(Boolean).join(" · ")}
-                      </p>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p style={{ fontFamily: "var(--font-apercu), sans-serif", fontSize: 13, color: "rgba(140,170,210,0.45)", padding: "8px 0" }}>
-                {location ? "No events found yet. Check back soon." : "Add your location in settings to see events."}
-              </p>
-            )}
-          </section>
+          {/* Streak + Momentum */}
+          <StreakMomentumCard />
 
           {/* Gap chart */}
           <GapChart

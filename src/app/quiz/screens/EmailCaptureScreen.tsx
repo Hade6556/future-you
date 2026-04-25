@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import CTAButton from "../components/CTAButton";
 import { useQuizStore } from "../store/quizStore";
-import { trackAnswerSelected } from "../utils/analytics";
+import { trackAnswerSelected, trackLead } from "../utils/analytics";
 import { TEXT_HI, TEXT_MID, TEXT_LO, GLASS, GLASS_BORDER } from "@/app/theme";
 
 export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
@@ -15,6 +15,7 @@ export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
   function handleSubmit() {
     setEmail(input);
     trackAnswerSelected("email", input);
+    trackLead(input);
     onNext();
   }
 

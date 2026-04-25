@@ -7,7 +7,7 @@ import { NavBar } from "./NavBar";
 import { EnsureAnonymousSession } from "./EnsureAnonymousSession";
 import { usePlanStore } from "../state/planStore";
 
-const hideNav = ["/signup", "/onboarding", "/generating", "/journal/new", "/quiz"];
+const hideNav = ["/signup", "/onboarding", "/generating", "/journal/new", "/quiz", "/paywall"];
 
 export default function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();

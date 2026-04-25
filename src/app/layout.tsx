@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { JetBrains_Mono, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import Shell from "./components/Shell";
+import Pixels from "./components/Pixels";
 
 const apercu = localFont({
   variable: "--font-apercu",
@@ -73,6 +74,7 @@ export const metadata: Metadata = {
     title: siteTitle,
     description: siteDescription,
     type: "website",
+    siteName: "Behavio",
   },
   twitter: {
     card: "summary_large_image",
@@ -105,6 +107,7 @@ export default function RootLayout({
         className={`${apercu.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable} antialiased`}
         style={{ fontFamily: "var(--font-apercu), -apple-system, BlinkMacSystemFont, sans-serif" }}
       >
+        <Pixels />
         <Shell>{children}</Shell>
       </body>
     </html>

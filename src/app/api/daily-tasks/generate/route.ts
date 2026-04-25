@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimitResponse } from "@/lib/rateLimit";
-import { requireAuth } from "@/lib/auth";
 import {
   AMBITION_GOAL_MAP,
   type DailyTasksRequest,
@@ -252,11 +251,9 @@ const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = anthropicApiKey ? new Anthropic({ apiKey: anthropicApiKey }) : null;
 
 export async function POST(request: Request) {
-  const auth = await requireAuth();
-  if (auth.error) {
-    console.warn("/api/daily-tasks/generate: auth failed, continuing without auth");
-  }
-
+  // Anonymous users in the funnel hit this before they have a Supabase row;
+  // we don't gate on auth here — the response is purely advisory task data
+  // and the client persists state locally. Rate limiting still applies.
   const limited = rateLimitResponse(request);
   if (limited) return limited;
 

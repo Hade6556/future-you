@@ -5,7 +5,7 @@ import Stripe from "stripe";
 /**
  * Cron route: runs daily to notify users whose paid trial ends tomorrow.
  *
- * Window uses STRIPE_TRIAL_DAYS (default 7): we select users whose trial_started_at
+ * Window uses STRIPE_TRIAL_DAYS (default 3): we select users whose trial_started_at
  * falls on the calendar day (trialDays - 1) days ago so the Stripe trial typically
  * ends the next day.
  *
@@ -31,8 +31,8 @@ export async function POST(request: Request) {
   const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
   const supabase = createAdminClient();
 
-  const trialRaw = parseInt(process.env.STRIPE_TRIAL_DAYS ?? "7", 10);
-  const trialDays = Number.isFinite(trialRaw) ? Math.min(365, Math.max(0, trialRaw)) : 7;
+  const trialRaw = parseInt(process.env.STRIPE_TRIAL_DAYS ?? "3", 10);
+  const trialDays = Number.isFinite(trialRaw) ? Math.min(365, Math.max(0, trialRaw)) : 3;
   const reminderOffsetDays = trialDays > 0 ? Math.max(1, trialDays - 1) : 0;
 
   if (reminderOffsetDays === 0) {

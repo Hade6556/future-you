@@ -16,9 +16,7 @@ export function stripePriceIds() {
 }
 
 export function parseStripeTrialDays(): number {
-  const raw = parseInt(process.env.STRIPE_TRIAL_DAYS ?? "7", 10);
-  if (!Number.isFinite(raw)) return 7;
-  return Math.min(365, Math.max(0, raw));
+  return 3;
 }
 
 /** GET — plan flags + trial length for paywall UI. */
@@ -49,9 +47,16 @@ export async function billingSessionPost(request: Request) {
   }
 
   let plan: "pro_annual" | "pro_monthly" = "pro_annual";
+  let attribution: Record<string, string> = {};
   try {
-    const body = (await request.json()) as { plan?: string };
+    const body = (await request.json()) as { plan?: string; attribution?: Record<string, string> };
     if (body?.plan === "pro_monthly") plan = "pro_monthly";
+    if (body?.attribution && typeof body.attribution === "object") {
+      // Stripe metadata cap is 50 keys / 500 chars per value — trim defensively
+      for (const [k, v] of Object.entries(body.attribution).slice(0, 20)) {
+        if (typeof v === "string") attribution[k] = String(v).slice(0, 500);
+      }
+    }
   } catch {
     /* default annual */
   }
@@ -67,18 +72,21 @@ export async function billingSessionPost(request: Request) {
     return NextResponse.json({ error: "Price not configured" }, { status: 503 });
   }
 
-  const origin = request.headers.get("origin") ?? "http://localhost:3000";
+  const origin =
+    request.headers.get("origin") ??
+    process.env.NEXT_PUBLIC_URL ??
+    "http://localhost:3000";
   const trialDays = parseStripeTrialDays();
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${origin}/?checkout=success`,
-    cancel_url: `${origin}/?checkout=cancelled`,
-    metadata: { userId: auth.user.id, plan },
+    success_url: `${origin}/?checkout=success&plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/paywall?checkout=cancelled`,
+    metadata: { userId: auth.user.id, plan, ...attribution },
     subscription_data: {
       ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
-      metadata: { userId: auth.user.id, plan },
+      metadata: { userId: auth.user.id, plan, ...attribution },
     },
   });
 

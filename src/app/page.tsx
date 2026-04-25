@@ -2,9 +2,12 @@
 
 import dynamic from "next/dynamic";
 
-// Disable SSR — driven by localStorage / Zustand; avoids hydration mismatch.
-const RootGate = dynamic(() => import("./RootGate"), { ssr: false });
+// Disable SSR — the landing reads localStorage (via planStore) to decide
+// whether to render the marketing page or the home dashboard.
+const LandingPage = dynamic(() => import("./components/landing/LandingPage"), {
+  ssr: false,
+});
 
 export default function Page() {
-  return <RootGate />;
+  return <LandingPage />;
 }

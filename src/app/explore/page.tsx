@@ -7,6 +7,7 @@ import { usePremiumGuard } from "../hooks/usePremiumGuard";
 import { StreakCard } from "../components/home/StreakCard";
 import type { PipelineEvent, PipelineExpert } from "../types/pipeline";
 import { resolveEventSearchContext } from "@/lib/events/resolveEventGoal";
+import { ambitionToGoalKey, getCuratedExperts, goalKeyFromText } from "@/lib/pipeline/experts";
 import { ACCENT as LIME, TEXT_HI, TEXT_MID, TEXT_LO, GLASS, GLASS_BORDER } from "@/app/theme";
 
 const sub = () => () => {};
@@ -43,19 +44,32 @@ export default function ExplorePage() {
   const cachedEvents = usePlanStore((s) => s.cachedEvents);
   const eventsFetchedAt = usePlanStore((s) => s.eventsFetchedAt);
   const setCachedEvents = usePlanStore((s) => s.setCachedEvents);
+  const setLocation = usePlanStore((s) => s.setLocation);
 
   const location = hydrated ? storeLocation : null;
+  const [locationDraft, setLocationDraft] = useState("");
 
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventsError, setEventsError] = useState<string | null>(null);
   const [eventsMeta, setEventsMeta] = useState<{ serpConfigured?: boolean } | null>(null);
 
-  const experts: PipelineExpert[] = (hydrated ? pipelinePlan?.recommended_experts : null) ?? [];
+  // Mentors: derive freshly from the goal text every render so updates to the
+  // mapping take effect even for users with stale cached plans. Direct quiz-goal
+  // mapping wins over stale `pipelinePlan.recommended_experts`.
+  const experts: PipelineExpert[] = (() => {
+    if (!hydrated) return [];
+    const directKey = goalKeyFromText(pipelinePlan?.goal_raw ?? "");
+    if (directKey) return getCuratedExperts(directKey).slice(0, 4);
+    const fromPlan = pipelinePlan?.recommended_experts;
+    if (fromPlan && fromPlan.length > 0) return fromPlan;
+    const goalKey = ambitionToGoalKey(ambitionType);
+    return goalKey ? getCuratedExperts(goalKey).slice(0, 4) : [];
+  })();
 
   const fetchEvents = useCallback(() => {
-    const loc = location?.trim();
+    const loc = location?.trim() ?? "";
     const ctx = resolveEventSearchContext(ambitionType, pipelinePlan);
-    if (!ctx || !loc) return;
+    if (!ctx) return;
     setEventsLoading(true);
     setEventsError(null);
     setEventsMeta(null);
@@ -88,11 +102,14 @@ export default function ExplorePage() {
       .finally(() => setEventsLoading(false));
   }, [ambitionType, location, pipelinePlan, setCachedEvents]);
 
-  // Auto-fetch only once per session (when no cached results exist yet)
+  // Auto-fetch only once a location is set. The Set button below also fetches
+  // explicitly, so this just covers users returning with a location already saved.
   useEffect(() => {
-    if (!hydrated || eventsFetchedAt) return;
+    if (!hydrated) return;
+    if (!location?.trim()) return;
+    if (eventsFetchedAt && cachedEvents.length > 0) return;
     fetchEvents();
-  }, [hydrated, eventsFetchedAt, fetchEvents]);
+  }, [hydrated, eventsFetchedAt, cachedEvents.length, location, fetchEvents]);
 
   if (guardRedirecting) return null;
 
@@ -125,6 +142,67 @@ export default function ExplorePage() {
       <div style={{ marginBottom: 28 }}>
         <h2 style={sectionTitle}>Events for you</h2>
 
+        {hydrated && (
+          <div
+            style={{
+              ...glassCard,
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              marginBottom: 10,
+              padding: 10,
+            }}
+          >
+            <input
+              type="text"
+              value={locationDraft}
+              onChange={(e) => setLocationDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && locationDraft.trim()) {
+                  setLocation(locationDraft.trim());
+                  fetchEvents();
+                }
+              }}
+              placeholder="Your city (e.g. Vilnius)"
+              style={{
+                flex: 1,
+                background: "rgba(255,255,255,0.04)",
+                border: `1px solid ${GLASS_BORDER}`,
+                borderRadius: 10,
+                padding: "10px 12px",
+                color: TEXT_HI,
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontSize: 14,
+                outline: "none",
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (!locationDraft.trim()) return;
+                setLocation(locationDraft.trim());
+                fetchEvents();
+              }}
+              disabled={!locationDraft.trim()}
+              style={{
+                background: locationDraft.trim() ? LIME : "rgba(255,255,255,0.06)",
+                color: locationDraft.trim() ? "#060912" : TEXT_LO,
+                border: "none",
+                borderRadius: 10,
+                padding: "10px 14px",
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 800,
+                fontSize: 13,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                cursor: locationDraft.trim() ? "pointer" : "default",
+              }}
+            >
+              Set
+            </button>
+          </div>
+        )}
+
         {eventsLoading && (
           <div style={{ ...glassCard, display: "flex", alignItems: "center", gap: 10 }}>
             <motion.div
@@ -144,23 +222,82 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {!eventsLoading && cachedEvents.length === 0 && (
-          <div style={{ ...glassCard }}>
-            <p style={{ fontFamily: "var(--font-apercu), sans-serif", fontSize: 14, color: eventsError ? "#f87171" : TEXT_LO, margin: 0 }}>
-              {eventsError
-                ? eventsError
-                : eventsMeta?.serpConfigured === false
-                  ? "Live event search isn't configured on the server (add SERPAPI_KEY in .env.local and restart npm run dev)."
-                  : location?.trim()
-                    ? "No relevant events found near you right now — we only show events that match your goals."
-                    : "Add your location in account settings to discover events."}
-            </p>
-          </div>
-        )}
+        {!eventsLoading && cachedEvents.length === 0 && (() => {
+          const ctx = resolveEventSearchContext(ambitionType, pipelinePlan);
+          const fallbackQuery = ctx?.searchQueries[0] ?? ctx?.goalRaw ?? "goal setting workshop";
+          const loc = location?.trim() ?? "";
+          const eventbriteUrl = `https://www.eventbrite.com/d/${loc ? encodeURIComponent(loc) : "online"}/${encodeURIComponent(fallbackQuery)}/`;
+          const meetupUrl = `https://www.meetup.com/find/?keywords=${encodeURIComponent(fallbackQuery)}${loc ? `&location=${encodeURIComponent(loc)}` : ""}`;
+          const lumaUrl = `https://lu.ma/discover?q=${encodeURIComponent(fallbackQuery)}`;
+
+          const message = eventsError
+            ? eventsError
+            : !loc
+              ? "Add your location in account settings to discover local events. In the meantime, try these communities:"
+              : "Nothing matched your goal locally — try these online communities and search hubs:";
+
+          const fallbackLinks = [
+            { label: "Eventbrite", host: "eventbrite.com", url: eventbriteUrl },
+            { label: "Meetup", host: "meetup.com", url: meetupUrl },
+            { label: "Luma", host: "lu.ma", url: lumaUrl },
+          ];
+
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ ...glassCard }}>
+                <p style={{ fontFamily: "var(--font-apercu), sans-serif", fontSize: 14, color: eventsError ? "#f87171" : TEXT_LO, margin: 0 }}>
+                  {message}
+                </p>
+              </div>
+              {fallbackLinks.map((link) => (
+                <a
+                  key={link.host}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none" }}
+                >
+                  <div style={{ ...glassCard, display: "flex", gap: 12, alignItems: "center" }}>
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 12,
+                        background: "rgba(94,205,161,0.08)",
+                        border: "1px solid rgba(94,205,161,0.15)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        fontFamily: "var(--font-barlow-condensed), sans-serif",
+                        fontWeight: 800,
+                        fontSize: 18,
+                        color: LIME,
+                      }}
+                    >
+                      {link.label.charAt(0)}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontFamily: "var(--font-apercu), sans-serif", fontWeight: 600, fontSize: 15, color: TEXT_HI, margin: "0 0 2px" }}>
+                        Search {link.label}
+                      </p>
+                      <p style={{ fontFamily: "var(--font-apercu), sans-serif", fontSize: 13, color: TEXT_MID, margin: 0 }}>
+                        “{fallbackQuery}”{loc ? ` · ${loc}` : " · online"}
+                      </p>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                      <path d="M6 4l4 4-4 4" stroke={TEXT_LO} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                </a>
+              ))}
+            </div>
+          );
+        })()}
 
         {!eventsLoading && cachedEvents.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {cachedEvents.map((evt) => (
+            {cachedEvents.slice(0, 3).map((evt) => (
               <a
                 key={evt.event_id}
                 href={evt.source_url}

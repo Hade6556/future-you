@@ -1,9 +1,12 @@
 import type { GoalPlan, PipelineEvent, UserContext } from "@/app/types/pipeline";
 import type { EventSearchContext } from "@/lib/events/resolveEventGoal";
-import { parseGoal } from "./goalParser";
+import goalsData from "@/data/goals.json";
+import { parseGoal, type GoalConfig } from "./goalParser";
 import { buildPersonalizedPlan } from "./planBuilder";
-import { getCuratedExperts } from "./experts";
+import { getRankedExperts, goalKeyFromText } from "./experts";
 import { findRelevantEvents } from "./eventMatcher";
+
+const allGoals = (goalsData as { goals: Record<string, GoalConfig> }).goals;
 
 /**
  * Plan-only pipeline — no event fetching.
@@ -14,8 +17,18 @@ export async function runPipeline(
   location: string | null,
   userContext?: UserContext
 ): Promise<GoalPlan> {
-  const { goalKey, goalConfig } = parseGoal(goal);
-  const experts = getCuratedExperts(goalKey);
+  let { goalKey, goalConfig } = parseGoal(goal);
+
+  // Direct mapping: if the user's narrative or specificGoals contains one of
+  // the 25 quiz phrases, that always wins over parseGoal's fuzzy match.
+  const combinedText = [goal, ...(userContext?.specificGoals ?? [])].join(" ");
+  const directKey = goalKeyFromText(combinedText);
+  if (directKey && allGoals[directKey]) {
+    goalKey = directKey;
+    goalConfig = allGoals[directKey];
+  }
+
+  const experts = getRankedExperts(goalKey, goalConfig, userContext);
   return buildPersonalizedPlan(goal, goalKey, goalConfig, [], experts, userContext);
 }
 
