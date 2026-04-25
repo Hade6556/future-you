@@ -7,17 +7,7 @@ import { usePlanStore } from "@/app/state/planStore";
 import { parseMarketingIntentParam } from "@/app/types/marketingIntent";
 import { trackEvent, trackStartTrial } from "@/app/quiz/utils/analytics";
 
-import LandingNav from "./LandingNav";
-import ResumeBanner from "./ResumeBanner";
-import Hero from "./Hero";
-import ArchetypePreview from "./ArchetypePreview";
-import HowItWorks from "./HowItWorks";
-import ProofStack from "./ProofStack";
-import TrustStrip from "./TrustStrip";
-import MiniFAQ from "./MiniFAQ";
-import FinalCTA from "./FinalCTA";
-import LandingFooter from "./LandingFooter";
-import StickyCTABar from "./StickyCTABar";
+import MarketingLanding from "./MarketingLanding";
 
 const HomeClient = dynamic(() => import("@/app/HomeClient"), { ssr: false });
 
@@ -117,21 +107,5 @@ export default function LandingPage() {
     return <HomeClient />;
   }
 
-  return (
-    <div className="landing-root">
-      <LandingNav />
-      <ResumeBanner status={status} resumeHref={resumeHref} />
-      <main>
-        <Hero />
-        <ArchetypePreview />
-        <HowItWorks />
-        <ProofStack />
-        <TrustStrip />
-        <MiniFAQ />
-        <FinalCTA />
-      </main>
-      <LandingFooter />
-      <StickyCTABar />
-    </div>
-  );
+  return <MarketingLanding status={status} resumeHref={resumeHref} />;
 }

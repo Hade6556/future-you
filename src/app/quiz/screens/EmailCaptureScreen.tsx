@@ -5,7 +5,13 @@ import { motion } from "framer-motion";
 import CTAButton from "../components/CTAButton";
 import { useQuizStore } from "../store/quizStore";
 import { trackAnswerSelected, trackLead } from "../utils/analytics";
-import { TEXT_HI, TEXT_MID, TEXT_LO, GLASS, GLASS_BORDER } from "@/app/theme";
+import { ACCENT, TEXT_HI, TEXT_MID, TEXT_LO, accentRgba } from "@/app/theme";
+
+const REMINDERS = [
+  { when: "Tomorrow", what: "Day 1's anchor action" },
+  { when: "Sunday",   what: "Your first weekly review" },
+  { when: "Day 30",   what: "What changed in your week" },
+];
 
 export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
   const email = useQuizStore((s) => s.answers.email);
@@ -34,30 +40,102 @@ export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
         justifyContent: "center",
       }}
     >
-      <h2
+      <p
         style={{
-          fontFamily: "var(--font-apercu), sans-serif",
-          fontWeight: 600,
-          fontSize: 24,
-          color: TEXT_HI,
-          margin: "0 0 8px",
-          letterSpacing: "-0.01em",
+          fontFamily: "var(--font-jetbrains-mono), monospace",
+          fontSize: 11,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: ACCENT,
+          margin: "0 0 14px",
         }}
       >
-        Optional — reminders only
+        ↳ Save your plan
+      </p>
+
+      <h2
+        style={{
+          fontFamily: "var(--font-barlow-condensed), sans-serif",
+          fontWeight: 900,
+          fontSize: "clamp(30px, 7vw, 40px)",
+          lineHeight: 0.98,
+          color: TEXT_HI,
+          margin: "0 0 16px",
+          letterSpacing: "-0.025em",
+        }}
+      >
+        Want your plan in your{" "}
+        <span style={{ fontStyle: "italic", color: ACCENT }}>inbox tomorrow morning?</span>
       </h2>
+
       <p
         style={{
           fontFamily: "var(--font-apercu), sans-serif",
-          fontSize: 14,
+          fontSize: 14.5,
           color: TEXT_MID,
-          margin: "0 0 28px",
-          lineHeight: 1.5,
+          margin: "0 0 22px",
+          lineHeight: 1.55,
         }}
       >
-        Add an email if you want plan reminders. This is not sign-up — you can skip
-        and continue. Payment (if you subscribe) happens on Stripe next.
+        Without it, your plan lives only in this browser. Drop your email and
+        we&apos;ll send three notes — three real touches, nothing else:
       </p>
+
+      {/* Reminder schedule */}
+      <ul
+        style={{
+          listStyle: "none",
+          padding: 0,
+          margin: "0 0 28px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
+        {REMINDERS.map((r, i) => (
+          <motion.li
+            key={r.when}
+            initial={{ opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.08 + i * 0.06, duration: 0.3 }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "auto 1fr",
+              gap: 14,
+              alignItems: "baseline",
+              padding: "10px 14px",
+              borderRadius: 12,
+              background: "linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.005))",
+              border: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 10,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: ACCENT,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+              }}
+            >
+              → {r.when}
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontSize: 13.5,
+                color: TEXT_HI,
+                letterSpacing: "-0.005em",
+                lineHeight: 1.4,
+              }}
+            >
+              {r.what}
+            </span>
+          </motion.li>
+        ))}
+      </ul>
 
       <input
         type="email"
@@ -68,49 +146,53 @@ export default function EmailCaptureScreen({ onNext }: { onNext: () => void }) {
         autoFocus
         style={{
           width: "100%",
-          padding: "16px 18px",
+          padding: "14px 16px",
           borderRadius: 14,
-          border: `1px solid ${GLASS_BORDER}`,
-          background: GLASS,
-          backdropFilter: "blur(12px)",
+          border: `1px solid ${valid ? accentRgba(0.45) : "rgba(255,255,255,0.10)"}`,
+          background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))",
           color: TEXT_HI,
           fontFamily: "var(--font-apercu), sans-serif",
-          fontSize: 16,
+          fontSize: 15.5,
           outline: "none",
-          marginBottom: 16,
+          marginBottom: 14,
+          letterSpacing: "-0.005em",
+          transition: "border-color 160ms",
         }}
       />
 
-      <CTAButton label="Continue with this email →" onClick={handleSubmit} disabled={!valid} />
+      <CTAButton label="Send me the plan →" onClick={handleSubmit} disabled={!valid} />
 
       <button
         type="button"
         onClick={onNext}
         style={{
-          marginTop: 12,
+          marginTop: 14,
           background: "none",
           border: "none",
           color: TEXT_LO,
-          fontFamily: "var(--font-apercu), sans-serif",
-          fontSize: 13,
+          fontFamily: "var(--font-jetbrains-mono), monospace",
+          fontSize: 11,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
           cursor: "pointer",
-          textDecoration: "underline",
-          textUnderlineOffset: 3,
+          alignSelf: "center",
         }}
       >
-        Skip for now
+        Skip · keep plan in browser only
       </button>
 
       <p
         style={{
           fontFamily: "var(--font-jetbrains-mono), monospace",
-          fontSize: 11,
+          fontSize: 10,
           color: TEXT_LO,
-          marginTop: 16,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          marginTop: 18,
           textAlign: "center",
         }}
       >
-        No spam. Just your plan.
+        No spam · 3 emails per phase · Unsubscribe in one click
       </p>
     </motion.div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { ACCENT, ACCENT_HOVER, ON_ACCENT, accentRgba } from "@/app/theme";
+import { ACCENT, ACCENT_HOVER, ON_ACCENT, TEXT_LO, accentRgba } from "@/app/theme";
 
 interface CTAButtonProps {
   label: string;
@@ -25,27 +25,26 @@ export default function CTAButton({
       style={{
         width: "100%",
         padding: "16px 24px",
-        borderRadius: 14,
+        borderRadius: 12,
         border: isPrimary ? "none" : "1px solid rgba(255,255,255,0.12)",
         background: isPrimary
           ? disabled
-            ? "rgba(255,255,255,0.08)"
-            : `linear-gradient(145deg, ${ACCENT}, ${ACCENT_HOVER})`
-          : "rgba(255,255,255,0.04)",
-        backdropFilter: isPrimary ? undefined : "blur(8px)",
+            ? "rgba(255,255,255,0.05)"
+            : `linear-gradient(180deg, ${ACCENT} 0%, ${ACCENT_HOVER} 100%)`
+          : "transparent",
         color: isPrimary
           ? disabled
-            ? "rgba(160,180,210,0.55)"
+            ? TEXT_LO
             : ON_ACCENT
-          : "rgba(160,180,210,0.85)",
-        fontFamily: "var(--font-barlow-condensed), sans-serif",
+          : "rgba(255,255,255,0.95)",
+        fontFamily: "var(--font-apercu), sans-serif",
         fontWeight: 700,
-        fontSize: 16,
-        letterSpacing: "0.04em",
+        fontSize: 15,
+        letterSpacing: "-0.005em",
         cursor: disabled ? "default" : "pointer",
-        transition: "all 0.15s",
+        transition: "background 160ms, box-shadow 160ms, color 160ms",
         boxShadow: isPrimary && !disabled
-          ? `0 0 20px ${accentRgba(0.25)}, 0 2px 8px rgba(0,0,0,0.3)`
+          ? `0 1px 0 rgba(255,255,255,0.20) inset, 0 12px 24px -10px ${accentRgba(0.55)}`
           : "none",
       }}
     >

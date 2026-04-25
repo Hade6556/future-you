@@ -1,207 +1,300 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import Reveal from "./Reveal";
 import { ACCENT, TEXT_HI, TEXT_MID, TEXT_LO, accentRgba } from "@/app/theme";
 
-type Testimonial = {
-  name: string;
+type HeroQuote = {
   photo: string;
-  daysActive: number;
-  quote: string;
-  goal: string;
+  pull: string;
+  body: string;
+  name: string;
+  city: string;
+  archetype: string;
+  outcome: string;
+  day: number;
 };
 
-const TESTIMONIALS: Testimonial[] = [
+const HERO_QUOTES: HeroQuote[] = [
   {
-    name: "Maya R.",
     photo: "/mock/people/maya-r.png",
-    daysActive: 84,
-    quote:
-      "Down 9kg in 11 weeks. First time it stuck — the plan adjusted itself the days I couldn't show up.",
-    goal: "Health · Strategist",
+    pull: "Down 9kg in 11 weeks.",
+    body: "First time it stuck. The plan adjusted itself the days I couldn't show up — so I never spiralled into 'forget it, start Monday' again.",
+    name: "Maya R.",
+    city: "Berlin",
+    archetype: "Strategist",
+    outcome: "Health · Day 84",
+    day: 84,
   },
   {
-    name: "James K.",
-    photo: "/mock/people/james-k.png",
-    daysActive: 67,
-    quote:
-      "Got the promotion I'd been chasing for two years. The daily action was tiny — but I never missed it.",
-    goal: "Career · Endurance",
-  },
-  {
-    name: "Sarah J.",
-    photo: "/mock/people/sarah-jones.jpg",
-    daysActive: 92,
-    quote:
-      "84-day journaling streak. I'd never made it past week 3 before. The morning nudge is the thing.",
-    goal: "Mindset · Steady",
-  },
-  {
-    name: "Mateo A.",
     photo: "/mock/people/mateo-a.jpg",
-    daysActive: 58,
-    quote:
-      "Saved €4,200 in 8 weeks following the money plan. It's just spreadsheets, but Behavio makes me actually do them.",
-    goal: "Finance · Guardian",
+    pull: "Saved €4,200 in eight weeks.",
+    body: "It's just spreadsheets and caps — nothing exotic. Behavio's job is making me actually open the thing every night. That's the whole trick.",
+    name: "Mateo A.",
+    city: "Madrid",
+    archetype: "Guardian",
+    outcome: "Finance · Day 58",
+    day: 58,
   },
   {
-    name: "Priya M.",
-    photo: "/mock/people/priya-m.png",
-    daysActive: 45,
-    quote:
-      "Picked up running for the first time at 38. Started at 1km. Did my first 10K last weekend.",
-    goal: "Health · Explorer",
+    photo: "/mock/people/james-k.png",
+    pull: "Got the promotion I'd been chasing for two years.",
+    body: "The daily action was tiny — 25 minutes, every weekday. But it stayed on the calendar even on weeks I was sure I'd skip. That's why it worked.",
+    name: "James K.",
+    city: "London",
+    archetype: "Endurance Engine",
+    outcome: "Career · Day 67",
+    day: 67,
   },
 ];
 
-function StarRow({ size = 11 }: { size?: number }) {
-  return (
-    <span style={{ display: "inline-flex", gap: 1 }}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} width={size} height={size} viewBox="0 0 12 12" fill="#F5C518">
-          <path d="M6 0l1.76 3.64L12 4.24 8.88 7.2l.72 4.32L6 9.48 2.4 11.52l.72-4.32L0 4.24l4.24-.6z" />
-        </svg>
-      ))}
-    </span>
-  );
-}
+const SHORT_QUOTES = [
+  { photo: "/mock/people/sarah-jones.jpg", name: "Sarah J.", outcome: "84-day journaling streak. Never made it past week 3 before.", tag: "Mindset · Steady Builder" },
+  { photo: "/mock/people/priya-m.png", name: "Priya M.", outcome: "First 10K at 38, started at 1km in week 1.", tag: "Health · Explorer" },
+  { photo: "/mock/people/david-kim.jpg", name: "David K.", outcome: "Shipped six side-project pieces in a quarter.", tag: "Career · Creative Spark" },
+  { photo: "/mock/people/nina-patel.jpg", name: "Nina P.", outcome: "Cut spend 22%, didn't track a single transaction manually.", tag: "Finance · Guardian" },
+];
 
 export default function ProofStack() {
   return (
-    <section style={{ paddingTop: 64, paddingBottom: 64 }}>
+    <section style={{ paddingTop: 88, paddingBottom: 88 }}>
       <div className="landing-section-inner">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.45 }}
-          style={{ textAlign: "center", marginBottom: 36 }}
-        >
-          <p
-            style={{
-              fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 11,
-              color: ACCENT,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              margin: "0 0 12px",
-            }}
-          >
-            Real people · Real plans
-          </p>
-          <h2
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 900,
-              fontStyle: "italic",
-              fontSize: "clamp(28px, 3.6vw, 44px)",
-              color: TEXT_HI,
-              lineHeight: 1.1,
-              margin: 0,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            What changes after <span style={{ color: ACCENT }}>day 30.</span>
-          </h2>
-        </motion.div>
+        <Reveal offset={10}>
+          <div style={{ marginBottom: 48, maxWidth: 760 }}>
+            <p
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 11,
+                color: ACCENT,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                margin: "0 0 14px",
+              }}
+            >
+              ↳ Real plans · Real outcomes
+            </p>
+            <h2
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(32px, 4vw, 52px)",
+                color: TEXT_HI,
+                lineHeight: 1.0,
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              What changes after{" "}
+              <span style={{ fontStyle: "italic", color: ACCENT }}>day 30.</span>
+            </h2>
+          </div>
+        </Reveal>
 
         <style>{`
-          .proof-grid {
+          .proof-hero-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 14px;
+            gap: 18px;
+          }
+          @media (min-width: 900px) {
+            .proof-hero-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+          }
+          .proof-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 26px;
+            border-radius: 20px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.08);
+            min-height: 320px;
+          }
+          .proof-short-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 22px;
           }
           @media (min-width: 768px) {
-            .proof-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+            .proof-short-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+          }
+          @media (min-width: 1100px) {
+            .proof-short-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
           }
         `}</style>
 
-        <div className="proof-grid">
-          {TESTIMONIALS.map((t, i) => (
-            <motion.figure
-              key={t.name}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-              style={{
-                margin: 0,
-                padding: 22,
-                borderRadius: 20,
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                backdropFilter: "blur(8px)",
-                display: "flex",
-                gap: 16,
-                alignItems: "flex-start",
-              }}
-            >
-              <Image
-                src={t.photo}
-                alt={t.name}
-                width={56}
-                height={56}
-                loading="lazy"
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: "2px solid rgba(255,255,255,0.10)",
-                  flexShrink: 0,
-                }}
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginBottom: 8,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <StarRow size={11} />
+        <div className="proof-hero-grid">
+          {HERO_QUOTES.map((q, i) => (
+            <Reveal key={q.name} offset={14} delay={0.04 + i * 0.06}>
+              <figure className="proof-card" style={{ margin: 0 }}>
+                <div>
                   <span
+                    aria-hidden
                     style={{
-                      padding: "2px 8px",
-                      borderRadius: 999,
-                      background: accentRgba(0.10),
-                      fontFamily: "var(--font-jetbrains-mono), monospace",
-                      fontSize: 10,
-                      color: ACCENT,
-                      letterSpacing: "0.06em",
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontStyle: "italic",
+                      fontWeight: 900,
+                      fontSize: 56,
+                      color: accentRgba(0.45),
+                      lineHeight: 0.7,
+                      display: "block",
+                      marginBottom: 4,
                     }}
                   >
-                    Day {t.daysActive}
+                    &ldquo;
+                  </span>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontWeight: 900,
+                      fontStyle: "italic",
+                      fontSize: 26,
+                      lineHeight: 1.1,
+                      letterSpacing: "-0.01em",
+                      color: TEXT_HI,
+                      margin: "0 0 14px",
+                    }}
+                  >
+                    {q.pull}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-apercu), sans-serif",
+                      fontSize: 14.5,
+                      color: TEXT_MID,
+                      lineHeight: 1.55,
+                      margin: 0,
+                    }}
+                  >
+                    {q.body}
+                  </p>
+                </div>
+
+                <figcaption
+                  style={{
+                    marginTop: 20,
+                    paddingTop: 18,
+                    borderTop: "1px solid rgba(255,255,255,0.06)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                >
+                  <Image
+                    src={q.photo}
+                    alt={q.name}
+                    width={44}
+                    height={44}
+                    loading="lazy"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-apercu), sans-serif",
+                        fontSize: 13.5,
+                        fontWeight: 600,
+                        color: TEXT_HI,
+                        letterSpacing: "-0.005em",
+                      }}
+                    >
+                      {q.name} · {q.city}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-jetbrains-mono), monospace",
+                        fontSize: 10,
+                        letterSpacing: "0.10em",
+                        color: TEXT_LO,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {q.outcome} · {q.archetype}
+                    </span>
+                  </div>
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+
+        <div className="proof-short-grid">
+          {SHORT_QUOTES.map((s, i) => (
+            <Reveal key={s.name} offset={10} delay={0.05 + i * 0.04}>
+              <div
+                style={{
+                  padding: "16px 18px",
+                  borderRadius: 14,
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <Image
+                    src={s.photo}
+                    alt={s.name}
+                    width={32}
+                    height={32}
+                    loading="lazy"
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "1px solid rgba(255,255,255,0.10)",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontFamily: "var(--font-apercu), sans-serif",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: TEXT_HI,
+                      letterSpacing: "-0.005em",
+                    }}
+                  >
+                    {s.name}
                   </span>
                 </div>
-                <blockquote
+                <p
                   style={{
-                    margin: "0 0 10px",
                     fontFamily: "var(--font-apercu), sans-serif",
-                    fontSize: 15,
+                    fontSize: 13.5,
                     color: TEXT_HI,
-                    lineHeight: 1.5,
+                    margin: 0,
+                    lineHeight: 1.45,
                     fontWeight: 500,
                   }}
                 >
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-                <figcaption
+                  &ldquo;{s.outcome}&rdquo;
+                </p>
+                <div
                   style={{
-                    fontFamily: "var(--font-apercu), sans-serif",
-                    fontSize: 12,
-                    color: TEXT_MID,
+                    fontFamily: "var(--font-jetbrains-mono), monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.10em",
+                    color: ACCENT,
+                    textTransform: "uppercase",
+                    marginTop: "auto",
                   }}
                 >
-                  <span style={{ color: TEXT_HI, fontWeight: 600 }}>{t.name}</span>
-                  <span style={{ color: TEXT_LO }}> · </span>
-                  {t.goal}
-                </figcaption>
+                  {s.tag}
+                </div>
               </div>
-            </motion.figure>
+            </Reveal>
           ))}
         </div>
       </div>

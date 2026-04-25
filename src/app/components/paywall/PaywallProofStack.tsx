@@ -1,7 +1,7 @@
 "use client";
 
 import { BRAND } from "@/app/data/copy";
-import { TEXT_HI, TEXT_LO, TEXT_MID } from "@/app/theme";
+import { ACCENT, TEXT_HI, TEXT_LO, TEXT_MID, accentRgba } from "@/app/theme";
 
 type Props = {
   compact?: boolean;
@@ -12,119 +12,138 @@ const DEFAULT_AVATAR = "https://i.pravatar.cc/120?img=5";
 export function PaywallProofStack({ compact = false }: Props) {
   const step3 = BRAND.paywall.step3;
   const primaryMetric = step3.proofMetrics[0];
-  const proofQuotes = step3.proofQuotes.filter((quote) => !!quote.avatarUrl).slice(0, 2);
+  const proofQuote = step3.proofQuotes.find((quote) => !!quote.avatarUrl) ?? step3.proofQuotes[0];
+  const benefits = step3.whyItWorks.slice(0, 3);
 
   return (
     <div
       style={{
+        position: "relative",
         width: "100%",
         borderRadius: 18,
-        border: "1px solid rgba(255,255,255,0.12)",
-        background: "rgba(255,255,255,0.03)",
-        padding: compact ? "14px 14px 12px" : "18px 16px 14px",
+        border: "1px solid rgba(255,255,255,0.08)",
+        background: "linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01))",
+        padding: compact ? "20px 18px" : "24px 22px",
+        overflow: "hidden",
       }}
     >
-      <p
+      <div
+        aria-hidden
         style={{
-          fontFamily: "var(--font-apercu), sans-serif",
-          fontWeight: 700,
-          fontSize: compact ? 16 : 17,
-          color: TEXT_HI,
-          margin: 0,
+          position: "absolute",
+          inset: 0,
+          background: `radial-gradient(60% 60% at 0% 0%, ${accentRgba(0.10)}, transparent 65%)`,
+          pointerEvents: "none",
         }}
-      >
-        {step3.proofHeadline}
-      </p>
+      />
 
-      {primaryMetric ? (
-        <div
-          style={{
-            marginTop: 12,
-            borderRadius: 12,
-            padding: compact ? "10px 12px" : "12px 14px",
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(8,16,32,0.55)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 10,
-          }}
-        >
-          <div>
+      <div style={{ position: "relative" }}>
+        {/* Stat hero */}
+        {primaryMetric ? (
+          <div style={{ marginBottom: 18 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 900,
+                fontStyle: "italic",
+                fontSize: compact ? "clamp(56px, 14vw, 80px)" : "clamp(64px, 16vw, 96px)",
+                lineHeight: 0.88,
+                letterSpacing: "-0.04em",
+                color: ACCENT,
+                fontVariantNumeric: "tabular-nums",
+                margin: "0 0 4px",
+              }}
+            >
+              {primaryMetric.value}
+            </div>
             <p
               style={{
-                margin: 0,
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontSize: compact ? 12 : 13,
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 10.5,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
                 color: TEXT_MID,
+                margin: 0,
+                lineHeight: 1.4,
               }}
             >
               {primaryMetric.label}
-            </p>
-            <p
-              style={{
-                margin: "2px 0 0",
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontSize: 11,
-                color: TEXT_LO,
-              }}
-            >
-              {primaryMetric.detail}
+              {primaryMetric.detail ? (
+                <>
+                  <span aria-hidden style={{ color: TEXT_LO, margin: "0 6px" }}>·</span>
+                  {primaryMetric.detail}
+                </>
+              ) : null}
             </p>
           </div>
-          <strong
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 900,
-              fontSize: compact ? 26 : 30,
-              color: "var(--cta)",
-              lineHeight: 1,
-              flexShrink: 0,
-            }}
-          >
-            {primaryMetric.value}
-          </strong>
-        </div>
-      ) : null}
+        ) : null}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
-        {proofQuotes.map((quote, idx) => (
-          <blockquote
-            key={`${quote.author}-${quote.quote}`}
+        {/* Headline */}
+        <h2
+          style={{
+            fontFamily: "var(--font-barlow-condensed), sans-serif",
+            fontWeight: 900,
+            fontSize: compact ? "clamp(20px, 4.4vw, 24px)" : "clamp(22px, 5vw, 28px)",
+            color: TEXT_HI,
+            margin: "0 0 18px",
+            lineHeight: 1.05,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          You don&apos;t need more{" "}
+          <span style={{ fontStyle: "italic", color: ACCENT }}>motivation.</span>{" "}
+          You need a system that{" "}
+          <span style={{ fontStyle: "italic", color: ACCENT }}>catches you.</span>
+        </h2>
+
+        {/* Single editorial pull-quote testimonial */}
+        {proofQuote ? (
+          <figure
             style={{
-              margin: 0,
-              padding: compact ? "9px 10px" : "10px 11px",
-              borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.08)",
-              background:
-                idx % 2 === 0
-                  ? "linear-gradient(135deg, rgba(94,205,161,0.11), rgba(255,255,255,0.03))"
-                  : "linear-gradient(135deg, rgba(130,164,255,0.12), rgba(255,255,255,0.03))",
+              margin: "0 0 18px",
+              padding: "16px 16px",
+              borderRadius: 14,
+              background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.005))",
+              border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <blockquote
+              style={{
+                margin: 0,
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 900,
+                fontStyle: "italic",
+                fontSize: 18,
+                color: TEXT_HI,
+                lineHeight: 1.15,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              &ldquo;{proofQuote.quote}&rdquo;
+            </blockquote>
+            <figcaption
+              style={{
+                marginTop: 12,
+                paddingTop: 10,
+                borderTop: "1px solid rgba(255,255,255,0.05)",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}
+            >
               <div
                 aria-hidden
                 style={{
-                  width: compact ? 26 : 30,
-                  height: compact ? 26 : 30,
+                  width: 28,
+                  height: 28,
                   borderRadius: "50%",
                   overflow: "hidden",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontFamily: "var(--font-apercu), sans-serif",
-                  fontSize: compact ? 10 : 11,
-                  fontWeight: 700,
-                  color: "#061124",
-                  background:
-                    idx % 2 === 0
-                      ? "linear-gradient(135deg, #bffff0, var(--cta))"
-                      : "linear-gradient(135deg, #d9e4ff, #8aa2ff)",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  flexShrink: 0,
                 }}
               >
                 <img
-                  src={quote.avatarUrl || DEFAULT_AVATAR}
+                  src={proofQuote.avatarUrl || DEFAULT_AVATAR}
                   alt=""
                   loading="lazy"
                   decoding="async"
@@ -138,74 +157,72 @@ export function PaywallProofStack({ compact = false }: Props) {
               </div>
               <span
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 5,
                   fontFamily: "var(--font-apercu), sans-serif",
-                  fontSize: 11,
-                  color: TEXT_LO,
+                  fontSize: 12,
+                  color: TEXT_HI,
+                  fontWeight: 600,
+                  letterSpacing: "-0.005em",
                 }}
               >
-                <span
-                  aria-hidden
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: "var(--cta)",
-                  }}
-                />
-                Verified user
+                {proofQuote.author}
               </span>
-            </div>
-            <p
+              <span
+                style={{
+                  fontFamily: "var(--font-jetbrains-mono), monospace",
+                  fontSize: 9.5,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: ACCENT,
+                  marginLeft: "auto",
+                  fontWeight: 600,
+                }}
+              >
+                ✓ Verified
+              </span>
+            </figcaption>
+          </figure>
+        ) : null}
+
+        {/* Benefit list */}
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          {benefits.map((line) => (
+            <li
+              key={line}
               style={{
-                margin: 0,
+                display: "flex",
+                gap: 10,
+                alignItems: "flex-start",
                 fontFamily: "var(--font-apercu), sans-serif",
-                fontSize: compact ? 12 : 13,
+                fontSize: 13.5,
                 color: TEXT_HI,
                 lineHeight: 1.45,
+                letterSpacing: "-0.005em",
               }}
             >
-              "{quote.quote}"
-            </p>
-            <p
-              style={{
-                margin: "4px 0 0",
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontSize: compact ? 10 : 11,
-                color: TEXT_LO,
-              }}
-            >
-              {quote.author}
-            </p>
-          </blockquote>
-        ))}
+              <span
+                aria-hidden
+                style={{
+                  flexShrink: 0,
+                  marginTop: 8,
+                  width: 8,
+                  height: 1,
+                  background: ACCENT,
+                }}
+              />
+              {line}
+            </li>
+          ))}
+        </ul>
       </div>
-
-      <ul
-        style={{
-          margin: "12px 0 0",
-          padding: 0,
-          listStyle: "none",
-          display: "flex",
-          flexDirection: "column",
-          gap: 6,
-        }}
-      >
-        {step3.whyItWorks.map((line) => (
-          <li
-            key={line}
-            style={{
-              fontFamily: "var(--font-apercu), sans-serif",
-              fontSize: compact ? 12 : 13,
-              color: TEXT_MID,
-            }}
-          >
-            {line}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

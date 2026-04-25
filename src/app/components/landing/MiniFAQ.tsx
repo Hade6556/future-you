@@ -1,125 +1,112 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ACCENT, TEXT_HI, TEXT_MID, accentRgba } from "@/app/theme";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import Reveal from "./Reveal";
+import { ACCENT, TEXT_HI, TEXT_MID } from "@/app/theme";
 
 const FAQ = [
   {
-    q: "How long does it take?",
-    a: "Three minutes for the quiz. Your archetype and first plan are generated instantly after.",
+    q: "How long does it actually take?",
+    a: "Three minutes for the seven-question quiz. Your archetype, weekly cadence, and first plan are generated and on your calendar within the next minute.",
   },
   {
     q: "Is it really free?",
-    a: "Yes — the quiz, your archetype, and your first 90-day plan are free. You can stay free forever, or upgrade later for daily AI coaching and calendar sync.",
+    a: "Yes. The quiz, your archetype, and your first 90-day plan are free forever. The optional upgrade unlocks daily AI coaching check-ins and two-way calendar sync.",
   },
   {
-    q: "What if it doesn't fit my life?",
-    a: "The plan adapts daily. Skip a day, the system reschedules — no judgment, no broken streaks. Your archetype's pacing is built in, so you never feel like you're behind.",
+    q: "Will this work if my schedule is unpredictable?",
+    a: "That's the case it's built for. Behavio asks how your week actually looks — including the parts that are unstable — and re-paces every time you skip. There's no streak to break.",
   },
   {
-    q: "How is this different from a habit tracker?",
-    a: "Trackers tell you what you didn't do. Behavio tells you the next thing to do — a single, scheduled action that fits your archetype, your goal, and the time you actually have today.",
+    q: "What if it doesn't fit my life after a week?",
+    a: "Tell the plan. There's a 30-second 'this isn't working' input on every day card; the plan re-bases overnight on what you said. If it still doesn't fit, cancel without losing what you wrote.",
+  },
+  {
+    q: "What happens after the 90 days?",
+    a: "You get a 90-day review — what scaled, what stalled, what surprised you. From there the plan re-bases for the next phase. Most users keep going on a new goal area; the system stays the same.",
+  },
+  {
+    q: "Where does my data live?",
+    a: "EU-hosted (Frankfurt). GDPR-compliant. We don't sell behavioral data, ever. You can export everything in a single zip and delete your account from settings.",
   },
 ];
 
 export default function MiniFAQ() {
   return (
-    <section style={{ paddingTop: 56, paddingBottom: 56 }}>
-      <div className="landing-section-inner" style={{ maxWidth: 760 }}>
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.45 }}
-          style={{ textAlign: "center", marginBottom: 32 }}
-        >
-          <p
-            style={{
-              fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 11,
-              color: ACCENT,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              margin: "0 0 12px",
-            }}
-          >
-            Common questions
-          </p>
-          <h2
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 900,
-              fontStyle: "italic",
-              fontSize: "clamp(28px, 3.4vw, 40px)",
-              color: TEXT_HI,
-              lineHeight: 1.1,
-              margin: 0,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Before you click.
-          </h2>
-        </motion.div>
-
-        <style>{`
-          .faq-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 18px 22px;
-            transition: border-color 0.18s, background 0.18s;
-          }
-          .faq-item[open] {
-            border-color: ${accentRgba(0.4)};
-            background: ${accentRgba(0.05)};
-          }
-          .faq-item > summary {
-            list-style: none;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            font-family: var(--font-apercu), sans-serif;
-            font-weight: 600;
-            font-size: 16px;
-            color: ${TEXT_HI};
-            letter-spacing: -0.01em;
-          }
-          .faq-item > summary::-webkit-details-marker { display: none; }
-          .faq-item > summary::after {
-            content: "+";
-            color: ${ACCENT};
-            font-size: 22px;
-            line-height: 1;
-            font-weight: 300;
-            transition: transform 0.2s;
-          }
-          .faq-item[open] > summary::after { content: "−"; }
-          .faq-item p {
-            margin: 14px 0 0;
-            font-family: var(--font-apercu), sans-serif;
-            font-size: 14.5px;
-            color: ${TEXT_MID};
-            line-height: 1.6;
-          }
-        `}</style>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {FAQ.map((item, i) => (
-            <motion.details
-              key={item.q}
-              className="faq-item"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.35, delay: i * 0.05 }}
+    <section id="faq" style={{ paddingTop: 88, paddingBottom: 88, scrollMarginTop: 96 }}>
+      <div className="landing-section-inner" style={{ maxWidth: 820 }}>
+        <Reveal offset={10}>
+          <div style={{ marginBottom: 36 }}>
+            <p
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 11,
+                color: ACCENT,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                margin: "0 0 14px",
+              }}
             >
-              <summary>{item.q}</summary>
-              <p>{item.a}</p>
-            </motion.details>
-          ))}
-        </div>
+              ↳ Common questions
+            </p>
+            <h2
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(32px, 4vw, 52px)",
+                color: TEXT_HI,
+                lineHeight: 1.0,
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              Before you{" "}
+              <span style={{ fontStyle: "italic", color: ACCENT }}>click.</span>
+            </h2>
+          </div>
+        </Reveal>
+
+        <Reveal offset={12} delay={0.08}>
+          <Accordion
+            className="border-y border-white/[0.06]"
+            style={
+              {
+                ["--accent" as string]: ACCENT,
+              } as React.CSSProperties
+            }
+          >
+            {FAQ.map((item) => (
+              <AccordionItem
+                key={item.q}
+                value={item.q}
+                className="border-b border-white/[0.06] last:border-b-0"
+              >
+                <AccordionTrigger
+                  className="!py-5 !text-base !font-semibold !text-white !no-underline hover:!no-underline"
+                  style={{
+                    fontFamily: "var(--font-apercu), sans-serif",
+                    color: TEXT_HI,
+                    letterSpacing: "-0.005em",
+                    fontSize: 16,
+                  }}
+                >
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent
+                  style={{
+                    fontFamily: "var(--font-apercu), sans-serif",
+                    color: TEXT_MID,
+                    fontSize: 14.5,
+                    lineHeight: 1.6,
+                    paddingRight: 32,
+                  }}
+                >
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Reveal>
       </div>
     </section>
   );

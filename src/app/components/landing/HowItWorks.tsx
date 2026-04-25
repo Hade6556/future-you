@@ -1,173 +1,200 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ClipboardList, Map as MapIcon, CalendarCheck } from "lucide-react";
-import { ACCENT, TEXT_HI, TEXT_MID, accentRgba } from "@/app/theme";
+import { ReactNode } from "react";
+import Reveal from "./Reveal";
+import { ACCENT, TEXT_HI, TEXT_MID, TEXT_LO } from "@/app/theme";
+import PlanCardMockup from "./mockups/PlanCardMockup";
+import QuizMockup from "./mockups/QuizMockup";
+import CalendarMockup from "./mockups/CalendarMockup";
 
-const STEPS = [
+type Step = {
+  index: string;
+  title: string;
+  body: string;
+  bullets: string[];
+  visual: ReactNode;
+  reverse?: boolean;
+};
+
+const STEPS: Step[] = [
   {
-    n: "01",
-    icon: ClipboardList,
-    title: "Take the quiz",
-    body: "3 minutes. We map your goal, your archetype, and what's blocking you.",
-    meta: "3 min",
+    index: "01",
+    title: "Take a 3-minute quiz.",
+    body: "Seven questions about your goal, your week, and what's quietly been blocking you. No essays, no productivity-bro jargon.",
+    bullets: [
+      "Pick the one area of life that comes first",
+      "Tell us your real schedule, not your aspirational one",
+      "Answer how you've actually responded to setbacks",
+    ],
+    visual: <QuizMockup />,
   },
   {
-    n: "02",
-    icon: MapIcon,
-    title: "Get your plan",
-    body: "An AI-built 90-day plan, structured into phases and daily steps that fit your life.",
-    meta: "Instant",
+    index: "02",
+    title: "Get your plan instantly.",
+    body: "The plan is sequenced for your archetype. Three phases, ninety days. Each day is one card with one anchor action — never a blank checklist.",
+    bullets: [
+      "Phase 1: get the system running",
+      "Phase 2: stretch what's already working",
+      "Phase 3: scale, document, anchor",
+    ],
+    visual: <PlanCardMockup archetype="Strategist" day={12} variant="full" />,
+    reverse: true,
   },
   {
-    n: "03",
-    icon: CalendarCheck,
-    title: "Show up daily",
-    body: "Auto-scheduled into your calendar. Skip a day — the plan adapts. No judgment.",
-    meta: "Auto-synced",
+    index: "03",
+    title: "It runs in your calendar.",
+    body: "Behavio writes the day's anchor action straight into your calendar at the time you said you're free. Skip a day — the plan reschedules. The streak doesn't break.",
+    bullets: [
+      "Two-way Google Calendar sync",
+      "Auto-reschedules around real conflicts",
+      "Adapts pacing if your energy drops three days running",
+    ],
+    visual: <CalendarMockup />,
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section style={{ paddingTop: 64, paddingBottom: 64 }}>
+    <section id="how-it-works" style={{ paddingTop: 88, paddingBottom: 88, scrollMarginTop: 96 }}>
       <div className="landing-section-inner">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.45 }}
-          style={{ textAlign: "center", marginBottom: 40 }}
-        >
-          <p
-            style={{
-              fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 11,
-              color: ACCENT,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              margin: "0 0 12px",
-            }}
-          >
-            How it works
-          </p>
-          <h2
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 900,
-              fontStyle: "italic",
-              fontSize: "clamp(28px, 3.6vw, 44px)",
-              color: TEXT_HI,
-              lineHeight: 1.1,
-              margin: 0,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            From <span style={{ color: ACCENT }}>scattered</span> to scheduled — in 3 steps.
-          </h2>
-        </motion.div>
+        <Reveal offset={10}>
+          <div style={{ marginBottom: 48, maxWidth: 760 }}>
+            <p
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 11,
+                color: ACCENT,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                margin: "0 0 14px",
+              }}
+            >
+              ↳ How it works
+            </p>
+            <h2
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(32px, 4vw, 52px)",
+                color: TEXT_HI,
+                lineHeight: 1.0,
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              From scattered to{" "}
+              <span style={{ fontStyle: "italic", color: ACCENT }}>scheduled</span> — in three steps.
+            </h2>
+          </div>
+        </Reveal>
 
         <style>{`
-          .hiw-grid {
+          .hiw-row {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 32px;
+            align-items: center;
+            padding: 28px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
           }
-          @media (min-width: 768px) {
-            .hiw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+          @media (min-width: 900px) {
+            .hiw-row { grid-template-columns: 1fr 1fr; gap: 64px; padding: 56px 0; }
+            .hiw-row[data-reverse="true"] .hiw-text { order: 2; }
+            .hiw-row[data-reverse="true"] .hiw-visual { order: 1; }
+          }
+          .hiw-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
         `}</style>
 
-        <div className="hiw-grid">
+        <div>
           {STEPS.map((s, i) => (
-            <motion.div
-              key={s.n}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-              style={{
-                position: "relative",
-                padding: 24,
-                borderRadius: 22,
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                backdropFilter: "blur(8px)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 18,
-                }}
-              >
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 12,
-                    background: accentRgba(0.12),
-                    border: `1px solid ${accentRgba(0.30)}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: ACCENT,
-                  }}
-                >
-                  <s.icon size={20} strokeWidth={1.8} />
+            <Reveal key={s.index} offset={12} delay={0.04 + i * 0.06}>
+              <div className="hiw-row" data-reverse={s.reverse ? "true" : "false"}>
+                <div className="hiw-text">
+                  <div
+                    style={{
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontWeight: 900,
+                      fontStyle: "italic",
+                      fontSize: 64,
+                      lineHeight: 1,
+                      color: "transparent",
+                      WebkitTextStroke: `1px ${TEXT_LO}`,
+                      letterSpacing: "-0.02em",
+                      marginBottom: 14,
+                    }}
+                  >
+                    {s.index}
+                  </div>
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-barlow-condensed), sans-serif",
+                      fontWeight: 900,
+                      fontSize: "clamp(26px, 2.6vw, 34px)",
+                      color: TEXT_HI,
+                      lineHeight: 1.05,
+                      letterSpacing: "-0.015em",
+                      margin: "0 0 14px",
+                    }}
+                  >
+                    {s.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-apercu), sans-serif",
+                      fontSize: 16,
+                      color: TEXT_MID,
+                      lineHeight: 1.55,
+                      margin: "0 0 18px",
+                      maxWidth: 480,
+                    }}
+                  >
+                    {s.body}
+                  </p>
+                  <ul
+                    style={{
+                      listStyle: "none",
+                      padding: 0,
+                      margin: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 8,
+                    }}
+                  >
+                    {s.bullets.map((b) => (
+                      <li
+                        key={b}
+                        style={{
+                          display: "flex",
+                          gap: 12,
+                          alignItems: "flex-start",
+                          fontFamily: "var(--font-apercu), sans-serif",
+                          fontSize: 14,
+                          color: TEXT_HI,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <span
+                          aria-hidden
+                          style={{
+                            flexShrink: 0,
+                            marginTop: 9,
+                            width: 6,
+                            height: 1,
+                            background: ACCENT,
+                          }}
+                        />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <span
-                  style={{
-                    fontFamily: "var(--font-jetbrains-mono), monospace",
-                    fontSize: 11,
-                    color: "rgba(160,180,210,0.55)",
-                    letterSpacing: "0.10em",
-                  }}
-                >
-                  {s.n}
-                </span>
+                <div className="hiw-visual">{s.visual}</div>
               </div>
-              <h3
-                style={{
-                  fontFamily: "var(--font-apercu), sans-serif",
-                  fontWeight: 600,
-                  fontSize: 19,
-                  color: TEXT_HI,
-                  margin: "0 0 8px",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {s.title}
-              </h3>
-              <p
-                style={{
-                  fontFamily: "var(--font-apercu), sans-serif",
-                  fontSize: 14,
-                  color: TEXT_MID,
-                  lineHeight: 1.55,
-                  margin: "0 0 14px",
-                }}
-              >
-                {s.body}
-              </p>
-              <span
-                style={{
-                  display: "inline-block",
-                  padding: "4px 10px",
-                  borderRadius: 999,
-                  background: accentRgba(0.08),
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                  fontSize: 10,
-                  color: ACCENT,
-                  letterSpacing: "0.10em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {s.meta}
-              </span>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>

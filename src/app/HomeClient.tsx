@@ -8,7 +8,9 @@ import { computeDayInfo } from "./utils/dayEngine";
 import { DailyCoachingSection } from "./components/DailyCoachingSection";
 import { StreakMomentumCard } from "./components/home/StreakMomentumCard";
 import { GapChart } from "./components/home/GapChart";
+import HomeLivePulse from "./components/home/HomeLivePulse";
 import { ACCENT, ACCENT_HOVER, ON_ACCENT, accentRgba } from "@/app/theme";
+import type { ArchetypeId, AmbitionDomain } from "./types/plan";
 
 function formatHeaderDate(): string {
   return new Date().toLocaleDateString("en-US", {
@@ -16,6 +18,38 @@ function formatHeaderDate(): string {
     month: "short",
     day: "numeric",
   });
+}
+
+const ARCHETYPE_LABEL: Record<ArchetypeId, string> = {
+  steady: "Steady Builder",
+  strategist: "Laser Strategist",
+  endurance: "Endurance Engine",
+  creative: "Creative Spark",
+  guardian: "Guardian",
+  explorer: "Explorer",
+};
+
+const AMBITION_LABEL: Record<AmbitionDomain, string> = {
+  entrepreneur: "Entrepreneurship",
+  athlete: "Health & Fitness",
+  weight_loss: "Weight Loss",
+  creative: "Creative Work",
+  student: "Studies",
+  wellness: "Wellness",
+  career: "Career",
+  finance: "Finance",
+  language: "Language",
+  travel: "Travel",
+  relationships: "Relationships",
+  productivity: "Productivity",
+  mindfulness: "Mindfulness",
+  confidence: "Personal Growth",
+};
+
+/** Sentence-case a user-typed string ("advance my career" → "Advance my career"). */
+function sentenceCase(s: string): string {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export default function HomeClient() {
@@ -32,6 +66,8 @@ export default function HomeClient() {
   const todayTasks         = usePlanStore((s) => s.todayTasks);
   const todayTasksDate     = usePlanStore((s) => s.todayTasksDate);
   const toggleDailyTask    = usePlanStore((s) => s.toggleDailyTask);
+  const dogArchetype       = usePlanStore((s) => s.dogArchetype);
+  const ambitionType       = usePlanStore((s) => s.ambitionType);
 
   const [mounted, setMounted] = useState(false);
 
@@ -69,13 +105,22 @@ export default function HomeClient() {
   const goalText = pipelinePlan?.goal_raw?.trim() ?? "";
 
   const greetingText = (() => {
-    if (todayStatus === "done") return `You closed the gap today, ${firstName || "you"}.`;
+    if (todayStatus === "done") {
+      return firstName ? `Closed the gap, ${firstName}.` : "You closed the gap today.";
+    }
     if (todayStatus === "partial") return "Partial progress. Finish what you started.";
     if (!planReady || (planStartDate === todayISO() && streak === 0)) return "Your system is ready. First action, now.";
     const h = new Date().getHours();
     const tod = h < 12 ? "morning" : h < 17 ? "afternoon" : "evening";
     return firstName ? `Good ${tod}, ${firstName}.` : `Good ${tod}.`;
   })();
+
+  const archetypeLabel = dogArchetype ? ARCHETYPE_LABEL[dogArchetype] : null;
+  const ambitionLabel = ambitionType ? AMBITION_LABEL[ambitionType] : null;
+  const identityChips = [archetypeLabel, ambitionLabel].filter(Boolean) as string[];
+
+  /** First step from Phase 1 — used as a today-mission preview before tasks are generated. */
+  const phaseOneAnchor = pipelinePlan?.phases?.[0]?.steps?.[0]?.title ?? null;
 
   return (
     <div
@@ -119,14 +164,29 @@ export default function HomeClient() {
           {/* Header */}
           <header style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
+              {identityChips.length > 0 && (
+                <p
+                  style={{
+                    fontFamily: "var(--font-jetbrains-mono), monospace",
+                    fontSize: 11,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: ACCENT,
+                    margin: "0 0 10px",
+                    fontWeight: 600,
+                  }}
+                >
+                  ↳ {identityChips.join(" · ")}
+                </p>
+              )}
               <h1
                 style={{
                   fontFamily: "var(--font-barlow-condensed), sans-serif",
                   fontWeight: 900,
                   fontStyle: "italic",
                   fontSize: 28,
-                  lineHeight: 1.15,
-                  letterSpacing: "-0.02em",
+                  lineHeight: 1.0,
+                  letterSpacing: "-0.025em",
                   color: "rgba(240,245,255,0.95)",
                   margin: 0,
                 }}
@@ -136,11 +196,11 @@ export default function HomeClient() {
               <p
                 style={{
                   fontFamily: "var(--font-jetbrains-mono), monospace",
-                  fontSize: 12,
-                  letterSpacing: "0.08em",
+                  fontSize: 11,
+                  letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: "rgba(140,170,210,0.70)",
-                  margin: "4px 0 0",
+                  color: "rgba(140,170,210,0.55)",
+                  margin: "8px 0 0",
                 }}
               >
                 {formatHeaderDate()}
@@ -152,7 +212,7 @@ export default function HomeClient() {
                     fontFamily: "var(--font-apercu), sans-serif",
                     fontSize: 13,
                     color: "rgba(200,220,245,0.80)",
-                    margin: "8px 0 0",
+                    margin: "10px 0 0",
                     lineHeight: 1.4,
                     overflow: "hidden",
                     display: "-webkit-box",
@@ -162,7 +222,7 @@ export default function HomeClient() {
                   title={goalText}
                 >
                   <span aria-hidden style={{ color: ACCENT, marginRight: 6 }}>↳</span>
-                  {goalText}
+                  {sentenceCase(goalText)}
                 </p>
               )}
             </div>
@@ -238,30 +298,48 @@ export default function HomeClient() {
                   boxShadow: `0 0 24px ${accentRgba(0.28)}, 0 2px 8px rgba(0,0,0,0.32)`,
                 }}
               >
-                <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
                   <span
                     style={{
                       fontFamily: "var(--font-barlow-condensed), sans-serif",
-                      fontWeight: 800,
-                      fontSize: 17,
-                      letterSpacing: "0.02em",
-                      textTransform: "uppercase",
-                      lineHeight: 1.1,
+                      fontWeight: 900,
+                      fontStyle: "italic",
+                      fontSize: 18,
+                      letterSpacing: "-0.005em",
+                      lineHeight: 1.0,
                     }}
                   >
                     Start today&apos;s plan
                   </span>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-apercu), sans-serif",
-                      fontWeight: 500,
-                      fontSize: 12.5,
-                      lineHeight: 1.3,
-                      opacity: 0.78,
-                    }}
-                  >
-                    3-min check-in &rarr; today&apos;s mission
-                  </span>
+                  {phaseOneAnchor ? (
+                    <span
+                      style={{
+                        fontFamily: "var(--font-apercu), sans-serif",
+                        fontWeight: 500,
+                        fontSize: 12.5,
+                        lineHeight: 1.35,
+                        opacity: 0.78,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                      title={phaseOneAnchor}
+                    >
+                      → {phaseOneAnchor}
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontFamily: "var(--font-apercu), sans-serif",
+                        fontWeight: 500,
+                        fontSize: 12.5,
+                        lineHeight: 1.35,
+                        opacity: 0.78,
+                      }}
+                    >
+                      3-min check-in &rarr; today&apos;s mission
+                    </span>
+                  )}
                 </div>
                 <span aria-hidden style={{ fontSize: 22, lineHeight: 1, fontWeight: 700, flexShrink: 0 }}>→</span>
               </Link>
@@ -453,6 +531,9 @@ export default function HomeClient() {
 
           {/* Streak + Momentum */}
           <StreakMomentumCard />
+
+          {/* Live "doing it now" pulse — peer signal for the user's archetype */}
+          {archetypeLabel && <HomeLivePulse archetypeLabel={archetypeLabel} />}
 
           {/* Gap chart */}
           <GapChart

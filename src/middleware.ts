@@ -4,6 +4,7 @@ import { getSupabaseAnonKey } from "@/lib/supabase/env";
 
 function isPublicPath(pathname: string): boolean {
   if (pathname === "/") return true;
+  if (pathname === "/landing") return true;
   if (pathname.startsWith("/api/")) return true;
   if (pathname.startsWith("/auth/")) return true;
   if (pathname.startsWith("/signup")) return true;

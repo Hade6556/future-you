@@ -1,6 +1,6 @@
 "use client";
 
-import { ACCENT, TEXT_MID } from "@/app/theme";
+import { ACCENT, TEXT_LO } from "@/app/theme";
 
 interface StatCardProps {
   value: number | string;
@@ -12,31 +12,34 @@ export default function StatCard({ value, label }: StatCardProps) {
     <div
       style={{
         flex: 1,
-        padding: "24px 16px",
+        padding: "22px 16px",
         borderRadius: 16,
-        background: "rgba(255,255,255,0.06)",
-        backdropFilter: "blur(16px)",
-        border: "1px solid rgba(255,255,255,0.12)",
+        background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))",
+        border: "1px solid rgba(255,255,255,0.08)",
         textAlign: "center",
       }}
     >
       <div
         style={{
           fontFamily: "var(--font-barlow-condensed), sans-serif",
-          fontWeight: 800,
-          fontSize: 36,
+          fontWeight: 900,
+          fontSize: 38,
+          fontStyle: "italic",
           color: ACCENT,
           lineHeight: 1,
-          marginBottom: 6,
+          marginBottom: 8,
+          letterSpacing: "-0.02em",
         }}
       >
         {value}
       </div>
       <div
         style={{
-          fontFamily: "var(--font-apercu), sans-serif",
-          fontSize: 13,
-          color: TEXT_MID,
+          fontFamily: "var(--font-jetbrains-mono), monospace",
+          fontSize: 10,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: TEXT_LO,
         }}
       >
         {label}

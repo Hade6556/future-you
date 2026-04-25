@@ -19,9 +19,11 @@ export default function InsightResearchScreen({ onNext }: { onNext: () => void }
       }}
     >
       <InsightCard
-        headline="📊 People who define their goals clearly are 6x more likely to achieve them."
-        source="Goal-setting research, Dominican University"
-        body="Behavio's quiz is built on the same clarity framework. You've already started."
+        source="Goal-clarity research"
+        stat={{ value: "6×", caption: "more likely to achieve" }}
+        headline="People who define their goals clearly hit them six times more often."
+        body="Behavio's quiz uses the same clarity framework. You've already started — the next questions sharpen it."
+        byline="Source · Dominican University · n=149 · peer-reviewed"
       />
       <div style={{ marginTop: 32 }}>
         <CTAButton label="That's exactly why I'm here →" onClick={onNext} />

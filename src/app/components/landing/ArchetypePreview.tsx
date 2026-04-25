@@ -1,217 +1,382 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Target, Layers, Mountain, Sparkles, Shield, Compass, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import Reveal from "./Reveal";
 import { ACCENT, TEXT_HI, TEXT_MID, TEXT_LO, accentRgba } from "@/app/theme";
+import { trackEvent } from "@/app/quiz/utils/analytics";
+import ArchetypeMicroMockup from "./mockups/ArchetypeMicroMockup";
+import ArchetypeSigil from "./ArchetypeSigil";
+import SpotlightCard from "./SpotlightCard";
+import type { ArchetypeKey } from "./mockups/PlanCardMockup";
 
 type Archetype = {
-  name: string;
-  blurb: string;
-  Icon: LucideIcon;
+  serial: string;
+  name: ArchetypeKey;
+  signature: string;
+  hook: string;
+  rarity: string;
 };
 
 const ARCHETYPES: Archetype[] = [
-  { name: "Strategist", blurb: "Sees the long game. Wins by sequencing.", Icon: Target },
-  { name: "Steady Builder", blurb: "Compounds small wins into big ones.", Icon: Layers },
-  { name: "Endurance Engine", blurb: "Outlasts obstacles. Quiet relentlessness.", Icon: Mountain },
-  { name: "Creative Spark", blurb: "Designs the path others didn't see.", Icon: Sparkles },
-  { name: "Guardian", blurb: "Protects what matters. Builds with care.", Icon: Shield },
-  { name: "Explorer", blurb: "Finds energy in new ground.", Icon: Compass },
+  {
+    serial: "ARC·01",
+    name: "Strategist",
+    signature: "Plans → sequences → ships",
+    hook: "Sees the long game. Wins by sequencing the right moves in the right order — never by working harder.",
+    rarity: "18%",
+  },
+  {
+    serial: "ARC·02",
+    name: "Steady Builder",
+    signature: "Same block, every day",
+    hook: "Compounds small wins. The plan's job is to never let the daily block break, even on bad weeks.",
+    rarity: "22%",
+  },
+  {
+    serial: "ARC·03",
+    name: "Endurance Engine",
+    signature: "Builds slow, finishes loud",
+    hook: "Outlasts obstacles. The plan ramps load gradually so the body — or the drive — never quits first.",
+    rarity: "14%",
+  },
+  {
+    serial: "ARC·04",
+    name: "Creative Spark",
+    signature: "Sprint → ship → recover",
+    hook: "Designs the path others didn't see. The plan protects deep-work windows and forces shipping cycles.",
+    rarity: "11%",
+  },
+  {
+    serial: "ARC·05",
+    name: "Guardian",
+    signature: "Caps · buffers · compounding",
+    hook: "Protects what matters. The plan turns one weekly cap into a permanent buffer — quiet, durable progress.",
+    rarity: "17%",
+  },
+  {
+    serial: "ARC·06",
+    name: "Explorer",
+    signature: "New ground, every week",
+    hook: "Finds energy in novelty. The plan rotates variety in without losing the throughline of the goal.",
+    rarity: "13%",
+  },
 ];
-
-function scrollToFinalCTA() {
-  document.getElementById("final-cta")?.scrollIntoView({ behavior: "smooth", block: "center" });
-}
 
 export default function ArchetypePreview() {
   return (
-    <section style={{ paddingTop: 64, paddingBottom: 64 }}>
+    <section id="archetypes" style={{ paddingTop: 96, paddingBottom: 96, scrollMarginTop: 96 }}>
       <div className="landing-section-inner">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.45 }}
-          style={{ textAlign: "center", marginBottom: 36 }}
-        >
-          <p
-            style={{
-              fontFamily: "var(--font-jetbrains-mono), monospace",
-              fontSize: 11,
-              color: ACCENT,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              margin: "0 0 12px",
-            }}
-          >
-            The reveal
-          </p>
-          <h2
-            style={{
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 900,
-              fontStyle: "italic",
-              fontSize: "clamp(28px, 3.6vw, 44px)",
-              color: TEXT_HI,
-              lineHeight: 1.1,
-              margin: "0 0 12px",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            You&apos;re one of <span style={{ color: ACCENT }}>6 archetypes.</span>
-          </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-apercu), sans-serif",
-              fontSize: 15,
-              color: TEXT_MID,
-              maxWidth: 520,
-              margin: "0 auto",
-              lineHeight: 1.5,
-            }}
-          >
-            Each one moves through goals differently. Find yours, get the plan that fits — not generic advice.
-          </p>
-        </motion.div>
+        <Reveal offset={10}>
+          <div style={{ maxWidth: 760, marginBottom: 56 }}>
+            <p
+              style={{
+                fontFamily: "var(--font-jetbrains-mono), monospace",
+                fontSize: 11,
+                color: ACCENT,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                margin: "0 0 14px",
+              }}
+            >
+              ↳ The reveal · Field manual
+            </p>
+            <h2
+              style={{
+                fontFamily: "var(--font-barlow-condensed), sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(32px, 4vw, 52px)",
+                color: TEXT_HI,
+                lineHeight: 1.0,
+                letterSpacing: "-0.02em",
+                margin: "0 0 14px",
+              }}
+            >
+              You&apos;re one of <span style={{ fontStyle: "italic", color: ACCENT }}>six archetypes.</span>
+            </h2>
+            <p
+              style={{
+                fontFamily: "var(--font-apercu), sans-serif",
+                fontSize: 16,
+                color: TEXT_MID,
+                lineHeight: 1.55,
+                margin: 0,
+                maxWidth: 560,
+              }}
+            >
+              Each one moves through goals on its own rhythm. Your plan is sequenced
+              for yours — not generic advice you have to translate.
+            </p>
+          </div>
+        </Reveal>
 
         <style>{`
-          .archetype-grid {
+          .arch-mirror {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            position: relative;
           }
-          @media (min-width: 768px) {
-            .archetype-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+          @media (min-width: 900px) {
+            .arch-mirror {
+              grid-template-columns: 1fr 1fr;
+              column-gap: 56px;
+              row-gap: 18px;
+            }
+            .arch-mirror::before {
+              content: "";
+              position: absolute;
+              top: 8px;
+              bottom: 8px;
+              left: 50%;
+              width: 1px;
+              background: linear-gradient(180deg, transparent, rgba(255,255,255,0.06) 12%, rgba(255,255,255,0.06) 88%, transparent);
+              transform: translateX(-0.5px);
+              pointer-events: none;
+            }
           }
-          @media (min-width: 1024px) {
-            .archetype-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-          }
-          .archetype-card {
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.03);
+          .arch-card {
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 18px;
+            align-items: start;
+            padding: 22px;
             border-radius: 18px;
-            padding: 18px 16px;
-            transition: transform 0.18s, border-color 0.18s, background 0.18s;
-            text-align: center;
-            backdrop-filter: blur(8px);
+            background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.07);
+            overflow: hidden;
+            transition: border-color 160ms, transform 160ms;
           }
-          .archetype-card:hover {
-            transform: translateY(-3px);
-            border-color: ${accentRgba(0.4)};
-            background: ${accentRgba(0.06)};
+          .arch-card:hover {
+            border-color: ${accentRgba(0.30)};
+            transform: translateY(-2px);
           }
-          .archetype-card.locked {
-            border-color: ${accentRgba(0.5)};
-            background: ${accentRgba(0.10)};
+          /* Mirrored: right column flips its inner sigil to the right edge */
+          @media (min-width: 900px) {
+            .arch-card[data-side="right"] {
+              grid-template-columns: 1fr auto;
+              text-align: right;
+            }
+            .arch-card[data-side="right"] .arch-sigil-wrap { order: 2; }
+            .arch-card[data-side="right"] .arch-body { order: 1; }
+            .arch-card[data-side="right"] .arch-meta-row {
+              flex-direction: row-reverse;
+            }
+            .arch-card[data-side="right"] .arch-bullet-row {
+              justify-content: flex-end;
+            }
+          }
+          .arch-locked {
+            background: linear-gradient(180deg, ${accentRgba(0.10)}, ${accentRgba(0.03)});
+            border-color: ${accentRgba(0.35)};
           }
         `}</style>
 
-        <div className="archetype-grid">
-          {ARCHETYPES.map((a, i) => (
-            <motion.button
-              key={a.name}
-              type="button"
-              onClick={scrollToFinalCTA}
-              className="archetype-card"
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.35, delay: i * 0.04 }}
-            >
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  margin: "0 auto 10px",
-                  borderRadius: "50%",
-                  background: accentRgba(0.10),
-                  border: `1px solid ${accentRgba(0.22)}`,
-                  color: ACCENT,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+        <div className="arch-mirror">
+          {ARCHETYPES.map((a, i) => {
+            const side = i % 2 === 0 ? "left" : "right";
+            return (
+              <Reveal
+                key={a.serial}
+                delay={0.05 + i * 0.05}
+                offset={20}
+                direction={side === "left" ? "right" : "left"}
               >
-                <a.Icon size={26} strokeWidth={1.6} />
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-apercu), sans-serif",
-                  fontWeight: 600,
-                  fontSize: 14,
-                  color: TEXT_HI,
-                  marginBottom: 4,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {a.name}
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-apercu), sans-serif",
-                  fontSize: 12,
-                  color: TEXT_MID,
-                  lineHeight: 1.4,
-                }}
-              >
-                {a.blurb}
-              </div>
-            </motion.button>
-          ))}
+                <SpotlightCard as="article" className="arch-card" data-side={side}>
+                  <div className="arch-sigil-wrap">
+                    <ArchetypeSigil archetype={a.name} size={72} />
+                  </div>
+                  <div className="arch-body">
+                    <div
+                      className="arch-meta-row"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        marginBottom: 8,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "var(--font-jetbrains-mono), monospace",
+                          fontSize: 10,
+                          letterSpacing: "0.16em",
+                          color: TEXT_LO,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {a.serial}
+                      </span>
+                      <span
+                        aria-hidden
+                        style={{ color: TEXT_LO, fontSize: 10 }}
+                      >
+                        ·
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: "var(--font-jetbrains-mono), monospace",
+                          fontSize: 10,
+                          letterSpacing: "0.10em",
+                          textTransform: "uppercase",
+                          color: ACCENT,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {a.rarity} of users
+                      </span>
+                    </div>
+                    <h3
+                      style={{
+                        fontFamily: "var(--font-barlow-condensed), sans-serif",
+                        fontWeight: 900,
+                        fontStyle: "italic",
+                        fontSize: 28,
+                        letterSpacing: "-0.015em",
+                        color: TEXT_HI,
+                        lineHeight: 1.0,
+                        margin: "0 0 8px",
+                      }}
+                    >
+                      {a.name}
+                    </h3>
+                    <div
+                      className="arch-bullet-row"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 10,
+                          height: 1,
+                          background: ACCENT,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-apercu), sans-serif",
+                          fontSize: 12.5,
+                          color: TEXT_MID,
+                          letterSpacing: "-0.005em",
+                        }}
+                      >
+                        {a.signature}
+                      </span>
+                    </div>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-apercu), sans-serif",
+                        fontSize: 14,
+                        color: TEXT_MID,
+                        lineHeight: 1.55,
+                        margin: 0,
+                      }}
+                    >
+                      {a.hook}
+                    </p>
+                    <ArchetypeMicroMockup archetype={a.name} />
+                  </div>
+                </SpotlightCard>
+              </Reveal>
+            );
+          })}
+        </div>
 
-          {/* Locked "Yours" card */}
-          <motion.button
-            type="button"
-            onClick={scrollToFinalCTA}
-            className="archetype-card locked"
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.35, delay: ARCHETYPES.length * 0.04 }}
+        {/* Locked "Yours" — keystone tile, full-width below the mirror */}
+        <Reveal delay={0.05 + ARCHETYPES.length * 0.05} offset={14}>
+          <SpotlightCard
+            className="arch-card arch-locked"
+            intensity={0.22}
+            radius={520}
+            style={{
+              marginTop: 18,
+              gridTemplateColumns: "1fr",
+              gap: 18,
+              padding: 28,
+              alignItems: "center",
+              textAlign: "center",
+            }}
           >
             <div
               style={{
-                width: 64,
-                height: 64,
-                margin: "0 auto 10px",
-                borderRadius: "50%",
-                background: accentRgba(0.18),
-                border: `1px dashed ${accentRgba(0.5)}`,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                fontSize: 28,
-                fontFamily: "var(--font-barlow-condensed), sans-serif",
-                fontWeight: 800,
-                color: ACCENT,
+                gap: 6,
               }}
             >
-              ?
+              <ArchetypeSigil archetype="locked" size={84} />
+              <span
+                style={{
+                  fontFamily: "var(--font-jetbrains-mono), monospace",
+                  fontSize: 10,
+                  letterSpacing: "0.16em",
+                  color: ACCENT,
+                  textTransform: "uppercase",
+                  fontWeight: 600,
+                }}
+              >
+                ARC·07 · Locked
+              </span>
             </div>
-            <div
-              style={{
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontWeight: 600,
-                fontSize: 14,
-                color: ACCENT,
-                marginBottom: 4,
-              }}
-            >
-              Yours
+            <div style={{ maxWidth: 520, margin: "0 auto" }}>
+              <h3
+                style={{
+                  fontFamily: "var(--font-barlow-condensed), sans-serif",
+                  fontWeight: 900,
+                  fontStyle: "italic",
+                  fontSize: 32,
+                  letterSpacing: "-0.015em",
+                  color: TEXT_HI,
+                  lineHeight: 1.0,
+                  margin: "0 0 10px",
+                }}
+              >
+                Yours.
+              </h3>
+              <p
+                style={{
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontSize: 15,
+                  color: TEXT_MID,
+                  lineHeight: 1.55,
+                  margin: "0 0 22px",
+                }}
+              >
+                The quiz is seven questions. Your archetype, weekly cadence, and
+                first plan are ready before you finish your coffee — and you only
+                belong to one.
+              </p>
+              <Link
+                href="/quiz"
+                onClick={() => trackEvent("funnel_start", { source: "landing_archetype" })}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "12px 18px",
+                  borderRadius: 12,
+                  background: ACCENT,
+                  color: "#060912",
+                  fontFamily: "var(--font-apercu), sans-serif",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  textDecoration: "none",
+                }}
+              >
+                Unlock yours
+                <span aria-hidden style={{ fontFamily: "var(--font-jetbrains-mono), monospace" }}>→</span>
+              </Link>
             </div>
-            <div
-              style={{
-                fontFamily: "var(--font-apercu), sans-serif",
-                fontSize: 12,
-                color: TEXT_LO,
-                lineHeight: 1.4,
-              }}
-            >
-              Take the quiz to unlock
-            </div>
-          </motion.button>
-        </div>
+          </SpotlightCard>
+        </Reveal>
       </div>
     </section>
   );

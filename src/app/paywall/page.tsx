@@ -13,7 +13,7 @@ import { resolvePaywallVariant, type PaywallVariant } from "../components/paywal
 import { paywallCheckoutFootnote, PRICING, type SubscriptionPlanId } from "../data/pricing";
 import { useCheckoutOptions } from "../hooks/useCheckoutOptions";
 import { trackEvent } from "../quiz/utils/analytics";
-import { NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS_BORDER } from "@/app/theme";
+import { ACCENT, ACCENT_HOVER, NAVY, TEXT_HI, TEXT_MID, TEXT_LO, GLASS_BORDER, accentRgba } from "@/app/theme";
 
 const heading: React.CSSProperties = {
   fontFamily: "var(--font-apercu), sans-serif",
@@ -32,8 +32,8 @@ const bodyText: React.CSSProperties = {
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "var(--font-jetbrains-mono), monospace",
-  fontSize: 13,
-  letterSpacing: "0.12em",
+  fontSize: 11,
+  letterSpacing: "0.18em",
   textTransform: "uppercase" as const,
   color: TEXT_LO,
   margin: 0,
@@ -284,7 +284,11 @@ export default function PaywallPage() {
         background: NAVY,
         position: "relative",
         overflow: "hidden",
-      }}
+        // Override the per-intent --cta on the paywall — this is a critical
+        // conversion screen and consistency with the rest of the app
+        // (sage-mint accent everywhere) beats per-intent vibe-matching.
+        ["--cta" as string]: ACCENT,
+      } as React.CSSProperties}
     >
       {/* Background mesh */}
       <div
@@ -338,17 +342,33 @@ export default function PaywallPage() {
           }}
         >
           {/* Headline */}
+          <p
+            style={{
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: ACCENT,
+              margin: "0 0 14px",
+              textAlign: "center",
+            }}
+          >
+            ↳ Phase 1 unlocked
+          </p>
           <h1
             style={{
-              ...heading,
-              fontSize: 34,
-              lineHeight: 1.2,
+              fontFamily: "var(--font-barlow-condensed), sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(36px, 9vw, 48px)",
+              lineHeight: 1.0,
               textAlign: "center",
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.025em",
+              color: TEXT_HI,
+              margin: 0,
             }}
           >
             {userName ? `${userName}, your` : "Your"}{" "}
-            <span style={{ color: "var(--cta)" }}>plan is ready.</span>
+            <span style={{ fontStyle: "italic", color: "var(--cta)" }}>plan is ready.</span>
           </h1>
           <p
             style={{
@@ -403,25 +423,31 @@ export default function PaywallPage() {
             style={{
               width: "100%",
               maxWidth: 360,
-              padding: "18px 0",
-              borderRadius: 14,
+              padding: "16px 24px",
+              borderRadius: 12,
               border: "none",
               cursor: "pointer",
-              fontFamily: "var(--font-barlow-condensed), sans-serif",
-              fontWeight: 800,
-              fontSize: 17,
-              letterSpacing: "0.10em",
-              textTransform: "uppercase",
-              background:
-                "linear-gradient(115deg, color-mix(in srgb, var(--cta) 88%, #ffffff) 0%, var(--cta) 50%, color-mix(in srgb, var(--cta) 72%, #c5fff0) 100%)",
+              fontFamily: "var(--font-apercu), sans-serif",
+              fontWeight: 700,
+              fontSize: 15.5,
+              letterSpacing: "-0.005em",
+              background: `linear-gradient(180deg, ${ACCENT} 0%, ${ACCENT_HOVER} 100%)`,
               color: NAVY,
               marginTop: 28,
               opacity: checkoutLoading ? 0.6 : 1,
-              boxShadow:
-                "0 12px 44px color-mix(in srgb, var(--cta) 32%, transparent), 0 0 0 1px color-mix(in srgb, var(--cta) 28%, transparent)",
+              boxShadow: `0 1px 0 rgba(255,255,255,0.20) inset, 0 12px 28px -10px ${accentRgba(0.55)}`,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
             }}
           >
-            {checkoutLoading ? "Redirecting..." : "Start Free Now"}
+            {checkoutLoading ? "Redirecting…" : (
+              <>
+                Start free now
+                <span aria-hidden style={{ fontFamily: "var(--font-jetbrains-mono), monospace", fontSize: 12 }}>→</span>
+              </>
+            )}
           </button>
 
           {/* Price note — small, muted */}

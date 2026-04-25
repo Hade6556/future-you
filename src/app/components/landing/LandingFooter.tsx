@@ -61,7 +61,8 @@ export default function LandingFooter() {
                 maxWidth: 320,
               }}
             >
-              Your AI life coach for any ambition. Built around your real behavior.
+              90-day plans that re-pace around how you actually live. EU-hosted,
+              GDPR-private, and free to start.
             </p>
           </div>
           {COLUMNS.map((col) => (
