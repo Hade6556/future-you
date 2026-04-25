@@ -35,7 +35,7 @@ export default function MiniFAQ() {
   return (
     <section id="faq" style={{ paddingTop: 88, paddingBottom: 88, scrollMarginTop: 96 }}>
       <div className="landing-section-inner" style={{ maxWidth: 820 }}>
-        <Reveal offset={10}>
+        <Reveal>
           <div style={{ marginBottom: 36 }}>
             <p
               style={{
@@ -66,7 +66,7 @@ export default function MiniFAQ() {
           </div>
         </Reveal>
 
-        <Reveal offset={12} delay={0.08}>
+        <Reveal delay={0.08}>
           <Accordion
             className="border-y border-white/[0.06]"
             style={

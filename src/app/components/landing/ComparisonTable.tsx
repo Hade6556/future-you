@@ -44,7 +44,7 @@ export default function ComparisonTable() {
   return (
     <section style={{ paddingTop: 88, paddingBottom: 88 }}>
       <div className="landing-section-inner">
-        <Reveal offset={10}>
+        <Reveal>
           <div style={{ marginBottom: 36, maxWidth: 820 }}>
             <p
               style={{
@@ -88,7 +88,7 @@ export default function ComparisonTable() {
           </div>
         </Reveal>
 
-        <Reveal offset={14} delay={0.1}>
+        <Reveal delay={0.1}>
           <style>{`
             .cmp-table {
               position: relative;

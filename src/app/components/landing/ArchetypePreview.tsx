@@ -66,7 +66,7 @@ export default function ArchetypePreview() {
   return (
     <section id="archetypes" style={{ paddingTop: 96, paddingBottom: 96, scrollMarginTop: 96 }}>
       <div className="landing-section-inner">
-        <Reveal offset={10}>
+        <Reveal>
           <div style={{ maxWidth: 760, marginBottom: 56 }}>
             <p
               style={{
@@ -176,12 +176,7 @@ export default function ArchetypePreview() {
           {ARCHETYPES.map((a, i) => {
             const side = i % 2 === 0 ? "left" : "right";
             return (
-              <Reveal
-                key={a.serial}
-                delay={0.05 + i * 0.05}
-                offset={20}
-                direction={side === "left" ? "right" : "left"}
-              >
+              <Reveal key={a.serial} delay={0.05 + i * 0.05}>
                 <SpotlightCard as="article" className="arch-card" data-side={side}>
                   <div className="arch-sigil-wrap">
                     <ArchetypeSigil archetype={a.name} size={72} />
@@ -290,7 +285,7 @@ export default function ArchetypePreview() {
         </div>
 
         {/* Locked "Yours" — keystone tile, full-width below the mirror */}
-        <Reveal delay={0.05 + ARCHETYPES.length * 0.05} offset={14}>
+        <Reveal delay={0.05 + ARCHETYPES.length * 0.05}>
           <SpotlightCard
             className="arch-card arch-locked"
             intensity={0.22}

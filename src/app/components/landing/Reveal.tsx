@@ -33,13 +33,13 @@ export default function Reveal({
   className,
   style,
   delay = 0,
-  offset = 6,
+  // Default to no y/x motion. Any axial translation while the user is
+  // scrolling fights the scroll direction and feels like resistance.
+  // Pure opacity + blur fade is the safest scroll-reveal language.
+  // Callers can opt in with explicit offset > 0 if they need it.
+  offset = 0,
   blur = "3px",
   duration = 0.45,
-  // Default to "up" — elements start *below* their final position and rise
-  // into place. This matches the natural scroll-down motion; the previous
-  // "down" default made elements fall downward while scrolling down, which
-  // felt like resistance fighting the scroll.
   direction = "up",
   inViewMargin = "-12%",
   ...rest

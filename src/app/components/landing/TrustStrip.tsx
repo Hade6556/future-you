@@ -15,7 +15,7 @@ export default function TrustStrip() {
   return (
     <section style={{ paddingTop: 32, paddingBottom: 16 }}>
       <div className="landing-section-inner">
-        <Reveal offset={6}>
+        <Reveal>
           <div
             style={{
               display: "flex",

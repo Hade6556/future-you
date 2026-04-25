@@ -57,7 +57,7 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works" style={{ paddingTop: 88, paddingBottom: 88, scrollMarginTop: 96 }}>
       <div className="landing-section-inner">
-        <Reveal offset={10}>
+        <Reveal>
           <div style={{ marginBottom: 48, maxWidth: 760 }}>
             <p
               style={{
@@ -111,7 +111,7 @@ export default function HowItWorks() {
 
         <div>
           {STEPS.map((s, i) => (
-            <Reveal key={s.index} offset={12} delay={0.04 + i * 0.06}>
+            <Reveal key={s.index} delay={0.04 + i * 0.06}>
               <div className="hiw-row" data-reverse={s.reverse ? "true" : "false"}>
                 <div className="hiw-text">
                   <div

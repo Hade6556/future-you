@@ -59,7 +59,7 @@ export default function ProofStack() {
   return (
     <section style={{ paddingTop: 88, paddingBottom: 88 }}>
       <div className="landing-section-inner">
-        <Reveal offset={10}>
+        <Reveal>
           <div style={{ marginBottom: 48, maxWidth: 760 }}>
             <p
               style={{
@@ -126,7 +126,7 @@ export default function ProofStack() {
 
         <div className="proof-hero-grid">
           {HERO_QUOTES.map((q, i) => (
-            <Reveal key={q.name} offset={14} delay={0.04 + i * 0.06}>
+            <Reveal key={q.name} delay={0.04 + i * 0.06}>
               <figure className="proof-card" style={{ margin: 0 }}>
                 <div>
                   <span
@@ -228,7 +228,7 @@ export default function ProofStack() {
 
         <div className="proof-short-grid">
           {SHORT_QUOTES.map((s, i) => (
-            <Reveal key={s.name} offset={10} delay={0.05 + i * 0.04}>
+            <Reveal key={s.name} delay={0.05 + i * 0.04}>
               <div
                 style={{
                   padding: "16px 18px",

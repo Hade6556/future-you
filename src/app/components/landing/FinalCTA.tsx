@@ -29,7 +29,7 @@ export default function FinalCTA() {
         className="landing-section-inner"
         style={{ maxWidth: 760, position: "relative" }}
       >
-        <Reveal offset={14}>
+        <Reveal>
           <p
             style={{
               fontFamily: "var(--font-jetbrains-mono), monospace",
@@ -71,7 +71,7 @@ export default function FinalCTA() {
           </p>
         </Reveal>
 
-        <Reveal offset={10} delay={0.1}>
+        <Reveal delay={0.1}>
           <div
             style={{
               display: "flex",
