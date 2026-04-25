@@ -33,19 +33,20 @@ export default function Reveal({
   className,
   style,
   delay = 0,
-  // Default to no y/x motion. Any axial translation while the user is
-  // scrolling fights the scroll direction and feels like resistance.
-  // Pure opacity + blur fade is the safest scroll-reveal language.
-  // Callers can opt in with explicit offset > 0 if they need it.
+  // No axial motion. Pure opacity + blur fade is the safest scroll-reveal
+  // language — anything else fights the scroll direction.
   offset = 0,
   blur = "3px",
   duration = 0.45,
   direction = "up",
-  inViewMargin = "-12%",
+  // 0px margin: trigger as the element's edge crosses the viewport edge.
+  // Combined with once:true, this fades elements in cleanly the first time
+  // they enter view; scrolling back never re-runs the animation.
+  inViewMargin = "0px",
   ...rest
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { margin: inViewMargin });
+  const inView = useInView(ref, { margin: inViewMargin, once: true });
 
   const isVertical = direction === "up" || direction === "down";
   // Match BlurFade's sign convention: "down" / "right" enter from the negative axis.
