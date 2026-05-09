@@ -311,7 +311,7 @@ export default function OnboardingPage() {
                 value={locationInput}
                 onChange={(e) => setLocationInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && canProceed && handleNext()}
-                placeholder="e.g. Vilnius, Lithuania"
+                placeholder="e.g. Austin, Texas"
                 autoFocus
                 style={ONBOARDING_INPUT}
               />

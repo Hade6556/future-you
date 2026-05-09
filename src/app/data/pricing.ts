@@ -10,7 +10,7 @@ export const PRICING = {
       emoji: "✨",
       tagline: "Best value after your trial",
       /** Shown after trial — match your Stripe price */
-      priceLine: "€44/year",
+      priceLine: "$49/year",
       recommended: true,
     },
     pro_monthly: {
@@ -19,12 +19,12 @@ export const PRICING = {
       emoji: "⚡",
       tagline: "Flexible month to month",
       /** Shown after trial — match your Stripe price */
-      priceLine: "€9.99/month",
+      priceLine: "$11.99/month",
       recommended: false,
     },
   },
   /** Shown when both plans are offered */
-  annualSavingsHint: "Save 63% — €44/year (≈ €0.85/week) vs €120 if billed monthly",
+  annualSavingsHint: "Save 66% — $49/year (≈ $0.94/week) vs $144 if billed monthly",
 } as const;
 
 /** Large headline inside plan cards (trial-first paywall). */

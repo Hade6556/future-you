@@ -304,7 +304,7 @@ export default function AccountPage() {
                 onChange={(e) => setEditLocation(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveLocation()}
                 maxLength={80}
-                placeholder="e.g. Vilnius, Lithuania"
+                placeholder="e.g. Austin, Texas"
                 style={inputStyle}
               />
               <button

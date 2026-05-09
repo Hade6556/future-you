@@ -14,21 +14,21 @@ type Person = {
 };
 
 const PEOPLE_POOL: Person[] = [
-  { photo: "/mock/people/maya-r.png",     name: "Maya R.",   city: "Berlin",     archetype: "Strategist",       goalArea: "Health" },
-  { photo: "/mock/people/mateo-a.jpg",    name: "Mateo A.",  city: "Madrid",     archetype: "Guardian",         goalArea: "Finance" },
-  { photo: "/mock/people/james-k.png",    name: "James K.",  city: "London",     archetype: "Endurance Engine", goalArea: "Career" },
-  { photo: "/mock/people/sarah-jones.jpg",name: "Sarah J.",  city: "Dublin",     archetype: "Steady Builder",   goalArea: "Mindset" },
-  { photo: "/mock/people/priya-m.png",    name: "Priya M.",  city: "Bristol",    archetype: "Explorer",         goalArea: "Health" },
-  { photo: "/mock/people/david-kim.jpg",  name: "David K.",  city: "Seoul",      archetype: "Creative Spark",   goalArea: "Career" },
-  { photo: "/mock/people/nina-patel.jpg", name: "Nina P.",   city: "Toronto",    archetype: "Guardian",         goalArea: "Finance" },
-  { photo: "/mock/people/alex-chen.jpg",  name: "Alex C.",   city: "Singapore",  archetype: "Strategist",       goalArea: "Career" },
-  { photo: "/mock/people/amara-okafor.jpg", name: "Amara O.", city: "Lagos",     archetype: "Endurance Engine", goalArea: "Health" },
-  { photo: "/mock/people/carlos-garcia.jpg", name: "Carlos G.", city: "México",  archetype: "Steady Builder",   goalArea: "Mindset" },
-  { photo: "/mock/people/emma-wilson.jpg",name: "Emma W.",   city: "Auckland",   archetype: "Creative Spark",   goalArea: "Career" },
-  { photo: "/mock/people/kenji-sato.jpg", name: "Kenji S.",  city: "Tokyo",      archetype: "Explorer",         goalArea: "Health" },
-  { photo: "/mock/people/marco-t.png",    name: "Marco T.",  city: "Milan",      archetype: "Strategist",       goalArea: "Finance" },
-  { photo: "/mock/people/sofia-a.png",    name: "Sofia A.",  city: "Lisbon",     archetype: "Guardian",         goalArea: "Mindset" },
-  { photo: "/mock/people/priya-menon.jpg",name: "Priya M.",  city: "Bangalore",  archetype: "Steady Builder",   goalArea: "Career" },
+  { photo: "/mock/people/maya-r.png",     name: "Maya R.",   city: "Brooklyn",   archetype: "Strategist",       goalArea: "Health" },
+  { photo: "/mock/people/mateo-a.jpg",    name: "Mateo A.",  city: "Austin",     archetype: "Guardian",         goalArea: "Finance" },
+  { photo: "/mock/people/james-k.png",    name: "James K.",  city: "Chicago",    archetype: "Endurance Engine", goalArea: "Career" },
+  { photo: "/mock/people/sarah-jones.jpg",name: "Sarah J.",  city: "Boston",     archetype: "Steady Builder",   goalArea: "Mindset" },
+  { photo: "/mock/people/priya-m.png",    name: "Priya M.",  city: "Seattle",    archetype: "Explorer",         goalArea: "Health" },
+  { photo: "/mock/people/david-kim.jpg",  name: "David K.",  city: "Los Angeles",archetype: "Creative Spark",   goalArea: "Career" },
+  { photo: "/mock/people/nina-patel.jpg", name: "Nina P.",   city: "Atlanta",    archetype: "Guardian",         goalArea: "Finance" },
+  { photo: "/mock/people/alex-chen.jpg",  name: "Alex C.",   city: "San Francisco", archetype: "Strategist",    goalArea: "Career" },
+  { photo: "/mock/people/amara-okafor.jpg", name: "Amara O.", city: "Houston",   archetype: "Endurance Engine", goalArea: "Health" },
+  { photo: "/mock/people/carlos-garcia.jpg", name: "Carlos G.", city: "Miami",   archetype: "Steady Builder",   goalArea: "Mindset" },
+  { photo: "/mock/people/emma-wilson.jpg",name: "Emma W.",   city: "Denver",     archetype: "Creative Spark",   goalArea: "Career" },
+  { photo: "/mock/people/kenji-sato.jpg", name: "Kenji S.",  city: "Portland",   archetype: "Explorer",         goalArea: "Health" },
+  { photo: "/mock/people/marco-t.png",    name: "Marco T.",  city: "Philadelphia", archetype: "Strategist",     goalArea: "Finance" },
+  { photo: "/mock/people/sofia-a.png",    name: "Sofia A.",  city: "Nashville",  archetype: "Guardian",         goalArea: "Mindset" },
+  { photo: "/mock/people/priya-menon.jpg",name: "Priya M.",  city: "San Diego",  archetype: "Steady Builder",   goalArea: "Career" },
 ];
 
 const VERBS = [

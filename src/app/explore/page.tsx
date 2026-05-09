@@ -163,7 +163,7 @@ export default function ExplorePage() {
                   fetchEvents();
                 }
               }}
-              placeholder="Your city (e.g. Vilnius)"
+              placeholder="Your city (e.g. Austin)"
               style={{
                 flex: 1,
                 background: "rgba(255,255,255,0.04)",

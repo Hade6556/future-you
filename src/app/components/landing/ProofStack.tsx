@@ -18,20 +18,20 @@ type HeroQuote = {
 const HERO_QUOTES: HeroQuote[] = [
   {
     photo: "/mock/people/maya-r.png",
-    pull: "Down 9kg in 11 weeks.",
+    pull: "Down 21 lbs in 11 weeks.",
     body: "First time it stuck. The plan adjusted itself the days I couldn't show up — so I never spiralled into 'forget it, start Monday' again.",
     name: "Maya R.",
-    city: "Berlin",
+    city: "Brooklyn",
     archetype: "Strategist",
     outcome: "Health · Day 84",
     day: 84,
   },
   {
     photo: "/mock/people/mateo-a.jpg",
-    pull: "Saved €4,200 in eight weeks.",
+    pull: "Saved $4,800 in eight weeks.",
     body: "It's just spreadsheets and caps — nothing exotic. Behavio's job is making me actually open the thing every night. That's the whole trick.",
     name: "Mateo A.",
-    city: "Madrid",
+    city: "Austin",
     archetype: "Guardian",
     outcome: "Finance · Day 58",
     day: 58,
@@ -41,7 +41,7 @@ const HERO_QUOTES: HeroQuote[] = [
     pull: "Got the promotion I'd been chasing for two years.",
     body: "The daily action was tiny — 25 minutes, every weekday. But it stayed on the calendar even on weeks I was sure I'd skip. That's why it worked.",
     name: "James K.",
-    city: "London",
+    city: "Chicago",
     archetype: "Endurance Engine",
     outcome: "Career · Day 67",
     day: 67,
@@ -50,7 +50,7 @@ const HERO_QUOTES: HeroQuote[] = [
 
 const SHORT_QUOTES = [
   { photo: "/mock/people/sarah-jones.jpg", name: "Sarah J.", outcome: "84-day journaling streak. Never made it past week 3 before.", tag: "Mindset · Steady Builder" },
-  { photo: "/mock/people/priya-m.png", name: "Priya M.", outcome: "First 10K at 38, started at 1km in week 1.", tag: "Health · Explorer" },
+  { photo: "/mock/people/priya-m.png", name: "Priya M.", outcome: "First 10K at 38, started at 1mi in week 1.", tag: "Health · Explorer" },
   { photo: "/mock/people/david-kim.jpg", name: "David K.", outcome: "Shipped six side-project pieces in a quarter.", tag: "Career · Creative Spark" },
   { photo: "/mock/people/nina-patel.jpg", name: "Nina P.", outcome: "Cut spend 22%, didn't track a single transaction manually.", tag: "Finance · Guardian" },
 ];

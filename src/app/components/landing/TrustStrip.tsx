@@ -6,7 +6,7 @@ import { TEXT_MID, TEXT_LO } from "@/app/theme";
 const SIGNALS = [
   "4.9 ★ App Store",
   "Trustpilot 4.8",
-  "GDPR-private · EU-hosted",
+  "Privacy-first · CCPA-compliant",
   "No card to start",
   "Cancel anytime",
 ];

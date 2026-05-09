@@ -61,8 +61,8 @@ export default function LandingFooter() {
                 maxWidth: 320,
               }}
             >
-              90-day plans that re-pace around how you actually live. EU-hosted,
-              GDPR-private, and free to start.
+              90-day plans that re-pace around how you actually live. US-hosted,
+              privacy-first, and free to start.
             </p>
           </div>
           {COLUMNS.map((col) => (

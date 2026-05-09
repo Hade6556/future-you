@@ -27,7 +27,7 @@ const FAQ = [
   },
   {
     q: "Where does my data live?",
-    a: "EU-hosted (Frankfurt). GDPR-compliant. We don't sell behavioral data, ever. You can export everything in a single zip and delete your account from settings.",
+    a: "US-hosted (Virginia, AWS us-east-1). CCPA-compliant. We don't sell behavioral data, ever. You can export everything in a single zip and delete your account from settings.",
   },
 ];
 

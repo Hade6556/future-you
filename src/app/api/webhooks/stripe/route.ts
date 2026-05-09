@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         // those with a 3-day trial; predicted_ltv = the post-trial price so
         // Meta can optimise toward high-LTV users early).
         const amountTotalCents = session.amount_total ?? 0;
-        const currency = (session.currency ?? "eur").toUpperCase();
+        const currency = (session.currency ?? "usd").toUpperCase();
         const plan = planIdFromMetadata(session.metadata);
         const email =
           session.customer_details?.email ??
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
         }
 
         const value = invoice.amount_paid / 100;
-        const currency = (invoice.currency ?? "eur").toUpperCase();
+        const currency = (invoice.currency ?? "usd").toUpperCase();
 
         await sendMetaEvent({
           eventName: "Subscribe",

@@ -8,9 +8,9 @@ import { ACCENT, TEXT_HI, TEXT_MID, TEXT_LO } from "@/app/theme";
 
 const PLACEHOLDER_BY_AREA: Record<GoalArea, string> = {
   "Career & Purpose":
-    "e.g. Land a senior PM role at a B2B SaaS company by August. Lead a team of 4. Compensation €110k+.",
+    "e.g. Land a senior PM role at a B2B SaaS company by August. Lead a team of 4. Compensation $140k+.",
   "Money & Financial Freedom":
-    "e.g. Save €8,000 toward a down payment by cutting subscriptions and adding a €600/mo side income.",
+    "e.g. Save $10,000 toward a down payment by cutting subscriptions and adding a $700/mo side income.",
   "Relationships & Connection":
     "e.g. Stop being the friend who flakes — start a weekly call with my brother and rebuild two friendships.",
   "Health & Energy":
